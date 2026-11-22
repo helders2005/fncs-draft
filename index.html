@@ -771,10 +771,10 @@
       {
         id: "vanyak3k", name: "Vanyak3k",
         seasons: {
-          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 78, stats: { igling: 72, mechanics: 83, clutch: 77 }, note: "Emerging EU mechanical talent" },
-          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 78, mechanics: 91, clutch: 85 }, note: "Breakout EU Grand Finals fragger" },
-          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 92, stats: { igling: 82, mechanics: 95, clutch: 91 }, note: "Back-to-back C5 Major 1 & Major 2 EU Champion" },
-          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 94, stats: { igling: 84, mechanics: 96, clutch: 93 }, note: "C6 Major 2 EU Champion & 2nd at Lyon LAN" }
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 78, stats: { igling: 80, mechanics: 79, clutch: 77 }, note: "Emerging EU IGL & mechanical talent" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 86, stats: { igling: 87, mechanics: 87, clutch: 85 }, note: "Breakout EU Grand Finals IGL" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 92, stats: { igling: 93, mechanics: 92, clutch: 91 }, note: "Back-to-back C5 Major 1 & Major 2 EU Champion" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 94, stats: { igling: 95, mechanics: 94, clutch: 93 }, note: "C6 Major 2 EU Champion & 2nd at Lyon LAN" }
         }
       },
       {
@@ -1349,36 +1349,36 @@
     }
 
     // ==========================================
-    // 5. SIMULATION ENGINE (2025 GLOBAL CHAMPIONSHIP FORMAT)
+    // 5. SIMULATION ENGINE (REALISTIC 2025 GLOBAL CHAMPIONSHIP PACING)
     // ==========================================
     function bellRandom(spread) {
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
     }
 
     function simulateSingleMatch(teamStats, sharedRng, isStreakMode) {
-      const rng = sharedRng !== null ? sharedRng : bellRandom(10.5);
+      const rng = sharedRng !== null ? sharedRng : bellRandom(12.5);
       const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + rng;
 
-      // In Streak Mode, widen VR threshold slightly so god-squads can realistically chase 12-0
-      const vrCutoff = isStreakMode ? 94.2 : 96.5;
+      // Calibrated so a 12-game FNCS Champion lands around 550–700 pts (like Lyon 2025's 664 pts)
+      const vrCutoff = isStreakMode ? 94.2 : 98.4;
 
       let placement, elims;
 
       if (perf >= vrCutoff) {
         placement = 1;
-        elims = Math.max(5, Math.round((teamStats.mech - 74) * 0.45) + Math.floor(Math.random() * 4) + 2);
-      } else if (perf >= 91.5) {
-        placement = Math.random() < 0.5 ? 2 : 3;
-        elims = Math.max(2, Math.round((teamStats.mech - 76) * 0.25) + Math.floor(Math.random() * 3) + 1);
-      } else if (perf >= 86.0) {
+        elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1);
+      } else if (perf >= 94.2) {
+        placement = Math.random() < 0.45 ? 2 : 3;
+        elims = Math.max(2, Math.round((teamStats.mech - 80) * 0.18) + Math.floor(Math.random() * 2));
+      } else if (perf >= 89.2) {
         placement = Math.floor(Math.random() * 7) + 4; // 4th - 10th
-        elims = Math.max(1, Math.round((teamStats.mech - 78) * 0.16) + Math.floor(Math.random() * 2));
-      } else if (perf >= 79.5) {
+        elims = Math.max(0, Math.round((teamStats.mech - 82) * 0.12) + Math.floor(Math.random() * 2));
+      } else if (perf >= 83.2) {
         placement = Math.floor(Math.random() * 10) + 11; // 11th - 20th
-        elims = Math.max(0, Math.round((teamStats.mech - 80) * 0.10) + Math.floor(Math.random() * 2));
+        elims = Math.max(0, Math.round((teamStats.mech - 84) * 0.08) + (Math.random() < 0.45 ? 1 : 0));
       } else {
         placement = Math.floor(Math.random() * 13) + 21; // 21st - 33rd (0 placement pts)
-        elims = Math.floor(Math.random() * 2);
+        elims = Math.random() < 0.35 ? 1 : 0;
       }
 
       const placePts = FNCS_2025_PLACEMENT_PTS[placement] || 0;
@@ -1505,7 +1505,7 @@
           : "Grand Finals Live (2025 Global Scoring: 65pt VR • 4pt/Kill)...";
 
       simTimer = setInterval(() => {
-        const sharedRng = bellRandom(10.5);
+        const sharedRng = bellRandom(12.5);
         const r1 = simulateSingleMatch(p1Stats, sharedRng, mode === "streak");
         p1Total += r1.points;
         if (r1.isWin) p1Wins++;
@@ -1539,10 +1539,10 @@
           if (mode === "finals") {
             let lobbyWinnerAssigned = r1.isWin;
             rivalTeams.forEach(rival => {
-              const rivalRng = bellRandom(8.5);
+              const rivalRng = bellRandom(11.5);
               const res = simulateSingleMatch(rival.stats, rivalRng, false);
               if (res.isWin && lobbyWinnerAssigned) {
-                rival.pts += Math.max(56, res.points - 9);
+                rival.pts += Math.max(52, res.points - 13);
               } else {
                 if (res.isWin) lobbyWinnerAssigned = true;
                 rival.pts += res.points;
