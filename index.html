@@ -314,6 +314,40 @@
       background: rgba(239, 68, 68, 0.12);
     }
 
+    .leaderboard-box {
+      margin-top: 16px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      animation: fadeIn 0.3s ease;
+    }
+    .lb-title {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .lb-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+    .lb-table th, .lb-table td {
+      padding: 7px 8px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .lb-table th { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
+    .lb-table tr.user-row {
+      background: rgba(56, 189, 248, 0.16);
+      color: #fff;
+      font-weight: 800;
+    }
+    .lb-table tr.user-row td:first-child { color: var(--accent); }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -415,6 +449,7 @@
       </div>
       <div class="banner banner-running" id="simBanner">Simulating matches...</div>
       <div class="match-log" id="matchLog"></div>
+      <div id="leaderboardContainer"></div>
     </div>
   </div>
 
@@ -874,7 +909,6 @@
         id: "shxrk", name: "Shxrk",
         seasons: {
           "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 79, stats: { igling: 73, mechanics: 84, clutch: 78 }, note: "Emerging EU Grand Finals fragger" },
-          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 79, mechanics: 90, clutch: 85 }, note: "Consistent EU Major finalist" },
           "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 82, mechanics: 92, clutch: 88 }, note: "Top EU Major contender" },
           "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 94, stats: { igling: 86, mechanics: 96, clutch: 94 }, note: "2nd at 2026 Antwerp Global LAN (2 pts off 1st)" }
         }
@@ -1102,6 +1136,21 @@
       ["muz", "volx"]
     ];
 
+    const RIVAL_SQUADS = [
+      "Queasy • SwizzY • Merstach",
+      "Peterbot • Pollo • Cold",
+      "Veno • vic0 • Flickzy",
+      "Acorn • Boltz • Ajerss",
+      "Malibuca • Kami • Setty",
+      "TaySon • Th0masHD • Hen",
+      "Shxrk • T3eny • Tjino",
+      "Clix • Rapid • Khanada",
+      "Mero • Cooper • Reet",
+      "Sky • Scroll • Pixie",
+      "K1nG • Phzin • Fazer",
+      "Koyota • Yuma • Rise"
+    ];
+
     // ==========================================
     // 2. GAME STATE
     // ==========================================
@@ -1126,6 +1175,7 @@
     const simPanel = document.getElementById("simPanel");
     const simBanner = document.getElementById("simBanner");
     const matchLog = document.getElementById("matchLog");
+    const leaderboardContainer = document.getElementById("leaderboardContainer");
     const summaryScore = document.getElementById("summaryScore");
     const pvpBanner = document.getElementById("pvpBanner");
 
@@ -1354,10 +1404,69 @@
       };
     }
 
+    function renderGrandFinalsLeaderboard(userRoster, userPts, userWins, aiTarget) {
+      const userNames = userRoster.map(p => p.name).join(" • ");
+
+      // Pick 11 rival trios and distribute scores realistically down from aiTarget
+      const shuffled = [...RIVAL_SQUADS].sort(() => Math.random() - 0.5).slice(0, 11);
+      const standings = shuffled.map((squad, idx) => {
+        const drop = idx === 0
+          ? 0
+          : Math.round((idx * 34) + (Math.random() * 22));
+        const pts = Math.max(180, aiTarget - drop);
+        const wins = idx === 0
+          ? Math.floor(Math.random() * 2) + 2
+          : (pts >= aiTarget - 75 ? Math.floor(Math.random() * 2) + 1 : (Math.random() < 0.35 ? 1 : 0));
+        return { squad, pts, wins, isUser: false };
+      });
+
+      // Add the player's squad and sort descending by points (tiebreaker: Victory Royales)
+      standings.push({ squad: `${userNames} (YOU)`, pts: userPts, wins: userWins, isUser: true });
+      standings.sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
+
+      const userRank = standings.findIndex(s => s.isUser) + 1;
+      const top8 = standings.slice(0, 8);
+      if (userRank > 8) {
+        top8.push({ ...standings[userRank - 1], customRank: userRank });
+      }
+
+      const rowsHtml = top8.map((row, idx) => {
+        const rank = row.customRank || (idx + 1);
+        return `
+          <tr class="${row.isUser ? "user-row" : ""}">
+            <td>#${rank}</td>
+            <td>${row.squad}</td>
+            <td>${row.wins} VR</td>
+            <td><strong>${row.pts} pts</strong></td>
+          </tr>
+        `;
+      }).join("");
+
+      leaderboardContainer.innerHTML = `
+        <div class="leaderboard-box">
+          <div class="lb-title">Final Lobby Standings — Top 8 Trio Leaderboard</div>
+          <table class="lb-table">
+            <thead>
+              <tr>
+                <th>Place</th>
+                <th>Trio Roster</th>
+                <th>Wins</th>
+                <th>Total Points</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </div>
+      `;
+
+      return userRank;
+    }
+
     function runSimulation() {
       if (simTimer) clearInterval(simTimer);
       simPanel.classList.add("visible");
       matchLog.innerHTML = "";
+      leaderboardContainer.innerHTML = "";
       summaryScore.textContent = "";
       simBtn.disabled = true;
 
@@ -1435,9 +1544,10 @@
             simBanner.className = "banner banner-win";
             simBanner.innerHTML = `<span>${winnerText}</span><button class="btn-secondary" onclick="resetDraft()">Rematch</button>`;
           } else {
-            const won = p1Total >= aiTarget;
+            const finalRank = renderGrandFinalsLeaderboard(p1Roster, p1Total, p1Wins, aiTarget);
+            const won = finalRank === 1;
             simBanner.className = `banner ${won ? "banner-win" : "banner-loss"}`;
-            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! ${p1Total} pts beat AI Leader (${aiTarget} pts)` : `2nd Place Finish — ${p1Total} pts fell short of AI Leader (${aiTarget} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
+            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! #1 Finish with ${p1Total} pts` : `#${finalRank} Place Finish — ${p1Total} pts (1st Place: ${aiTarget} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
           }
         }
 
@@ -1548,6 +1658,7 @@
       hasSpun = false;
       eraVal.textContent = "Ready to Spin";
       regionVal.textContent = "—";
+      leaderboardContainer.innerHTML = "";
       simPanel.classList.remove("visible");
 
       if (mode === "pvp") {
