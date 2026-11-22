@@ -420,7 +420,7 @@
 
   <script>
     // ==========================================
-    // 1. MULTI-ERA 38-PLAYER FNCS DATABASE
+    // 1. MULTI-ERA 53-PLAYER FNCS DATABASE
     // ==========================================
     const ERAS = [
       "Chapter 2 (2019-2021)",
@@ -869,6 +869,195 @@
           "Chapter 6 (2025)": { region: "NAC", role: "IGL", overall: 87, stats: { igling: 89, mechanics: 85, clutch: 87 }, note: "18th at 2025 Lyon Global LAN" },
           "Chapter 7 (2026)": { region: "NAC", role: "IGL", overall: 89, stats: { igling: 91, mechanics: 87, clutch: 89 }, note: "Top-10 at 2026 Antwerp Global LAN" }
         }
+      },
+      {
+        id: "shxrk", name: "Shxrk",
+        seasons: {
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 79, stats: { igling: 73, mechanics: 84, clutch: 78 }, note: "Emerging EU Grand Finals fragger" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 79, mechanics: 90, clutch: 85 }, note: "Consistent EU Major finalist" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 82, mechanics: 92, clutch: 88 }, note: "Top EU Major contender" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 94, stats: { igling: 86, mechanics: 96, clutch: 94 }, note: "2nd at 2026 Antwerp Global LAN (2 pts off 1st)" }
+        }
+      },
+      {
+        id: "t3eny", name: "T3eny",
+        seasons: {
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 78, stats: { igling: 80, mechanics: 78, clutch: 77 }, note: "Early EU qualifier appearances" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 85, stats: { igling: 87, mechanics: 83, clutch: 85 }, note: "Breakout EU Major finalist" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 88, stats: { igling: 90, mechanics: 86, clutch: 88 }, note: "EU Major top-10 IGL" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 95, mechanics: 91, clutch: 93 }, note: "2nd at 2026 Antwerp Global LAN with Shxrk" }
+        }
+      },
+      {
+        id: "tjino", name: "Tjino",
+        seasons: {
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 82, stats: { igling: 76, mechanics: 86, clutch: 81 }, note: "Rising EU mechanical talent" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 88, stats: { igling: 81, mechanics: 92, clutch: 87 }, note: "Breakout EU Major contender" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 92, stats: { igling: 84, mechanics: 95, clutch: 91 }, note: "7th at Antwerp Global LAN (#1 elims) & C7 Solo Champ" }
+        }
+      },
+      {
+        id: "pablowingu", name: "PabloWingu",
+        seasons: {
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 80, stats: { igling: 82, mechanics: 79, clutch: 79 }, note: "Early EU Grand Finals qualifier" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 86, stats: { igling: 88, mechanics: 84, clutch: 86 }, note: "Consistent EU Major IGL" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 90, stats: { igling: 92, mechanics: 88, clutch: 90 }, note: "7th at 2026 Antwerp Global LAN with Tjino" }
+        }
+      },
+      {
+        id: "chap", name: "Chap",
+        seasons: {
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 81, stats: { igling: 83, mechanics: 80, clutch: 80 }, note: "Emerging EU Grand Finals IGL" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 85, stats: { igling: 87, mechanics: 83, clutch: 85 }, note: "Consistent EU Major qualifier" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 86, stats: { igling: 88, mechanics: 84, clutch: 86 }, note: "C6 Major 3 EU Grand Finalist with MrSavage" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 88, stats: { igling: 90, mechanics: 86, clutch: 88 }, note: "1st in EU Last Chance Finals; 21st at Antwerp LAN" }
+        }
+      },
+      {
+        id: "rezon", name: "Rezon ay",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 80, mechanics: 93, clutch: 88 }, note: "Iconic EU Trio boxfighter alongside Vadeal & Noahreyli" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 79, mechanics: 90, clutch: 85 }, note: "Top EU Duo Grand Finalist" },
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 83, stats: { igling: 78, mechanics: 86, clutch: 82 }, note: "Veteran EU Major competitor" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 82, stats: { igling: 78, mechanics: 85, clutch: 81 }, note: "C6 Major 3 EU Grand Finalist" }
+        }
+      },
+      {
+        id: "noahreyli", name: "Noahreyli",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 79, mechanics: 94, clutch: 88 }, note: "Elite Chapter 2 EU mechanical fragger" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 85, stats: { igling: 78, mechanics: 89, clutch: 84 }, note: "EU Duo Grand Finals regular" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 80, stats: { igling: 76, mechanics: 83, clutch: 79 }, note: "Veteran EU qualifier" }
+        }
+      },
+      {
+        id: "ritual", name: "Ritual",
+        seasons: {
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 77, stats: { igling: 76, mechanics: 79, clutch: 77 }, note: "Early NAE qualifier runs" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 85, mechanics: 86, clutch: 87 }, note: "9th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 87, stats: { igling: 86, mechanics: 87, clutch: 88 }, note: "12th at 2024 Fort Worth Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 91, stats: { igling: 89, mechanics: 91, clutch: 92 }, note: "Won C6 Major 2 & Major 3 NAC with Peterbot & Cold" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 89, stats: { igling: 88, mechanics: 89, clutch: 90 }, note: "11th at 2026 Antwerp Global LAN with Cold" }
+        }
+      },
+      {
+        id: "ajerss", name: "Ajerss",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 83, stats: { igling: 82, mechanics: 84, clutch: 83 }, note: "Consistent NAE Grand Finals support" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 86, stats: { igling: 85, mechanics: 86, clutch: 87 }, note: "Top NAE Duo Grand Finalist" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 90, stats: { igling: 88, mechanics: 90, clutch: 91 }, note: "C4 Major 3 NAC Champion with Khanada" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 86, mechanics: 86, clutch: 86 }, note: "16th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 90, stats: { igling: 89, mechanics: 90, clutch: 91 }, note: "C6 Major 1 NAC Champion with Acorn & Pollo" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 85, stats: { igling: 85, mechanics: 85, clutch: 85 }, note: "Qualified for 2026 Antwerp LAN with Veno" }
+        }
+      },
+      {
+        id: "curve", name: "Curve",
+        seasons: {
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 80, stats: { igling: 74, mechanics: 84, clutch: 79 }, note: "Rising NAC mechanical prospect" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 86, stats: { igling: 79, mechanics: 90, clutch: 85 }, note: "Breakout NAC Major finalist" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 90, stats: { igling: 83, mechanics: 93, clutch: 89 }, note: "C7 Major 1 NA Champion & 10th at Antwerp LAN" }
+        }
+      },
+      {
+        id: "eomzo", name: "Eomzo",
+        seasons: {
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 78, stats: { igling: 76, mechanics: 80, clutch: 78 }, note: "Early NAE Grand Finals qualifier" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 84, stats: { igling: 83, mechanics: 85, clutch: 84 }, note: "Consistent NAC Major finalist" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 85, mechanics: 87, clutch: 86 }, note: "Top-15 NAC Major regular" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 87, stats: { igling: 86, mechanics: 88, clutch: 87 }, note: "18th at 2025 Lyon Global LAN with Clix & Higgs" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 85, stats: { igling: 84, mechanics: 86, clutch: 85 }, note: "Qualified for 2026 Antwerp Global LAN" }
+        }
+      },
+      {
+        id: "dukez", name: "Dukez",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 87, stats: { igling: 84, mechanics: 88, clutch: 88 }, note: "C2S7 NAE FNCS Champion with Justice & Userz" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 85, stats: { igling: 83, mechanics: 86, clutch: 86 }, note: "Consistent NAE Duo finalist" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 84, mechanics: 87, clutch: 87 }, note: "Top-10 NAC Major regular" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 87, stats: { igling: 85, mechanics: 88, clutch: 88 }, note: "Veteran NAC Major Grand Finalist" }
+        }
+      },
+      {
+        id: "cented", name: "Cented",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "IGL", overall: 90, stats: { igling: 93, mechanics: 87, clutch: 90 }, note: "4x consecutive NAE FNCS 2nd place finishes" },
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 83, clutch: 84 }, note: "Top NAE Duo IGL" }
+        }
+      },
+      {
+        id: "edgey", name: "Edgey",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 89, stats: { igling: 88, mechanics: 88, clutch: 91 }, note: "Multiple NAE FNCS podium finishes" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 90, stats: { igling: 89, mechanics: 89, clutch: 92 }, note: "C3S2 NAE FNCS Champion with Acorn" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 83, stats: { igling: 84, mechanics: 82, clutch: 83 }, note: "Veteran NAC Grand Finals support" }
+        }
+      },
+      {
+        id: "reverse2k", name: "Reverse2k",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "IGL", overall: 89, stats: { igling: 92, mechanics: 83, clutch: 90 }, note: "2x NAE FNCS Champion (C2S4 & C2S6) with Mero & Deyy" },
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 80, stats: { igling: 84, mechanics: 77, clutch: 80 }, note: "Late-career NAE qualifier runs" }
+        }
+      },
+      {
+        id: "stretch", name: "Stretch",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 90, stats: { igling: 86, mechanics: 92, clutch: 90 }, note: "C2S2 NAE Champion with Zayt & Saf" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 83, stats: { igling: 82, mechanics: 85, clutch: 82 }, note: "NAE Duo Grand Finalist" }
+        }
+      },
+      {
+        id: "fazer", name: "Fazer",
+        seasons: {
+          "Chapter 3 (2022)": { region: "BR", role: "IGL", overall: 83, stats: { igling: 85, mechanics: 81, clutch: 83 }, note: "Rising Brazil Grand Finals IGL" },
+          "Chapter 4 (2023)": { region: "BR", role: "IGL", overall: 90, stats: { igling: 92, mechanics: 87, clutch: 90 }, note: "Back-to-back C4 Major 2 & Major 3 BR Champion with K1nG" },
+          "Chapter 5 (2024)": { region: "BR", role: "IGL", overall: 89, stats: { igling: 91, mechanics: 86, clutch: 89 }, note: "C5 Major 3 Brazil Champion with K1nG" },
+          "Chapter 6 (2025)": { region: "BR", role: "IGL", overall: 89, stats: { igling: 91, mechanics: 86, clutch: 89 }, note: "C6 Major 1 Brazil Champion with K1nG & Phzin" }
+        }
+      },
+      {
+        id: "lewa", name: "Lewa",
+        seasons: {
+          "Chapter 5 (2024)": { region: "BR", role: "IGL", overall: 82, stats: { igling: 84, mechanics: 80, clutch: 82 }, note: "Emerging Brazil Grand Finals IGL" },
+          "Chapter 6 (2025)": { region: "BR", role: "IGL", overall: 86, stats: { igling: 88, mechanics: 84, clutch: 86 }, note: "Top Brazil Major finalist" },
+          "Chapter 7 (2026)": { region: "BR", role: "IGL", overall: 89, stats: { igling: 91, mechanics: 87, clutch: 89 }, note: "14th at 2026 Antwerp Global LAN (top BR duo)" }
+        }
+      },
+      {
+        id: "rise", name: "Rise",
+        seasons: {
+          "Chapter 4 (2023)": { region: "ASIA", role: "Support", overall: 81, stats: { igling: 80, mechanics: 82, clutch: 81 }, note: "Early Asia Grand Finals appearances" },
+          "Chapter 5 (2024)": { region: "ASIA", role: "Support", overall: 85, stats: { igling: 84, mechanics: 86, clutch: 85 }, note: "Consistent Asia Major finalist" },
+          "Chapter 6 (2025)": { region: "ASIA", role: "Support", overall: 89, stats: { igling: 88, mechanics: 89, clutch: 90 }, note: "2x C6 Asia Major Champion with Koyota & Yuma" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 85, stats: { igling: 84, mechanics: 86, clutch: 85 }, note: "Moved to NAC; qualified for 2026 Antwerp LAN with Muz" }
+        }
+      },
+      {
+        id: "volx", name: "Volx",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "OCE", role: "Fragger", overall: 88, stats: { igling: 81, mechanics: 91, clutch: 88 }, note: "Multi-time OCE FNCS podium finisher" },
+          "Chapter 3 (2022)": { region: "OCE", role: "Fragger", overall: 86, stats: { igling: 80, mechanics: 89, clutch: 86 }, note: "Top OCE Duo fragger" },
+          "Chapter 4 (2023)": { region: "OCE", role: "Fragger", overall: 85, stats: { igling: 80, mechanics: 87, clutch: 85 }, note: "OCE Major finalist" },
+          "Chapter 6 (2025)": { region: "OCE", role: "Fragger", overall: 87, stats: { igling: 82, mechanics: 89, clutch: 87 }, note: "C6 Major 1 OCE Champion with Muz & Jace" }
+        }
+      },
+      {
+        id: "adapter", name: "Adapter",
+        seasons: {
+          "Chapter 3 (2022)": { region: "ME", role: "Fragger", overall: 83, stats: { igling: 78, mechanics: 86, clutch: 82 }, note: "Breakout Middle East Grand Finals fragger" },
+          "Chapter 4 (2023)": { region: "ME", role: "Fragger", overall: 85, stats: { igling: 80, mechanics: 88, clutch: 84 }, note: "Top ME Major contender" },
+          "Chapter 5 (2024)": { region: "ME", role: "Fragger", overall: 87, stats: { igling: 82, mechanics: 90, clutch: 86 }, note: "C5 Major 2 Middle East Champion with FKS" }
+        }
+      },
+      {
+        id: "howly", name: "Howly",
+        seasons: {
+          "Chapter 4 (2023)": { region: "ME", role: "IGL", overall: 81, stats: { igling: 83, mechanics: 80, clutch: 80 }, note: "Emerging Middle East IGL" },
+          "Chapter 5 (2024)": { region: "ME", role: "IGL", overall: 84, stats: { igling: 86, mechanics: 82, clutch: 84 }, note: "Consistent ME Major finalist" },
+          "Chapter 6 (2025)": { region: "ME", role: "IGL", overall: 86, stats: { igling: 88, mechanics: 84, clutch: 86 }, note: "Top ME Major IGL" },
+          "Chapter 7 (2026)": { region: "ME", role: "IGL", overall: 87, stats: { igling: 89, mechanics: 85, clutch: 87 }, note: "C7 Major 2 Middle East Champion with 1Lusha" }
+        }
       }
     ];
 
@@ -876,6 +1065,7 @@
     const CHEMISTRY_PAIRS = [
       ["peterbot", "pollo"],
       ["peterbot", "cold"],
+      ["peterbot", "ritual"],
       ["queasy", "veno"],
       ["queasy", "merstach"],
       ["queasy", "hen"],
@@ -884,19 +1074,32 @@
       ["swizzy", "merstach"],
       ["acorn", "cold"],
       ["acorn", "boltz"],
+      ["acorn", "edgey"],
+      ["acorn", "ajerss"],
       ["kami", "setty"],
       ["bugha", "mero"],
       ["mero", "cooper"],
       ["mero", "deyy"],
+      ["mero", "reverse2k"],
       ["vic0", "flickzy"],
       ["vic0", "malibuca"],
       ["sky", "scroll"],
       ["epikwhale", "arkhram"],
       ["zayt", "saf"],
+      ["zayt", "stretch"],
       ["koyota", "yuma"],
+      ["koyota", "rise"],
       ["k1ng", "phzin"],
+      ["k1ng", "fazer"],
       ["clix", "rapid"],
-      ["khanada", "boltz"]
+      ["clix", "eomzo"],
+      ["khanada", "boltz"],
+      ["khanada", "ajerss"],
+      ["shxrk", "t3eny"],
+      ["tjino", "pablowingu"],
+      ["rezon", "noahreyli"],
+      ["fks", "adapter"],
+      ["muz", "volx"]
     ];
 
     // ==========================================
@@ -1009,7 +1212,7 @@
     }
 
     // ==========================================
-    // 4. SPIN & DRAFT LOGIC
+    // 4. SPIN & WEIGHTED DRAFT LOGIC
     // ==========================================
     function getValidSpins(draftedIds) {
       const valid = [];
@@ -1042,7 +1245,7 @@
       let ticks = 0;
       const anim = setInterval(() => {
         const randEra = ERAS[Math.floor(Math.random() * ERAS.length)];
-        const randRegs = ["EU", "NAC", "NAE", "NAW", "BR", "ASIA", "GLOBAL LAN"];
+        const randRegs = ["EU", "NAC", "NAE", "NAW", "BR", "ASIA", "OCE", "ME", "GLOBAL LAN"];
         eraVal.textContent = randEra;
         regionVal.textContent = randRegs[Math.floor(Math.random() * randRegs.length)];
         ticks++;
@@ -1056,13 +1259,32 @@
     }
 
     function dealChoices(spin) {
-      const shuffled = [...spin.pool].sort(() => Math.random() - 0.5).slice(0, 3);
-      currentChoices = shuffled.map(p => ({
-        id: p.id,
-        name: p.name,
-        era: spin.era,
-        ...p.seasons[spin.era]
-      }));
+      const remaining = [...spin.pool];
+      const picked = [];
+      for (let i = 0; i < 3 && remaining.length > 0; i++) {
+        // Lower-rated cards receive higher weights so 95+ pulls feel rare
+        const weights = remaining.map(p => {
+          const ovr = p.seasons[spin.era].overall;
+          if (ovr >= 95) return 1;
+          if (ovr >= 90) return 2.2;
+          return 4.5;
+        });
+        const totalW = weights.reduce((a, b) => a + b, 0);
+        let r = Math.random() * totalW;
+        let idx = 0;
+        for (let j = 0; j < weights.length; j++) {
+          r -= weights[j];
+          if (r <= 0) { idx = j; break; }
+        }
+        const chosen = remaining.splice(idx, 1)[0];
+        picked.push({
+          id: chosen.id,
+          name: chosen.name,
+          era: spin.era,
+          ...chosen.seasons[spin.era]
+        });
+      }
+      currentChoices = picked;
       hasSpun = true;
       renderChoices();
     }
@@ -1147,8 +1369,8 @@
       let p1Total = 0, p1Wins = 0;
       let p2Total = 0, p2Wins = 0;
 
-      // AI Lobby Leader target for Solo Grand Finals Mode
-      const aiTarget = Math.floor(Math.random() * 65) + 495; // 495 - 560 pts
+      // AI Lobby Leader target for Solo Grand Finals Mode (680 - 700 pts)
+      const aiTarget = Math.floor(Math.random() * 21) + 680;
 
       simBanner.className = "banner banner-running";
       simBanner.textContent = mode === "streak"
