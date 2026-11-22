@@ -123,6 +123,15 @@
     .reel-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
     .reel-val { font-size: 1.1rem; font-weight: 800; margin-top: 4px; color: #fff; }
 
+    .spin-actions {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .spin-actions { grid-template-columns: 1fr; }
+    }
+
     .btn-primary {
       width: 100%;
       padding: 12px 18px;
@@ -137,6 +146,24 @@
     }
     .btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
     .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-reroll {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--accent);
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      background: rgba(56, 189, 248, 0.14);
+      color: #e0f2fe;
+      transition: transform 0.12s, opacity 0.15s, background 0.15s;
+    }
+    .btn-reroll:hover:not(:disabled) {
+      transform: translateY(-1px);
+      background: rgba(56, 189, 248, 0.24);
+    }
+    .btn-reroll:disabled { opacity: 0.4; cursor: not-allowed; border-color: var(--border); color: var(--muted); }
 
     .btn-secondary {
       background: var(--panel-2);
@@ -413,7 +440,10 @@
           </div>
         </div>
 
-        <button class="btn-primary" id="spinBtn">Spin Era & Region</button>
+        <div class="spin-actions">
+          <button class="btn-primary" id="spinBtn">Spin Era & Region</button>
+          <button class="btn-reroll" id="rerollBtn" disabled>Reroll Pool (3 left)</button>
+        </div>
 
         <div class="choices-grid" id="choicesGrid"></div>
       </div>
@@ -1161,6 +1191,9 @@
     let pvpTurn = 1;     // 1 or 2
     let p1Roster = [];
     let p2Roster = [];
+    let p1Rerolls = 3;
+    let p2Rerolls = 1;
+    let currentSpin = null;
     let currentChoices = [];
     let hasSpun = false;
     let simTimer = null;
@@ -1170,6 +1203,7 @@
     const regionVal = document.getElementById("regionVal");
     const pickCounter = document.getElementById("pickCounter");
     const spinBtn = document.getElementById("spinBtn");
+    const rerollBtn = document.getElementById("rerollBtn");
     const choicesGrid = document.getElementById("choicesGrid");
     const rosterSlots = document.getElementById("rosterSlots");
     const rosterTitle = document.getElementById("rosterTitle");
@@ -1184,6 +1218,24 @@
 
     function getActiveRoster() {
       return (mode === "pvp" && pvpTurn === 2) ? p2Roster : p1Roster;
+    }
+
+    function getActiveRerolls() {
+      return (mode === "pvp" && pvpTurn === 2) ? p2Rerolls : p1Rerolls;
+    }
+
+    function setActiveRerolls(val) {
+      if (mode === "pvp" && pvpTurn === 2) {
+        p2Rerolls = val;
+      } else {
+        p1Rerolls = val;
+      }
+    }
+
+    function getStartingRerollsForMode() {
+      if (mode === "streak") return 3;
+      if (mode === "finals") return 1;
+      return 1; // pvp per player
     }
 
     function getTierClass(ovr) {
@@ -1265,7 +1317,7 @@
     }
 
     // ==========================================
-    // 4. SPIN & EQUAL-ODDS DRAFT LOGIC
+    // 4. SPIN, REROLL & EQUAL-ODDS DRAFT LOGIC
     // ==========================================
     function getValidSpins(draftedIds) {
       const valid = [];
@@ -1294,6 +1346,7 @@
       const chosenSpin = validSpins[Math.floor(Math.random() * validSpins.length)];
 
       spinBtn.disabled = true;
+      rerollBtn.disabled = true;
       let ticks = 0;
       const anim = setInterval(() => {
         const randEra = ERAS[Math.floor(Math.random() * ERAS.length)];
@@ -1305,9 +1358,21 @@
           clearInterval(anim);
           eraVal.textContent = chosenSpin.era;
           regionVal.textContent = chosenSpin.region;
+          currentSpin = chosenSpin;
           dealChoices(chosenSpin);
         }
       }, 55);
+    }
+
+    function rerollChoices() {
+      const roster = getActiveRoster();
+      const rerollsLeft = getActiveRerolls();
+      if (roster.length >= 3 || !hasSpun || !currentSpin || rerollsLeft <= 0) return;
+
+      setActiveRerolls(rerollsLeft - 1);
+      const draftedIds = new Set(roster.map(p => p.id));
+      const freshPool = currentSpin.pool.filter(p => !draftedIds.has(p.id));
+      dealChoices({ ...currentSpin, pool: freshPool });
     }
 
     function dealChoices(spin) {
@@ -1327,6 +1392,7 @@
       currentChoices = picked;
       hasSpun = true;
       renderChoices();
+      updateRerollButton();
     }
 
     function selectPlayer(index) {
@@ -1336,6 +1402,7 @@
       const roster = getActiveRoster();
       roster.push(picked);
       currentChoices = [];
+      currentSpin = null;
       hasSpun = false;
 
       if (mode === "pvp" && pvpTurn === 1 && p1Roster.length === 3) {
@@ -1664,6 +1731,17 @@
       });
     }
 
+    function updateRerollButton() {
+      const roster = getActiveRoster();
+      const rerollsLeft = getActiveRerolls();
+      const readyToSim = mode === "pvp"
+        ? (p1Roster.length === 3 && p2Roster.length === 3)
+        : (p1Roster.length === 3);
+
+      rerollBtn.textContent = `Reroll Pool (${rerollsLeft} left)`;
+      rerollBtn.disabled = readyToSim || !hasSpun || rerollsLeft <= 0;
+    }
+
     function updateUI() {
       const roster = getActiveRoster();
       const readyToSim = mode === "pvp"
@@ -1675,6 +1753,7 @@
         : `Pick ${roster.length + 1} of 3`;
 
       spinBtn.disabled = readyToSim || hasSpun;
+      updateRerollButton();
       simBtn.disabled = !readyToSim;
       simBtn.textContent = mode === "streak"
         ? "Start 12-0 Streak Run"
@@ -1690,7 +1769,11 @@
       if (simTimer) clearInterval(simTimer);
       p1Roster = [];
       p2Roster = [];
+      const startRerolls = getStartingRerollsForMode();
+      p1Rerolls = startRerolls;
+      p2Rerolls = startRerolls;
       pvpTurn = 1;
+      currentSpin = null;
       currentChoices = [];
       hasSpun = false;
       eraVal.textContent = "Ready to Spin";
@@ -1709,6 +1792,7 @@
 
     // Event Listeners
     spinBtn.addEventListener("click", spinWheel);
+    rerollBtn.addEventListener("click", rerollChoices);
     simBtn.addEventListener("click", runSimulation);
     resetBtn.addEventListener("click", resetDraft);
 
