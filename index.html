@@ -442,7 +442,7 @@
 
         <div class="spin-actions">
           <button class="btn-primary" id="spinBtn">Spin Era & Region</button>
-          <button class="btn-reroll" id="rerollBtn" disabled>Reroll Pool (3 left)</button>
+          <button class="btn-reroll" id="rerollBtn" disabled>Reroll Spin (3 left)</button>
         </div>
 
         <div class="choices-grid" id="choicesGrid"></div>
@@ -1193,7 +1193,6 @@
     let p2Roster = [];
     let p1Rerolls = 3;
     let p2Rerolls = 1;
-    let currentSpin = null;
     let currentChoices = [];
     let hasSpun = false;
     let simTimer = null;
@@ -1337,16 +1336,16 @@
       return valid;
     }
 
-    function spinWheel() {
+    function executeSpinAnimation(onComplete) {
       const roster = getActiveRoster();
-      if (roster.length >= 3 || hasSpun) return;
-
       const draftedIds = new Set(roster.map(p => p.id));
       const validSpins = getValidSpins(draftedIds);
       const chosenSpin = validSpins[Math.floor(Math.random() * validSpins.length)];
 
       spinBtn.disabled = true;
       rerollBtn.disabled = true;
+      choicesGrid.innerHTML = "";
+
       let ticks = 0;
       const anim = setInterval(() => {
         const randEra = ERAS[Math.floor(Math.random() * ERAS.length)];
@@ -1358,21 +1357,27 @@
           clearInterval(anim);
           eraVal.textContent = chosenSpin.era;
           regionVal.textContent = chosenSpin.region;
-          currentSpin = chosenSpin;
           dealChoices(chosenSpin);
+          if (onComplete) onComplete();
         }
       }, 55);
+    }
+
+    function spinWheel() {
+      const roster = getActiveRoster();
+      if (roster.length >= 3 || hasSpun) return;
+      executeSpinAnimation();
     }
 
     function rerollChoices() {
       const roster = getActiveRoster();
       const rerollsLeft = getActiveRerolls();
-      if (roster.length >= 3 || !hasSpun || !currentSpin || rerollsLeft <= 0) return;
+      if (roster.length >= 3 || !hasSpun || rerollsLeft <= 0) return;
 
       setActiveRerolls(rerollsLeft - 1);
-      const draftedIds = new Set(roster.map(p => p.id));
-      const freshPool = currentSpin.pool.filter(p => !draftedIds.has(p.id));
-      dealChoices({ ...currentSpin, pool: freshPool });
+      hasSpun = false;
+      updateRerollButton();
+      executeSpinAnimation();
     }
 
     function dealChoices(spin) {
@@ -1402,7 +1407,6 @@
       const roster = getActiveRoster();
       roster.push(picked);
       currentChoices = [];
-      currentSpin = null;
       hasSpun = false;
 
       if (mode === "pvp" && pvpTurn === 1 && p1Roster.length === 3) {
@@ -1738,7 +1742,7 @@
         ? (p1Roster.length === 3 && p2Roster.length === 3)
         : (p1Roster.length === 3);
 
-      rerollBtn.textContent = `Reroll Pool (${rerollsLeft} left)`;
+      rerollBtn.textContent = `Reroll Spin (${rerollsLeft} left)`;
       rerollBtn.disabled = readyToSim || !hasSpun || rerollsLeft <= 0;
     }
 
@@ -1773,7 +1777,6 @@
       p1Rerolls = startRerolls;
       p2Rerolls = startRerolls;
       pvpTurn = 1;
-      currentSpin = null;
       currentChoices = [];
       hasSpun = false;
       eraVal.textContent = "Ready to Spin";
