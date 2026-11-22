@@ -1219,7 +1219,6 @@
       for (const era of ERAS) {
         const inEra = PLAYERS.filter(p => p.seasons[era] && !draftedIds.has(p.id));
         if (inEra.length >= 3) {
-          // Wildcard Global LAN pool for this chapter
           valid.push({ era, region: "GLOBAL LAN (All Regions)", pool: inEra });
         }
         const regions = ["EU", "NAC", "NAE", "NAW", "BR", "ASIA", "OCE", "ME"];
@@ -1326,24 +1325,24 @@
 
       if (perf >= vrCutoff) {
         placement = 1;
-        placePts = 65;
-        elims = Math.max(4, Math.round((teamStats.mech - 74) * 0.45) + Math.floor(Math.random() * 5) + 2);
+        placePts = 45;
+        elims = Math.max(4, Math.round((teamStats.mech - 74) * 0.42) + Math.floor(Math.random() * 4) + 2);
       } else if (perf >= 91.5) {
         placement = Math.random() < 0.5 ? 2 : 3;
-        placePts = placement === 2 ? 56 : 52;
-        elims = Math.max(2, Math.round((teamStats.mech - 75) * 0.35) + Math.floor(Math.random() * 4) + 1);
+        placePts = placement === 2 ? 38 : 34;
+        elims = Math.max(2, Math.round((teamStats.mech - 75) * 0.32) + Math.floor(Math.random() * 4) + 1);
       } else if (perf >= 86.0) {
         placement = Math.floor(Math.random() * 7) + 4; // 4th - 10th
-        placePts = 52 - (placement * 2);
-        elims = Math.max(1, Math.round((teamStats.mech - 76) * 0.25) + Math.floor(Math.random() * 4));
+        placePts = 36 - (placement * 2);
+        elims = Math.max(1, Math.round((teamStats.mech - 76) * 0.22) + Math.floor(Math.random() * 3));
       } else if (perf >= 79.5) {
         placement = Math.floor(Math.random() * 10) + 11; // 11th - 20th
-        placePts = Math.max(12, 36 - placement);
-        elims = Math.max(0, Math.round((teamStats.mech - 78) * 0.15) + Math.floor(Math.random() * 3));
+        placePts = Math.max(4, 24 - placement);
+        elims = Math.max(0, Math.round((teamStats.mech - 78) * 0.14) + Math.floor(Math.random() * 3));
       } else {
         placement = Math.floor(Math.random() * 13) + 21; // 21st - 33rd (Off-spawn wipe)
-        placePts = Math.max(0, 26 - placement);
-        elims = Math.floor(Math.random() * 3);
+        placePts = Math.max(0, 23 - placement);
+        elims = Math.floor(Math.random() * 2);
       }
 
       const elimPts = elims * 2;
@@ -1369,8 +1368,8 @@
       let p1Total = 0, p1Wins = 0;
       let p2Total = 0, p2Wins = 0;
 
-      // AI Lobby Leader target for Solo Grand Finals Mode (495 - 525 pts)
-      const aiTarget = Math.floor(Math.random() * 31) + 495;
+      // AI Lobby Leader target for Solo Grand Finals Mode (585 - 625 pts)
+      const aiTarget = Math.floor(Math.random() * 41) + 585;
 
       simBanner.className = "banner banner-running";
       simBanner.textContent = mode === "streak"
