@@ -289,9 +289,19 @@
     .banner-win { background: rgba(34, 197, 94, 0.18); border: 1px solid var(--win); color: #bbf7d0; }
     .banner-loss { background: rgba(239, 68, 68, 0.18); border: 1px solid var(--loss); color: #fecaca; }
 
+    .sim-split {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .sim-split { grid-template-columns: 1fr; }
+    }
+
     .match-log {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 10px;
     }
     .match-row {
@@ -315,7 +325,6 @@
     }
 
     .leaderboard-box {
-      margin-top: 16px;
       background: var(--panel-2);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -444,12 +453,14 @@
     <!-- SIMULATION RESULTS -->
     <div class="card-box sim-panel" id="simPanel">
       <div class="section-title">
-        <span>3. Grand Finals Match Log (12 Games)</span>
+        <span>3. Grand Finals Match Log & Live Standings</span>
         <span id="summaryScore"></span>
       </div>
       <div class="banner banner-running" id="simBanner">Simulating matches...</div>
-      <div class="match-log" id="matchLog"></div>
-      <div id="leaderboardContainer"></div>
+      <div class="sim-split">
+        <div class="match-log" id="matchLog"></div>
+        <div id="leaderboardContainer"></div>
+      </div>
     </div>
   </div>
 
@@ -1136,21 +1147,6 @@
       ["muz", "volx"]
     ];
 
-    const RIVAL_SQUADS = [
-      "Queasy • SwizzY • Merstach",
-      "Peterbot • Pollo • Cold",
-      "Veno • vic0 • Flickzy",
-      "Acorn • Boltz • Ajerss",
-      "Malibuca • Kami • Setty",
-      "TaySon • Th0masHD • Hen",
-      "Shxrk • T3eny • Tjino",
-      "Clix • Rapid • Khanada",
-      "Mero • Cooper • Reet",
-      "Sky • Scroll • Pixie",
-      "K1nG • Phzin • Fazer",
-      "Koyota • Yuma • Rise"
-    ];
-
     // ==========================================
     // 2. GAME STATE
     // ==========================================
@@ -1404,27 +1400,55 @@
       };
     }
 
-    function renderGrandFinalsLeaderboard(userRoster, userPts, userWins, aiTarget) {
-      const userNames = userRoster.map(p => p.name).join(" • ");
-
-      // Pick 11 rival trios and distribute scores realistically down from aiTarget
-      const shuffled = [...RIVAL_SQUADS].sort(() => Math.random() - 0.5).slice(0, 11);
-      const standings = shuffled.map((squad, idx) => {
-        const drop = idx === 0
-          ? 0
-          : Math.round((idx * 34) + (Math.random() * 22));
-        const pts = Math.max(180, aiTarget - drop);
-        const wins = idx === 0
-          ? Math.floor(Math.random() * 2) + 2
-          : (pts >= aiTarget - 75 ? Math.floor(Math.random() * 2) + 1 : (Math.random() < 0.35 ? 1 : 0));
-        return { squad, pts, wins, isUser: false };
+    function buildRandomRivalTrios(userRoster, count = 11) {
+      const draftedIds = new Set(userRoster.map(p => p.id));
+      const available = PLAYERS.filter(p => !draftedIds.has(p.id)).map(p => {
+        const eras = Object.keys(p.seasons);
+        const randomEra = eras[Math.floor(Math.random() * eras.length)];
+        return {
+          id: p.id,
+          name: p.name,
+          era: randomEra,
+          ...p.seasons[randomEra]
+        };
       });
 
-      // Add the player's squad and sort descending by points (tiebreaker: Victory Royales)
-      standings.push({ squad: `${userNames} (YOU)`, pts: userPts, wins: userWins, isUser: true });
+      const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+      const igls = shuffle(available.filter(p => p.role === "IGL"));
+      const fraggers = shuffle(available.filter(p => p.role === "Fragger"));
+      const supports = shuffle(available.filter(p => p.role === "Support"));
+
+      const rivals = [];
+      for (let i = 0; i < count; i++) {
+        const p1 = igls.pop() || fraggers.pop() || supports.pop();
+        const p2 = fraggers.pop() || supports.pop() || igls.pop();
+        const p3 = supports.pop() || fraggers.pop() || igls.pop();
+        if (p1 && p2 && p3) {
+          const trio = [p1, p2, p3];
+          rivals.push({
+            squad: `${p1.name} • ${p2.name} • ${p3.name}`,
+            stats: calculateTeamStats(trio),
+            pts: 0,
+            wins: 0,
+            isUser: false
+          });
+        }
+      }
+      return rivals;
+    }
+
+    function renderLiveLeaderboard(userRoster, userPts, userWins, rivalTeams, currentGame) {
+      const userNames = userRoster.map(p => p.name).join(" • ");
+      const standings = [
+        ...rivalTeams,
+        { squad: `${userNames} (YOU)`, pts: userPts, wins: userWins, isUser: true }
+      ];
+
+      // Sort descending by total points (tiebreaker: Victory Royales)
       standings.sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
 
       const userRank = standings.findIndex(s => s.isUser) + 1;
+      const leaderPts = standings[0].pts;
       const top8 = standings.slice(0, 8);
       if (userRank > 8) {
         top8.push({ ...standings[userRank - 1], customRank: userRank });
@@ -1442,9 +1466,13 @@
         `;
       }).join("");
 
+      const heading = currentGame >= 12
+        ? "Final Lobby Standings — Top 8 Trio Leaderboard"
+        : `Live Lobby Standings — After Game ${currentGame} of 12`;
+
       leaderboardContainer.innerHTML = `
         <div class="leaderboard-box">
-          <div class="lb-title">Final Lobby Standings — Top 8 Trio Leaderboard</div>
+          <div class="lb-title">${heading}</div>
           <table class="lb-table">
             <thead>
               <tr>
@@ -1459,7 +1487,7 @@
         </div>
       `;
 
-      return userRank;
+      return { userRank, leaderPts };
     }
 
     function runSimulation() {
@@ -1472,20 +1500,18 @@
 
       const p1Stats = calculateTeamStats(p1Roster);
       const p2Stats = mode === "pvp" ? calculateTeamStats(p2Roster) : null;
+      const rivalTeams = mode === "finals" ? buildRandomRivalTrios(p1Roster, 11) : [];
 
       let game = 1;
       let p1Total = 0, p1Wins = 0;
       let p2Total = 0, p2Wins = 0;
-
-      // AI Lobby Leader target for Solo Grand Finals Mode (585 - 625 pts)
-      const aiTarget = Math.floor(Math.random() * 41) + 585;
 
       simBanner.className = "banner banner-running";
       simBanner.textContent = mode === "streak"
         ? "Chasing the 12-0 Undefeated Streak..."
         : mode === "pvp"
           ? "Simulating 12-Game Head-to-Head Lobby..."
-          : `Grand Finals Underway — Target to Beat AI Leader: ${aiTarget} pts`;
+          : "Grand Finals Live — Standings updating every second...";
 
       simTimer = setInterval(() => {
         const sharedRng = bellRandom(10.5);
@@ -1519,6 +1545,25 @@
           matchLog.appendChild(row);
           summaryScore.textContent = `Total: ${p1Total} pts • ${p1Wins} Victory Royales`;
 
+          if (mode === "finals") {
+            let lobbyWinnerAssigned = r1.isWin;
+            rivalTeams.forEach(rival => {
+              const res = simulateSingleMatch(rival.stats, null, false);
+              if (res.isWin && lobbyWinnerAssigned) {
+                rival.pts += Math.max(34, res.points - 7);
+              } else {
+                if (res.isWin) lobbyWinnerAssigned = true;
+                rival.pts += res.points;
+                if (res.isWin) rival.wins++;
+              }
+            });
+
+            const { userRank, leaderPts } = renderLiveLeaderboard(p1Roster, p1Total, p1Wins, rivalTeams, game);
+            if (game < 12) {
+              simBanner.textContent = `Game ${game}/12 Complete — Currently #${userRank} (${p1Total} pts | 1st Place: ${leaderPts} pts)`;
+            }
+          }
+
           if (failedStreak) {
             clearInterval(simTimer);
             simBanner.className = "banner banner-loss";
@@ -1544,15 +1589,15 @@
             simBanner.className = "banner banner-win";
             simBanner.innerHTML = `<span>${winnerText}</span><button class="btn-secondary" onclick="resetDraft()">Rematch</button>`;
           } else {
-            const finalRank = renderGrandFinalsLeaderboard(p1Roster, p1Total, p1Wins, aiTarget);
-            const won = finalRank === 1;
+            const { userRank, leaderPts } = renderLiveLeaderboard(p1Roster, p1Total, p1Wins, rivalTeams, 12);
+            const won = userRank === 1;
             simBanner.className = `banner ${won ? "banner-win" : "banner-loss"}`;
-            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! #1 Finish with ${p1Total} pts` : `#${finalRank} Place Finish — ${p1Total} pts (1st Place: ${aiTarget} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
+            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! #1 Finish with ${p1Total} pts` : `#${userRank} Place Finish — ${p1Total} pts (1st Place: ${leaderPts} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
           }
         }
 
         game++;
-      }, 420);
+      }, 1000);
     }
 
     // ==========================================
