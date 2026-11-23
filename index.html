@@ -402,6 +402,12 @@
       .sim-split { grid-template-columns: 1fr; }
     }
 
+    .right-sim-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
     .match-log {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
@@ -473,6 +479,47 @@
       font-size: 0.74rem;
       color: #cbd5e1;
       line-height: 1.35;
+    }
+
+    /* Post-Tournament Contested POIs Summary */
+    .contested-summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .contested-item {
+      background: rgba(9, 13, 22, 0.55);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 0.79rem;
+    }
+    .contested-item.user-involved {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .contested-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      gap: 8px;
+    }
+    .contested-poi-name {
+      font-weight: 800;
+      color: #fff;
+      font-size: 0.84rem;
+    }
+    .contested-matchup {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      color: #cbd5e1;
+      font-size: 0.75rem;
+    }
+    .spawn-winner-tag {
+      color: #86efac;
+      font-weight: 700;
     }
 
     @keyframes fadeIn {
@@ -592,7 +639,10 @@
       <div class="banner banner-running" id="simBanner">Simulating matches...</div>
       <div class="sim-split">
         <div class="match-log" id="matchLog"></div>
-        <div id="leaderboardContainer"></div>
+        <div class="right-sim-col">
+          <div id="leaderboardContainer"></div>
+          <div id="contestedSummaryContainer"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1390,6 +1440,12 @@
       13: 21, 14: 18, 15: 15, 16: 12, 17: 9
     };
 
+    // Contest Tuning Constants:
+    // Losing off-spawn severely punishes placement (early wipe), while winning off-spawn grants +1 elim
+    // but only +0.3 momentum (scuffed mats/heals/late rotation compared to an uncontested drop).
+    const CONTEST_WIN_PERF_DELTA = 0.3;
+    const CONTEST_LOSS_PERF_DELTA = -13.5;
+
     // ==========================================
     // 3. GAME STATE
     // ==========================================
@@ -1431,6 +1487,7 @@
     const simBanner = document.getElementById("simBanner");
     const matchLog = document.getElementById("matchLog");
     const leaderboardContainer = document.getElementById("leaderboardContainer");
+    const contestedSummaryContainer = document.getElementById("contestedSummaryContainer");
     const summaryScore = document.getElementById("summaryScore");
     const pvpBanner = document.getElementById("pvpBanner");
 
@@ -1656,7 +1713,6 @@
         if (filtered.length >= 3) pool = filtered;
       }
 
-      // Deal 3 distinct POIs
       const picked = [];
       for (let i = 0; i < 3 && pool.length > 0; i++) {
         const idx = Math.floor(Math.random() * pool.length);
@@ -1749,15 +1805,34 @@
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
     }
 
-    function simulateSingleMatch(teamStats, poi, contestDelta = 0, bonusElim = 0) {
+    function simulateSingleMatch(teamStats, poi, spawnOutcome = null) {
       const rng = bellRandom(12.5);
       const poiBoost = poi ? poi.perfMod : 0;
+
+      let contestDelta = 0;
+      let bonusElim = 0;
+      let lostOffSpawn = false;
+
+      if (spawnOutcome && spawnOutcome.contested) {
+        if (spawnOutcome.wonSpawn) {
+          contestDelta = CONTEST_WIN_PERF_DELTA;
+          bonusElim = 1;
+        } else {
+          contestDelta = CONTEST_LOSS_PERF_DELTA;
+          lostOffSpawn = true;
+        }
+      }
+
       const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + poiBoost + contestDelta + rng;
 
       let placement, elims;
-      const extraPoiElims = (poi ? poi.elimBonus : 0) + bonusElim;
+      const extraPoiElims = (poi && !lostOffSpawn ? poi.elimBonus : 0) + bonusElim;
 
-      if (perf >= 98.4) {
+      if (lostOffSpawn) {
+        // Wiped off-spawn: eliminated 25th-33rd (0 placement points) with at most 0-1 knocks finished
+        placement = Math.floor(Math.random() * 9) + 25;
+        elims = Math.random() < 0.25 ? 1 : 0;
+      } else if (perf >= 98.4) {
         placement = 1;
         elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1 + extraPoiElims);
       } else if (perf >= 94.2) {
@@ -1792,7 +1867,12 @@
       const bPois = POIS.filter(p => p.tier === "B");
       const cPois = POIS.filter(p => p.tier === "C");
 
+      // Prefer uncontested POIs first within the bucket so contests stay realistic (around 5-8 POIs per lobby)
       const pickFromBucket = (bucket, maxPerPoi) => {
+        const uncon = bucket.filter(p => (poiCounts[p.id] || 0) === 0);
+        if (uncon.length > 0) {
+          return uncon[Math.floor(Math.random() * uncon.length)];
+        }
         const available = bucket.filter(p => (poiCounts[p.id] || 0) < maxPerPoi);
         if (available.length === 0) return null;
         return available[Math.floor(Math.random() * available.length)];
@@ -1802,26 +1882,31 @@
       let chosen = null;
 
       if (avgRating >= 93) {
-        if (roll < 0.55) chosen = pickFromBucket(sPois, 2);
-        if (!chosen && roll < 0.90) chosen = pickFromBucket(aPois, 2);
+        if (roll < 0.48) chosen = pickFromBucket(sPois, 2);
+        if (!chosen && roll < 0.88) chosen = pickFromBucket(aPois, 2);
         if (!chosen) chosen = pickFromBucket(bPois, 2);
       } else if (avgRating >= 89) {
-        if (roll < 0.25) chosen = pickFromBucket(sPois, 2);
-        if (!chosen && roll < 0.72) chosen = pickFromBucket(aPois, 2);
+        if (roll < 0.22) chosen = pickFromBucket(sPois, 2);
+        if (!chosen && roll < 0.68) chosen = pickFromBucket(aPois, 2);
         if (!chosen) chosen = pickFromBucket(bPois, 2);
       } else if (avgRating >= 85) {
-        if (roll < 0.45) chosen = pickFromBucket(bPois, 2);
-        if (!chosen && roll < 0.75) chosen = pickFromBucket(aPois, 2);
+        if (roll < 0.48) chosen = pickFromBucket(bPois, 2);
+        if (!chosen && roll < 0.78) chosen = pickFromBucket(aPois, 2);
         if (!chosen) chosen = pickFromBucket(cPois, 2);
       } else {
-        if (roll < 0.65) chosen = pickFromBucket(cPois, 2);
+        if (roll < 0.68) chosen = pickFromBucket(cPois, 2);
         if (!chosen) chosen = pickFromBucket(bPois, 2);
       }
 
       if (!chosen) {
-        const anyOpen = POIS.filter(p => (poiCounts[p.id] || 0) < 2);
-        const fallbackPool = anyOpen.length > 0 ? anyOpen : POIS;
-        chosen = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+        const anyUncon = POIS.filter(p => (poiCounts[p.id] || 0) === 0);
+        if (anyUncon.length > 0) {
+          chosen = anyUncon[Math.floor(Math.random() * anyUncon.length)];
+        } else {
+          const anyOpen = POIS.filter(p => (poiCounts[p.id] || 0) < 2);
+          const fallbackPool = anyOpen.length > 0 ? anyOpen : POIS;
+          chosen = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+        }
       }
 
       poiCounts[chosen.id] = (poiCounts[chosen.id] || 0) + 1;
@@ -1889,6 +1974,7 @@
           poi,
           pts: 0,
           wins: 0,
+          spawnWins: 0,
           isUser: false,
           isContested: false,
           contestedBy: []
@@ -1898,7 +1984,6 @@
       return rivals;
     }
 
-    // Resolve off-spawn contests at every shared POI for a single match
     function resolveOffSpawnContests(lobbyTeams) {
       const byPoi = {};
       lobbyTeams.forEach(t => {
@@ -1919,7 +2004,6 @@
       Object.values(byPoi).forEach(group => {
         if (group.length <= 1) return;
 
-        // Roll off-spawn fight score (Mechanics + Clutch + RNG)
         const scored = group.map(team => ({
           team,
           spawnScore: (team.stats.mech * 0.65) + (team.stats.clutch * 0.35) + bellRandom(10)
@@ -1946,6 +2030,9 @@
       ];
 
       standings.sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
+      standings.forEach((team, i) => {
+        team.finalRank = i + 1;
+      });
 
       const userRank = standings.findIndex(s => s.isUser) + 1;
       const leaderPts = standings[0].pts;
@@ -1996,7 +2083,72 @@
         </div>
       `;
 
-      return { userRank, leaderPts };
+      return { userRank, leaderPts, standings };
+    }
+
+    function renderContestedPoisSummary(standings) {
+      const contestedGroups = {};
+      standings.forEach(team => {
+        if (!team.isContested || !team.poi) return;
+        if (!contestedGroups[team.poi.id]) {
+          contestedGroups[team.poi.id] = {
+            poi: team.poi,
+            teams: []
+          };
+        }
+        contestedGroups[team.poi.id].teams.push(team);
+      });
+
+      const entries = Object.values(contestedGroups);
+      if (entries.length === 0) {
+        contestedSummaryContainer.innerHTML = `
+          <div class="leaderboard-box">
+            <div class="lb-title">Post-Tournament Top Contested POIs</div>
+            <div style="font-size:0.8rem;color:var(--muted);">Every trio landed uncontested across all 25 POIs in this lobby.</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Sort contested POIs by highest-finishing team at that drop spot
+      entries.sort((a, b) => {
+        const bestA = Math.min(...a.teams.map(t => t.finalRank));
+        const bestB = Math.min(...b.teams.map(t => t.finalRank));
+        return bestA - bestB;
+      });
+
+      const itemsHtml = entries.map(group => {
+        const sortedTeams = [...group.teams].sort((a, b) => (b.spawnWins - a.spawnWins) || (b.pts - a.pts));
+        const hasUser = sortedTeams.some(t => t.isUser);
+        const topSpawnWinner = sortedTeams[0];
+
+        const teamsLines = sortedTeams.map(t => {
+          const isDropKing = t.id === topSpawnWinner.id && t.spawnWins > 0;
+          return `
+            <div>
+              ${isDropKing ? `<span class="spawn-winner-tag">★ ${t.squad}</span>` : `<span>${t.squad}</span>`}
+              — <strong>${t.spawnWins}/12 spawn wins</strong> • Finished <strong>#${t.finalRank}</strong> (${t.pts} pts)
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <div class="contested-item ${hasUser ? "user-involved" : ""}">
+            <div class="contested-item-header">
+              <span class="contested-poi-name">${group.poi.name} (${group.poi.tier}-Tier • ${group.poi.chapter})</span>
+              <span class="contest-pill pill-con">${sortedTeams.length} TRIOS CONTESTED</span>
+            </div>
+            <div class="contested-matchup">${teamsLines}</div>
+          </div>
+        `;
+      }).join("");
+
+      contestedSummaryContainer.innerHTML = `
+        <div class="leaderboard-box">
+          <div class="lb-title">Post-Tournament Contested POIs Summary (${entries.length} Contested Drops)</div>
+          <div class="contested-summary-list">${itemsHtml}</div>
+        </div>
+      `;
     }
 
     function showTwelveZeroCelebration(squadLabel, totalPts, totalElims) {
@@ -2013,6 +2165,7 @@
       twelveZeroScreen.classList.remove("visible");
       matchLog.innerHTML = "";
       leaderboardContainer.innerHTML = "";
+      contestedSummaryContainer.innerHTML = "";
       summaryScore.textContent = "";
       simBtn.disabled = true;
 
@@ -2026,6 +2179,8 @@
         poi: p1Poi,
         pts: 0,
         wins: 0,
+        spawnWins: 0,
+        finalRank: 1,
         isUser: true,
         isContested: false,
         contestedBy: []
@@ -2033,7 +2188,6 @@
 
       const rivalTeams = mode === "finals" ? buildRandomRivalTrios(p1Roster, p1Poi, 32) : [];
 
-      // Mark permanent POI contest status across the 33-trio lobby
       if (mode === "finals") {
         const allLobby = [userTeam, ...rivalTeams];
         allLobby.forEach(team => {
@@ -2044,8 +2198,8 @@
       }
 
       let game = 1;
-      let p1Total = 0, p1Wins = 0, p1Elims = 0;
-      let p2Total = 0, p2Wins = 0, p2Elims = 0;
+      let p1Total = 0, p1Wins = 0, p1Elims = 0, p1SpawnWins = 0;
+      let p2Total = 0, p2Wins = 0, p2Elims = 0, p2SpawnWins = 0;
 
       simBanner.className = "banner banner-running";
       if (mode === "pvp") {
@@ -2067,13 +2221,11 @@
           const s1 = spawnMap.get("p1");
           const s2 = spawnMap.get("p2");
 
-          const cDelta1 = s1.contested ? (s1.wonSpawn ? 1.5 : -7.5) : 0;
-          const cDelta2 = s2.contested ? (s2.wonSpawn ? 1.5 : -7.5) : 0;
-          const bElim1 = (s1.contested && s1.wonSpawn) ? 1 : 0;
-          const bElim2 = (s2.contested && s2.wonSpawn) ? 1 : 0;
+          if (s1.contested && s1.wonSpawn) p1SpawnWins++;
+          if (s2.contested && s2.wonSpawn) p2SpawnWins++;
 
-          const r1 = simulateSingleMatch(p1Stats, p1Poi, cDelta1, bElim1);
-          const r2 = simulateSingleMatch(p2Stats, p2Poi, cDelta2, bElim2);
+          const r1 = simulateSingleMatch(p1Stats, p1Poi, s1);
+          const r2 = simulateSingleMatch(p2Stats, p2Poi, s2);
 
           let p1WonMatch = false;
           let p2WonMatch = false;
@@ -2124,21 +2276,22 @@
           const spawnMap = resolveOffSpawnContests(allLobby);
 
           const userSpawn = spawnMap.get(userTeam.id);
-          const userContestDelta = userSpawn.contested ? (userSpawn.wonSpawn ? 1.5 : -7.5) : 0;
-          const userBonusElim = (userSpawn.contested && userSpawn.wonSpawn) ? 1 : 0;
-          const r1 = simulateSingleMatch(p1Stats, p1Poi, userContestDelta, userBonusElim);
+          if (userSpawn.contested && userSpawn.wonSpawn) {
+            userTeam.spawnWins++;
+          }
+          const r1 = simulateSingleMatch(p1Stats, p1Poi, userSpawn);
 
           const rivalResults = rivalTeams.map(rival => {
             const sp = spawnMap.get(rival.id);
-            const cDelta = sp.contested ? (sp.wonSpawn ? 1.5 : -7.5) : 0;
-            const bElim = (sp.contested && sp.wonSpawn) ? 1 : 0;
+            if (sp.contested && sp.wonSpawn) {
+              rival.spawnWins++;
+            }
             return {
               rival,
-              res: simulateSingleMatch(rival.stats, rival.poi, cDelta, bElim)
+              res: simulateSingleMatch(rival.stats, rival.poi, sp)
             };
           });
 
-          // Fair Victory Royale resolution by highest match perf
           const vrContenders = [];
           if (r1.isWin) vrContenders.push({ isUser: true, perf: r1.perf, res: r1 });
           rivalResults.forEach(entry => {
@@ -2171,7 +2324,7 @@
           });
 
           const spawnPillHtml = userSpawn.contested
-            ? `<span class="contest-pill pill-con">${userSpawn.wonSpawn ? "CONTESTED • WON SPAWN" : "CONTESTED • LOST SPAWN"}</span>`
+            ? `<span class="contest-pill pill-con">${userSpawn.wonSpawn ? "CONTESTED • WON SPAWN" : "CONTESTED • WIPED OFF-SPAWN"}</span>`
             : `<span class="contest-pill pill-uncon">UNCONTESTED (${p1Poi.name})</span>`;
 
           const row = document.createElement("div");
@@ -2192,7 +2345,7 @@
           const { userRank, leaderPts } = renderLiveLeaderboard(userTeam, rivalTeams, game);
           if (game < 12) {
             const statusPill = userTeam.isContested
-              ? `<span class="contest-pill pill-con">CONTESTED @ ${p1Poi.name}</span>`
+              ? `<span class="contest-pill pill-con">CONTESTED @ ${p1Poi.name} (${userTeam.spawnWins}/${game} Spawn Wins)</span>`
               : `<span class="contest-pill pill-uncon">UNCON @ ${p1Poi.name}</span>`;
             simBanner.innerHTML = `<span>Game ${game}/12 — Currently #${userRank} (${p1Total} pts | 1st: ${leaderPts} pts)</span>${statusPill}`;
           }
@@ -2216,6 +2369,31 @@
               );
             }
 
+            if (p1Poi.id === p2Poi.id) {
+              renderContestedPoisSummary([
+                {
+                  id: "p1",
+                  squad: `Player 1 (${p1Roster.map(p => p.name).join(" • ")})`,
+                  poi: p1Poi,
+                  pts: p1Total,
+                  spawnWins: p1SpawnWins,
+                  finalRank: p1Total >= p2Total ? 1 : 2,
+                  isUser: true,
+                  isContested: true
+                },
+                {
+                  id: "p2",
+                  squad: `Player 2 (${p2Roster.map(p => p.name).join(" • ")})`,
+                  poi: p2Poi,
+                  pts: p2Total,
+                  spawnWins: p2SpawnWins,
+                  finalRank: p2Total > p1Total ? 1 : 2,
+                  isUser: true,
+                  isContested: true
+                }
+              ]);
+            }
+
             const winnerText = p1Total > p2Total
               ? `PLAYER 1 WINS THE FNCS TROPHY! (${p1Total} vs ${p2Total} pts)`
               : p2Total > p1Total
@@ -2224,7 +2402,9 @@
             simBanner.className = "banner banner-win";
             simBanner.innerHTML = `<span>${winnerText}</span><button class="btn-secondary" onclick="resetDraft()">Rematch</button>`;
           } else {
-            const { userRank, leaderPts } = renderLiveLeaderboard(userTeam, rivalTeams, 12);
+            const { userRank, leaderPts, standings } = renderLiveLeaderboard(userTeam, rivalTeams, 12);
+            renderContestedPoisSummary(standings);
+
             if (p1Wins === 12) {
               showTwelveZeroCelebration(p1Roster.map(p => p.name).join(" • "), p1Total, p1Elims);
             }
@@ -2324,7 +2504,6 @@
         rosterSlots.appendChild(slot);
       }
 
-      // 4th Slot: Drop Spot POI
       const poiSlot = document.createElement("div");
       if (poi) {
         const sign = poi.perfMod >= 0 ? "+" : "";
@@ -2420,6 +2599,7 @@
       eraVal.textContent = "Ready to Spin";
       regionVal.textContent = "—";
       leaderboardContainer.innerHTML = "";
+      contestedSummaryContainer.innerHTML = "";
       twelveZeroScreen.classList.remove("visible");
       simPanel.classList.remove("visible");
 
