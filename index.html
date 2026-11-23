@@ -177,6 +177,11 @@
       cursor: pointer;
     }
     .btn-secondary:hover { border-color: var(--accent); }
+    .btn-secondary.active-toggle {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--accent);
+      color: #e0f2fe;
+    }
 
     /* Draft Choices */
     .choices-grid {
@@ -449,13 +454,31 @@
       animation: fadeIn 0.3s ease;
       overflow-x: auto;
     }
+    .lb-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
     .lb-title {
       font-size: 0.76rem;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--muted);
-      margin-bottom: 8px;
       font-weight: 700;
+      margin: 0;
+    }
+    .lb-toggle-btn {
+      padding: 5px 10px;
+      font-size: 0.73rem;
+      border-radius: 6px;
+    }
+    .lb-scroll-wrap.expanded {
+      max-height: 460px;
+      overflow-y: auto;
+      padding-right: 2px;
     }
     .lb-table {
       width: 100%;
@@ -1440,10 +1463,6 @@
       13: 21, 14: 18, 15: 15, 16: 12, 17: 9
     };
 
-    // Contest & Macro Tuning:
-    // Uncontested drops get +2.0 clean loot/surge/rotate edge;
-    // Contested drop winners get only +0.1 edge (+1 elim) from scuffed early fights;
-    // Contested drop losers take -18.0 penalty and wipe off-spawn (0 elims, 26th-33rd).
     const UNCON_CLEAN_PERF_DELTA = 2.0;
     const CONTEST_WIN_PERF_DELTA = 0.1;
     const CONTEST_LOSS_PERF_DELTA = -18.0;
@@ -1464,6 +1483,8 @@
     let hasSpun = false;
     let lastEra = "";
     let lastPoiIds = [];
+    let showAllStandings = false;
+    let latestStandingsState = null;
     let simTimer = null;
 
     // DOM refs
@@ -1833,7 +1854,6 @@
       const extraPoiElims = (poi && !lostOffSpawn ? poi.elimBonus : 0) + bonusElim;
 
       if (lostOffSpawn) {
-        // Wiped off-spawn: eliminated 26th-33rd with 0 elims and 0 placement points
         placement = Math.floor(Math.random() * 8) + 26;
         elims = 0;
       } else if (perf >= 98.4) {
@@ -1871,7 +1891,6 @@
       const bPois = POIS.filter(p => p.tier === "B");
       const cPois = POIS.filter(p => p.tier === "C");
 
-      // Strong preference for completely uncontested POIs so most of the lobby (and Top 10) is uncontested
       const pickUncontestedFromBucket = bucket => {
         const uncon = bucket.filter(p => (poiCounts[p.id] || 0) === 0);
         if (uncon.length === 0) return null;
@@ -1903,7 +1922,6 @@
         if (anyUncon.length > 0) {
           chosen = anyUncon[Math.floor(Math.random() * anyUncon.length)];
         } else {
-          // Only contest an already-claimed POI if we have fewer than 6 contested POIs in the lobby
           const canContestMore = contestedUsedCount.value < 6;
           const contestable = canContestMore
             ? POIS.filter(p => (poiCounts[p.id] || 0) === 1 && (p.tier === "S" || p.tier === "A" || Math.random() < 0.35))
@@ -2017,7 +2035,6 @@
       Object.values(byPoi).forEach(group => {
         if (group.length <= 1) return;
 
-        // Off-spawn fights are volatile: heavy RNG noise so even strong teams drop spawns regularly
         const scored = group.map(team => ({
           team,
           spawnScore: (team.stats.mech * 0.45) + (team.stats.clutch * 0.25) + bellRandom(18)
@@ -2037,26 +2054,26 @@
       return outcomeMap;
     }
 
-    function renderLiveLeaderboard(userTeam, rivalTeams, currentGame) {
-      const standings = [
-        ...rivalTeams,
-        userTeam
-      ];
-
-      standings.sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
-      standings.forEach((team, i) => {
-        team.finalRank = i + 1;
-      });
-
-      const userRank = standings.findIndex(s => s.isUser) + 1;
-      const leaderPts = standings[0].pts;
-      const top10 = standings.slice(0, 10);
-      if (userRank > 10) {
-        top10.push({ ...standings[userRank - 1], customRank: userRank });
+    function toggleFullStandings() {
+      showAllStandings = !showAllStandings;
+      if (latestStandingsState) {
+        paintLeaderboardDom(latestStandingsState.standings, latestStandingsState.currentGame);
       }
+    }
 
-      const rowsHtml = top10.map((row, idx) => {
-        const rank = row.customRank || (idx + 1);
+    function paintLeaderboardDom(standings, currentGame) {
+      const userRank = standings.findIndex(s => s.isUser) + 1;
+      const totalTeams = standings.length;
+      const rowsToShow = showAllStandings ? standings : (() => {
+        const top10 = standings.slice(0, 10);
+        if (userRank > 10) {
+          top10.push({ ...standings[userRank - 1], customRank: userRank });
+        }
+        return top10;
+      })();
+
+      const rowsHtml = rowsToShow.map((row, idx) => {
+        const rank = row.customRank || (showAllStandings ? (idx + 1) : (idx + 1));
         const badgeHtml = row.isContested
           ? `<span class="contest-pill pill-con" title="Contested by ${row.contestedBy.join(", ")}">CONTESTED</span>`
           : `<span class="contest-pill pill-uncon">UNCON</span>`;
@@ -2076,26 +2093,60 @@
       }).join("");
 
       const heading = currentGame >= 12
-        ? "Final Lobby Standings — Top 10 Trio Leaderboard (33 Trios)"
-        : `Live Lobby Standings — After Game ${currentGame} of 12 (33 Trios)`;
+        ? (showAllStandings
+          ? `Final Lobby Standings — All ${totalTeams} Trios`
+          : `Final Lobby Standings — Top 10 Trio Leaderboard (${totalTeams} Trios)`)
+        : (showAllStandings
+          ? `Live Lobby Standings — All ${totalTeams} Trios (Game ${currentGame}/12)`
+          : `Live Lobby Standings — Top 10 After Game ${currentGame} of 12 (${totalTeams} Trios)`);
+
+      const toggleLabel = showAllStandings ? "Show Top 10 Only" : `Show All ${totalTeams} Teams`;
 
       leaderboardContainer.innerHTML = `
         <div class="leaderboard-box">
-          <div class="lb-title">${heading}</div>
-          <table class="lb-table">
-            <thead>
-              <tr>
-                <th>Place</th>
-                <th>Trio Roster</th>
-                <th>Drop Spot (POI)</th>
-                <th>Wins</th>
-                <th>Points</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
+          <div class="lb-header">
+            <div class="lb-title">${heading}</div>
+            <button
+              type="button"
+              id="toggleAllTeamsBtn"
+              class="btn-secondary lb-toggle-btn ${showAllStandings ? "active-toggle" : ""}"
+              onclick="toggleFullStandings()"
+            >${toggleLabel}</button>
+          </div>
+          <div class="lb-scroll-wrap ${showAllStandings ? "expanded" : ""}">
+            <table class="lb-table">
+              <thead>
+                <tr>
+                  <th>Place</th>
+                  <th>Trio Roster</th>
+                  <th>Drop Spot (POI)</th>
+                  <th>Wins</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml}</tbody>
+            </table>
+          </div>
         </div>
       `;
+    }
+
+    function renderLiveLeaderboard(userTeam, rivalTeams, currentGame) {
+      const standings = [
+        ...rivalTeams,
+        userTeam
+      ];
+
+      standings.sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
+      standings.forEach((team, i) => {
+        team.finalRank = i + 1;
+      });
+
+      const userRank = standings.findIndex(s => s.isUser) + 1;
+      const leaderPts = standings[0].pts;
+      latestStandingsState = { standings, currentGame };
+
+      paintLeaderboardDom(standings, currentGame);
 
       return { userRank, leaderPts, standings };
     }
@@ -2179,6 +2230,7 @@
       matchLog.innerHTML = "";
       leaderboardContainer.innerHTML = "";
       contestedSummaryContainer.innerHTML = "";
+      latestStandingsState = null;
       summaryScore.textContent = "";
       simBtn.disabled = true;
 
@@ -2609,6 +2661,7 @@
       hasSpun = false;
       lastEra = "";
       lastPoiIds = [];
+      latestStandingsState = null;
       eraVal.textContent = "Ready to Spin";
       regionVal.textContent = "—";
       leaderboardContainer.innerHTML = "";
