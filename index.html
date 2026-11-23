@@ -456,7 +456,7 @@
     <header>
       <div class="brand">
         <h1>FNCS GRAND FINALS // MULTI-ERA DRAFT</h1>
-        <p>Spin Chapters 2–7, draft across all regions, and compete in a 12-Game Grand Finals lobby.</p>
+        <p>Spin Chapters 2–7, draft across all regions, and compete in a 33-Trio 12-Game Grand Finals lobby.</p>
       </div>
       <div class="mode-tabs">
         <button class="mode-btn active" data-mode="finals">Grand Finals (Points)</button>
@@ -1622,8 +1622,8 @@
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
     }
 
-    function simulateSingleMatch(teamStats, sharedRng) {
-      const rng = sharedRng !== null ? sharedRng : bellRandom(12.5);
+    function simulateSingleMatch(teamStats, customRng = null) {
+      const rng = customRng !== null ? customRng : bellRandom(12.5);
       const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + rng;
 
       let placement, elims;
@@ -1651,44 +1651,67 @@
         placement,
         elims,
         points: placePts + elimPts,
+        perf,
         isWin: placement === 1
       };
     }
 
-    function buildRandomRivalTrios(userRoster, count = 11) {
+    function buildRandomRivalTrios(userRoster, count = 32) {
       const draftedIds = new Set(userRoster.map(p => p.id));
-      const available = PLAYERS.filter(p => !draftedIds.has(p.id)).map(p => {
-        const eras = Object.keys(p.seasons);
-        const randomEra = eras[Math.floor(Math.random() * eras.length)];
-        return {
-          id: p.id,
-          name: p.name,
-          era: randomEra,
-          ...p.seasons[randomEra]
-        };
+      const basePool = PLAYERS.filter(p => !draftedIds.has(p.id));
+      const allEraEntries = [];
+
+      basePool.forEach(p => {
+        Object.keys(p.seasons).forEach(era => {
+          allEraEntries.push({
+            id: p.id,
+            name: p.name,
+            era,
+            ...p.seasons[era]
+          });
+        });
       });
 
       const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
-      const igls = shuffle(available.filter(p => p.role === "IGL"));
-      const fraggers = shuffle(available.filter(p => p.role === "Fragger"));
-      const supports = shuffle(available.filter(p => p.role === "Support"));
-
       const rivals = [];
-      for (let i = 0; i < count; i++) {
-        const p1 = igls.pop() || fraggers.pop() || supports.pop();
-        const p2 = fraggers.pop() || supports.pop() || igls.pop();
-        const p3 = supports.pop() || fraggers.pop() || igls.pop();
-        if (p1 && p2 && p3) {
-          const trio = [p1, p2, p3];
-          rivals.push({
-            squad: `${p1.name} • ${p2.name} • ${p3.name}`,
-            stats: calculateTeamStats(trio),
-            pts: 0,
-            wins: 0,
-            isUser: false
-          });
-        }
+      const usedSquadKeys = new Set();
+
+      let igls = shuffle(allEraEntries.filter(p => p.role === "IGL"));
+      let fraggers = shuffle(allEraEntries.filter(p => p.role === "Fragger"));
+      let supports = shuffle(allEraEntries.filter(p => p.role === "Support"));
+
+      const refillIfNeeded = () => {
+        if (igls.length === 0) igls = shuffle(allEraEntries.filter(p => p.role === "IGL"));
+        if (fraggers.length === 0) fraggers = shuffle(allEraEntries.filter(p => p.role === "Fragger"));
+        if (supports.length === 0) supports = shuffle(allEraEntries.filter(p => p.role === "Support"));
+      };
+
+      let guards = 0;
+      while (rivals.length < count && guards < 400) {
+        guards++;
+        refillIfNeeded();
+        const p1 = igls.pop();
+        const p2 = fraggers.pop();
+        const p3 = supports.pop();
+        if (!p1 || !p2 || !p3) break;
+
+        const ids = [p1.id, p2.id, p3.id];
+        if (new Set(ids).size < 3) continue;
+
+        const key = [...ids].sort().join("|");
+        if (usedSquadKeys.has(key)) continue;
+        usedSquadKeys.add(key);
+
+        const trio = [p1, p2, p3];
+        rivals.push({
+          squad: `${p1.name} • ${p2.name} • ${p3.name}`,
+          stats: calculateTeamStats(trio),
+          pts: 0,
+          wins: 0,
+          isUser: false
+        });
       }
+
       return rivals;
     }
 
@@ -1721,8 +1744,8 @@
       }).join("");
 
       const heading = currentGame >= 12
-        ? "Final Lobby Standings — Top 8 Trio Leaderboard"
-        : `Live Lobby Standings — After Game ${currentGame} of 12`;
+        ? "Final Lobby Standings — Top 8 Trio Leaderboard (33 Trios)"
+        : `Live Lobby Standings — After Game ${currentGame} of 12 (33 Trios)`;
 
       leaderboardContainer.innerHTML = `
         <div class="leaderboard-box">
@@ -1763,7 +1786,7 @@
 
       const p1Stats = calculateTeamStats(p1Roster);
       const p2Stats = mode === "pvp" ? calculateTeamStats(p2Roster) : null;
-      const rivalTeams = mode === "finals" ? buildRandomRivalTrios(p1Roster, 11) : [];
+      const rivalTeams = mode === "finals" ? buildRandomRivalTrios(p1Roster, 32) : [];
 
       let game = 1;
       let p1Total = 0, p1Wins = 0, p1Elims = 0;
@@ -1772,23 +1795,39 @@
       simBanner.className = "banner banner-running";
       simBanner.textContent = mode === "pvp"
         ? "Simulating 12-Game Head-to-Head Lobby..."
-        : "Grand Finals Live (2025 Global Scoring: 65pt VR • 4pt/Kill)...";
+        : "Grand Finals Live (33 Trios • 2025 Global Scoring: 65pt VR • 4pt/Kill)...";
 
       simTimer = setInterval(() => {
-        const sharedRng = bellRandom(12.5);
-        const r1 = simulateSingleMatch(p1Stats, sharedRng);
-        p1Total += r1.points;
-        p1Elims += r1.elims;
-        if (r1.isWin) p1Wins++;
+        const r1 = simulateSingleMatch(p1Stats, bellRandom(12.5));
 
         if (mode === "pvp") {
-          const r2 = simulateSingleMatch(p2Stats, sharedRng);
+          const r2 = simulateSingleMatch(p2Stats, bellRandom(12.5));
+          let p1WonMatch = false;
+          let p2WonMatch = false;
+
+          if (r1.isWin && r2.isWin) {
+            if (r1.perf >= r2.perf) {
+              p1WonMatch = true;
+            } else {
+              p2WonMatch = true;
+              r1.placement = 2;
+              r1.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (r1.elims * 4);
+            }
+          } else {
+            p1WonMatch = r1.isWin;
+            p2WonMatch = r2.isWin;
+          }
+
+          p1Total += r1.points;
+          p1Elims += r1.elims;
+          if (p1WonMatch) p1Wins++;
+
           p2Total += r2.points;
           p2Elims += r2.elims;
-          if (r2.isWin) p2Wins++;
+          if (p2WonMatch) p2Wins++;
 
           const row = document.createElement("div");
-          row.className = `match-row ${r1.isWin || r2.isWin ? "vr" : ""}`;
+          row.className = `match-row ${p1WonMatch || p2WonMatch ? "vr" : ""}`;
           row.innerHTML = `
             <div><strong>Game ${game}</strong></div>
             <div>P1: #${r1.placement} (${r1.elims}k) <strong>+${r1.points}</strong></div>
@@ -1797,8 +1836,45 @@
           matchLog.appendChild(row);
           summaryScore.textContent = `P1: ${p1Total} pts (${p1Wins} VR) | P2: ${p2Total} pts (${p2Wins} VR)`;
         } else {
+          // Simulate all 32 AI rival trios with equal 12.5 RNG spread
+          const rivalResults = rivalTeams.map(rival => ({
+            rival,
+            res: simulateSingleMatch(rival.stats, bellRandom(12.5))
+          }));
+
+          // Fair Victory Royale resolution: highest match performance (perf) wins the 1st-place VR
+          const vrContenders = [];
+          if (r1.isWin) vrContenders.push({ isUser: true, perf: r1.perf, res: r1 });
+          rivalResults.forEach(entry => {
+            if (entry.res.isWin) vrContenders.push({ isUser: false, perf: entry.res.perf, res: entry.res });
+          });
+
+          let userWonMatch = false;
+          if (vrContenders.length > 0) {
+            vrContenders.sort((a, b) => b.perf - a.perf);
+            const winner = vrContenders[0];
+            userWonMatch = winner.isUser;
+
+            // Any other contender who rolled VR in the same lobby is placed 2nd instead
+            vrContenders.slice(1).forEach(runnerUp => {
+              runnerUp.res.placement = 2;
+              runnerUp.res.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (runnerUp.res.elims * 4);
+            });
+          }
+
+          p1Total += r1.points;
+          p1Elims += r1.elims;
+          if (userWonMatch) p1Wins++;
+
+          rivalResults.forEach(({ rival, res }, idx) => {
+            rival.pts += res.points;
+            if (res.placement === 1 && vrContenders[0] && !vrContenders[0].isUser && vrContenders[0].res === res) {
+              rival.wins++;
+            }
+          });
+
           const row = document.createElement("div");
-          row.className = `match-row ${r1.isWin ? "vr" : ""}`;
+          row.className = `match-row ${userWonMatch ? "vr" : ""}`;
           row.innerHTML = `
             <div><strong>Game ${game}</strong></div>
             <div>#${r1.placement} Place • ${r1.elims} Elims</div>
@@ -1806,19 +1882,6 @@
           `;
           matchLog.appendChild(row);
           summaryScore.textContent = `Total: ${p1Total} pts • ${p1Wins} Victory Royales`;
-
-          let lobbyWinnerAssigned = r1.isWin;
-          rivalTeams.forEach(rival => {
-            const rivalRng = bellRandom(11.5);
-            const res = simulateSingleMatch(rival.stats, rivalRng);
-            if (res.isWin && lobbyWinnerAssigned) {
-              rival.pts += Math.max(52, res.points - 13);
-            } else {
-              if (res.isWin) lobbyWinnerAssigned = true;
-              rival.pts += res.points;
-              if (res.isWin) rival.wins++;
-            }
-          });
 
           const { userRank, leaderPts } = renderLiveLeaderboard(p1Roster, p1Total, p1Wins, rivalTeams, game);
           if (game < 12) {
