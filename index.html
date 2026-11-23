@@ -476,7 +476,7 @@
       border-radius: 6px;
     }
     .lb-scroll-wrap.expanded {
-      max-height: 460px;
+      max-height: 520px;
       overflow-y: auto;
       padding-right: 2px;
     }
@@ -710,7 +710,7 @@
     ];
 
     // ==========================================
-    // 2. MULTI-ERA 65-PLAYER FNCS DATABASE
+    // 2. MULTI-ERA FNCS DATABASE
     // ==========================================
     const ERAS = [
       "Chapter 2 (2019-2021)",
@@ -1978,29 +1978,20 @@
         if (supports.length === 0) supports = shuffle(allEraEntries.filter(p => p.role === "Support"));
       };
 
-      let guards = 0;
-      while (rivals.length < count && guards < 450) {
-        guards++;
-        refillIfNeeded();
-        const p1 = igls.pop();
-        const p2 = fraggers.pop();
-        const p3 = supports.pop();
-        if (!p1 || !p2 || !p3) break;
-
-        const ids = [p1.id, p2.id, p3.id];
-        if (new Set(ids).size < 3) continue;
-
+      const addRivalTrio = trio => {
+        const ids = trio.map(p => p.id);
+        if (new Set(ids).size < 3) return false;
         const key = [...ids].sort().join("|");
-        if (usedSquadKeys.has(key)) continue;
+        if (usedSquadKeys.has(key)) return false;
         usedSquadKeys.add(key);
 
-        const trio = [p1, p2, p3];
         const baseStats = calculateTeamStats(trio);
         const poi = assignPoiToRival(baseStats, poiCounts, contestedUsedCount);
+        const idx = rivals.length;
 
         rivals.push({
-          id: `rival_${rivals.length}`,
-          squad: `${p1.name} • ${p2.name} • ${p3.name}`,
+          id: `rival_${idx}`,
+          squad: `${trio[0].name} • ${trio[1].name} • ${trio[2].name}`,
           stats: calculateTeamStats(trio, poi),
           poi,
           pts: 0,
@@ -2010,6 +2001,27 @@
           isContested: false,
           contestedBy: []
         });
+        return true;
+      };
+
+      let guards = 0;
+      while (rivals.length < count && guards < 600) {
+        guards++;
+        refillIfNeeded();
+        const p1 = igls.pop();
+        const p2 = fraggers.pop();
+        const p3 = supports.pop();
+        if (!p1 || !p2 || !p3) break;
+        addRivalTrio([p1, p2, p3]);
+      }
+
+      // Guarantee full 32 rival trios (33 trios in lobby) even if role buckets were skewed
+      let fallbackGuards = 0;
+      while (rivals.length < count && fallbackGuards < 1200) {
+        fallbackGuards++;
+        const shuffled = shuffle(allEraEntries);
+        if (shuffled.length < 3) break;
+        addRivalTrio([shuffled[0], shuffled[1], shuffled[2]]);
       }
 
       return rivals;
@@ -2073,7 +2085,7 @@
       })();
 
       const rowsHtml = rowsToShow.map((row, idx) => {
-        const rank = row.customRank || (showAllStandings ? (idx + 1) : (idx + 1));
+        const rank = row.customRank || (idx + 1);
         const badgeHtml = row.isContested
           ? `<span class="contest-pill pill-con" title="Contested by ${row.contestedBy.join(", ")}">CONTESTED</span>`
           : `<span class="contest-pill pill-uncon">UNCON</span>`;
