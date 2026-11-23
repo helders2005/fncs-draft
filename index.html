@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FNCS Draft // Multi-Era Fortnite Squad Draft</title>
+  <title>FNCS Grand Finals // Multi-Era Squad Draft</title>
   <style>
     :root {
       --bg: #090d16;
@@ -316,7 +316,7 @@
     .banner-win { background: rgba(34, 197, 94, 0.18); border: 1px solid var(--win); color: #bbf7d0; }
     .banner-loss { background: rgba(239, 68, 68, 0.18); border: 1px solid var(--loss); color: #fecaca; }
 
-    /* 12-0 Undefeated Special Celebration Screen */
+    /* Perfect 12-Win Celebration Screen */
     .twelve-zero-screen {
       display: none;
       background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(192, 132, 252, 0.16), rgba(34, 197, 94, 0.14));
@@ -455,7 +455,7 @@
   <div class="container">
     <header>
       <div class="brand">
-        <h1>FNCS DRAFT // MULTI-ERA SQUAD DRAFT</h1>
+        <h1>FNCS GRAND FINALS // MULTI-ERA DRAFT</h1>
         <p>Spin Chapters 2–7, draft across all regions, and compete in a 12-Game Grand Finals lobby.</p>
       </div>
       <div class="mode-tabs">
@@ -535,9 +535,9 @@
       </div>
 
       <div class="twelve-zero-screen" id="twelveZeroScreen">
-        <div class="twelve-zero-badge">12-0 UNDEFEATED GRAND FINALS SWEEP</div>
-        <div class="twelve-zero-title" id="tzTitle">PERFECT 12 VICTORY ROYALES!</div>
-        <div class="twelve-zero-sub" id="tzSub">Every single game in the 12-match lobby ended in a Victory Royale.</div>
+        <div class="twelve-zero-badge">PERFECT 12-WIN GRAND FINALS SWEEP</div>
+        <div class="twelve-zero-title" id="tzTitle">ALL 12 VICTORY ROYALES!</div>
+        <div class="twelve-zero-sub" id="tzSub">Dominated every single match in the 12-game Grand Finals lobby.</div>
         <div class="twelve-zero-stats">
           <div class="tz-stat"><strong id="tzPts">0</strong><span>Total Points</span></div>
           <div class="tz-stat"><strong id="tzElims">0</strong><span>Total Eliminations</span></div>
@@ -1747,7 +1747,7 @@
     }
 
     function showTwelveZeroCelebration(squadLabel, totalPts, totalElims) {
-      tzTitle.textContent = `${squadLabel} — 12-0 UNDEFEATED!`;
+      tzTitle.textContent = `${squadLabel} — PERFECT 12-WIN SWEEP!`;
       tzSub.textContent = "Dominated all 12 Grand Finals games with back-to-back Victory Royales.";
       tzPts.textContent = `${totalPts} pts`;
       tzElims.textContent = `${totalElims}`;
