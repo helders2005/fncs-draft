@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FNCS Grand Finals // Multi-Era Squad Draft</title>
+  <title>FNCS Grand Finals // Multi-Era Squad & POI Draft</title>
   <style>
     :root {
       --bg: #090d16;
@@ -32,7 +32,7 @@
       line-height: 1.45;
     }
 
-    .container { max-width: 1120px; margin: 0 auto; }
+    .container { max-width: 1180px; margin: 0 auto; }
 
     header {
       display: flex;
@@ -104,6 +104,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
 
     /* Spinner Box */
@@ -248,7 +249,7 @@
     }
     .mini-stats span { display: block; font-weight: 800; font-size: 0.85rem; color: #fff; }
 
-    /* Roster Slots */
+    /* Roster & POI Slots */
     .roster-slots { display: flex; flex-direction: column; gap: 10px; }
     .slot {
       background: var(--panel-2);
@@ -259,11 +260,13 @@
       justify-content: space-between;
       align-items: center;
       min-height: 58px;
+      gap: 10px;
     }
     .slot.filled { border-style: solid; }
+    .slot-poi { margin-top: 2px; }
     .slot-left strong { font-size: 0.96rem; display: block; }
     .slot-left small { color: var(--muted); font-size: 0.76rem; }
-    .slot-right { text-align: right; }
+    .slot-right { text-align: right; flex-shrink: 0; }
 
     /* Team Ratings & Synergy */
     .team-bars {
@@ -315,6 +318,27 @@
     .banner-running { background: rgba(56, 189, 248, 0.14); border: 1px solid var(--accent); }
     .banner-win { background: rgba(34, 197, 94, 0.18); border: 1px solid var(--win); color: #bbf7d0; }
     .banner-loss { background: rgba(239, 68, 68, 0.18); border: 1px solid var(--loss); color: #fecaca; }
+
+    .contest-pill {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      vertical-align: middle;
+    }
+    .pill-uncon {
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+    .pill-con {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+    }
 
     /* Perfect 12-Win Celebration Screen */
     .twelve-zero-screen {
@@ -370,17 +394,17 @@
 
     .sim-split {
       display: grid;
-      grid-template-columns: 1.25fr 1fr;
+      grid-template-columns: 1.2fr 1.15fr;
       gap: 18px;
       align-items: start;
     }
-    @media (max-width: 900px) {
+    @media (max-width: 960px) {
       .sim-split { grid-template-columns: 1fr; }
     }
 
     .match-log {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
       gap: 10px;
     }
     .match-row {
@@ -389,10 +413,22 @@
       border-radius: 9px;
       padding: 10px 12px;
       display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.83rem;
+      animation: fadeIn 0.25s ease;
+    }
+    .match-row-top {
+      display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.84rem;
-      animation: fadeIn 0.25s ease;
+    }
+    .match-row-sub {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.74rem;
+      color: var(--muted);
     }
     .match-row.vr {
       border-color: var(--mythic);
@@ -405,6 +441,7 @@
       border-radius: 10px;
       padding: 12px 14px;
       animation: fadeIn 0.3s ease;
+      overflow-x: auto;
     }
     .lb-title {
       font-size: 0.76rem;
@@ -417,20 +454,26 @@
     .lb-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.84rem;
+      font-size: 0.81rem;
     }
     .lb-table th, .lb-table td {
-      padding: 7px 8px;
+      padding: 7px 6px;
       text-align: left;
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: middle;
     }
-    .lb-table th { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
+    .lb-table th { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; }
     .lb-table tr.user-row {
       background: rgba(56, 189, 248, 0.16);
       color: #fff;
       font-weight: 800;
     }
     .lb-table tr.user-row td:first-child { color: var(--accent); }
+    .lb-poi-cell {
+      font-size: 0.74rem;
+      color: #cbd5e1;
+      line-height: 1.35;
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
@@ -455,50 +498,50 @@
   <div class="container">
     <header>
       <div class="brand">
-        <h1>FNCS GRAND FINALS // MULTI-ERA DRAFT</h1>
-        <p>Spin Chapters 2–7, draft across all regions, and compete in a 33-Trio 12-Game Grand Finals lobby.</p>
+        <h1>FNCS GRAND FINALS // MULTI-ERA &amp; POI DRAFT</h1>
+        <p>Spin Chapters 2–7, claim your Drop Spot POI, and battle a 33-Trio 12-Game Grand Finals lobby.</p>
       </div>
       <div class="mode-tabs">
         <button class="mode-btn active" data-mode="finals">Grand Finals (Points)</button>
-        <button class="mode-btn" data-mode="pvp">Pass & Play PvP</button>
+        <button class="mode-btn" data-mode="pvp">Pass &amp; Play PvP</button>
       </div>
     </header>
 
     <div id="pvpBanner" class="pvp-header">
-      Player 1 Drafting — Pick 3 pros first, then pass to Player 2!
+      Player 1 Drafting — Pick 3 pros &amp; 1 POI first, then pass to Player 2!
     </div>
 
     <div class="grid-main">
       <!-- LEFT: SPINNER & DRAFT POOL -->
       <div class="card-box">
         <div class="section-title">
-          <span>1. Chapter / Era Spinner</span>
-          <span id="pickCounter">Pick 1 of 3</span>
+          <span id="spinnerTitle">1. Chapter / Era Spinner</span>
+          <span id="pickCounter">Pick 1 of 4 (Pro #1)</span>
         </div>
 
         <div class="spinner-display">
           <div class="reel">
-            <div class="reel-label">Chapter / Era</div>
+            <div class="reel-label" id="reel1Label">Chapter / Era</div>
             <div class="reel-val" id="eraVal">Ready to Spin</div>
           </div>
           <div class="reel">
-            <div class="reel-label">Pool Scope</div>
+            <div class="reel-label" id="reel2Label">Pool Scope</div>
             <div class="reel-val" id="regionVal">—</div>
           </div>
         </div>
 
         <div class="spin-actions">
           <button class="btn-primary" id="spinBtn">Spin Chapter / Era</button>
-          <button class="btn-reroll" id="rerollBtn" disabled>Reroll Era (1 left)</button>
+          <button class="btn-reroll" id="rerollBtn" disabled>Reroll (1 left)</button>
         </div>
 
         <div class="choices-grid" id="choicesGrid"></div>
       </div>
 
-      <!-- RIGHT: DRAFTED TRIO & SYNERGY -->
+      <!-- RIGHT: DRAFTED TRIO, POI & SYNERGY -->
       <div class="card-box">
         <div class="section-title">
-          <span id="rosterTitle">2. Your Drafted Trio</span>
+          <span id="rosterTitle">2. Your Drafted Trio &amp; Drop Spot</span>
           <button class="btn-secondary" id="resetBtn">Reset Draft</button>
         </div>
 
@@ -530,7 +573,7 @@
     <!-- SIMULATION RESULTS -->
     <div class="card-box sim-panel" id="simPanel">
       <div class="section-title">
-        <span>3. Grand Finals Match Log & Live Standings</span>
+        <span>3. Grand Finals Match Log &amp; Live Standings</span>
         <span id="summaryScore"></span>
       </div>
 
@@ -556,7 +599,45 @@
 
   <script>
     // ==========================================
-    // 1. MULTI-ERA 65-PLAYER FNCS DATABASE (VERIFIED & REBALANCED)
+    // 1. 25-POI DROP SPOT DATABASE (CHAPTERS 1-7)
+    // ==========================================
+    const POIS = [
+      // S-TIER (7 POIs)
+      { id: "stark", name: "Stark Industries", chapter: "Chapter 2", tier: "S", perfMod: 2.0, elimBonus: 1, riskLabel: "High Contest Risk", note: "Unibeam Mythics, vault & Stark robot loot" },
+      { id: "agency", name: "The Agency", chapter: "Chapter 2", tier: "S", perfMod: 1.8, elimBonus: 1, riskLabel: "High Contest Risk", note: "Dead-center map control + Midas Drum Gun" },
+      { id: "tilted", name: "Tilted Towers", chapter: "Chapter 1", tier: "S", perfMod: 1.7, elimBonus: 1, riskLabel: "High Contest Risk", note: "Center map, max mats & high early elim potential" },
+      { id: "lavish", name: "Lavish Lair", chapter: "Chapter 5", tier: "S", perfMod: 1.6, elimBonus: 1, riskLabel: "High Contest Risk", note: "Medallion + Oscar's Frenzy Auto Shotgun" },
+      { id: "crime_city", name: "Crime City", chapter: "Chapter 6", tier: "S", perfMod: 1.6, elimBonus: 1, riskLabel: "High Contest Risk", note: "Vaults, black market loot & dense chests" },
+      { id: "reality_reign", name: "Reality's Reign", chapter: "Chapter 7", tier: "S", perfMod: 1.6, elimBonus: 1, riskLabel: "High Contest Risk", note: "Geno/Eggman fortress with Override Console & mythic AR" },
+      { id: "rig_shark", name: "The Rig / The Shark", chapter: "Chapter 2", tier: "S", perfMod: 1.5, elimBonus: 1, riskLabel: "High Contest Risk", note: "Skye's Assault Rifle & Grappler mobility" },
+
+      // A-TIER (6 POIs)
+      { id: "slappy", name: "Slappy Shores", chapter: "Chapter 4", tier: "A", perfMod: 1.2, elimBonus: 0, riskLabel: "Moderate Risk", note: "Slap barrels & elite endgame rotation stamina" },
+      { id: "mega_city", name: "Mega City", chapter: "Chapter 4", tier: "A", perfMod: 1.2, elimBonus: 0, riskLabel: "Moderate Risk", note: "Grind rails, vaults & high chest count" },
+      { id: "lazy_lake", name: "Lazy Lake", chapter: "Chapter 2", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Clean splits, high chest density & central rotations" },
+      { id: "sweaty_sands", name: "Sweaty Sands", chapter: "Chapter 2", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Massive loot pool & gold/upgrade economy" },
+      { id: "lonewolf", name: "Lonewolf Lair", chapter: "Chapter 6", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Fletcher Kane boss loot & medallion" },
+      { id: "green_hill", name: "Green Hill Zone", chapter: "Chapter 7", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Boost pads/loops for fast early-game rotates & boss loot" },
+
+      // B-TIER (6 POIs)
+      { id: "pleasant", name: "Pleasant Park", chapter: "Chapter 2", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Classic safe splits & predictable mid-map rotates" },
+      { id: "retail", name: "Retail Row", chapter: "Chapter 1", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Reliable loot & easy surge tags" },
+      { id: "frenzy", name: "Frenzy Farm", chapter: "Chapter 2", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Open sightlines for surge & central position" },
+      { id: "coney", name: "Coney Crossroads", chapter: "Chapter 3", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Solid mid-map hub with vehicle spawns" },
+      { id: "anvil", name: "Anvil Square", chapter: "Chapter 4", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Good cover & balanced chest count" },
+      { id: "stone_sanctum", name: "Stone Sanctum", chapter: "Chapter 7", tier: "B", perfMod: 0.2, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Quiet drop with shifting temple walls" },
+
+      // C-TIER (6 POIs)
+      { id: "coral", name: "Coral Castle", chapter: "Chapter 2", tier: "C", perfMod: -1.5, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Low-ground pit, poor mats & brutal uphill rotations" },
+      { id: "junk", name: "Junk Junction", chapter: "Chapter 1", tier: "C", perfMod: -1.3, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far northwest corner & sparse chest count" },
+      { id: "stealthy", name: "Stealthy Stronghold", chapter: "Chapter 2", tier: "C", perfMod: -1.1, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Walled-in choke points & slow zone pulls" },
+      { id: "haunted", name: "Haunted Hills", chapter: "Chapter 1", tier: "C", perfMod: -1.1, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Edge-map isolation & weak upgrade/heal economy" },
+      { id: "sleepy", name: "Sleepy Sound", chapter: "Chapter 3", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far edge rotates with limited mobility" },
+      { id: "shifty", name: "Shifty Shafts", chapter: "Chapter 1", tier: "C", perfMod: -0.8, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Cramped tunnels & low trio loot capacity" }
+    ];
+
+    // ==========================================
+    // 2. MULTI-ERA 65-PLAYER FNCS DATABASE
     // ==========================================
     const ERAS = [
       "Chapter 2 (2019-2021)",
@@ -1287,75 +1368,22 @@
       }
     ];
 
-    // Real-life iconic duo/trio chemistry pairs
     const CHEMISTRY_PAIRS = [
-      ["peterbot", "pollo"],
-      ["peterbot", "cold"],
-      ["peterbot", "ritual"],
-      ["peterbot", "mero"],
-      ["peterbot", "dukez"],
-      ["queasy", "veno"],
-      ["queasy", "merstach"],
-      ["queasy", "hen"],
-      ["swizzy", "pixie"],
-      ["swizzy", "vanyak3k"],
-      ["swizzy", "merstach"],
-      ["acorn", "cold"],
-      ["acorn", "boltz"],
-      ["acorn", "edgey"],
-      ["acorn", "ajerss"],
-      ["kami", "setty"],
-      ["bugha", "mero"],
-      ["bugha", "muz"],
-      ["mero", "cooper"],
-      ["mero", "deyy"],
-      ["mero", "reverse2k"],
-      ["mero", "dukez"],
-      ["deyy", "reverse2k"],
-      ["vic0", "flickzy"],
-      ["vic0", "malibuca"],
-      ["sky", "scroll"],
-      ["epikwhale", "arkhram"],
-      ["epikwhale", "rehx"],
-      ["arkhram", "rehx"],
-      ["zayt", "saf"],
-      ["zayt", "stretch"],
-      ["saf", "stretch"],
-      ["cented", "edgey"],
-      ["cented", "commandment"],
-      ["edgey", "commandment"],
-      ["edgey", "dukez"],
-      ["avery", "commandment"],
-      ["mongraal", "mitr0"],
-      ["mongraal", "tayson"],
-      ["mitr0", "tayson"],
-      ["tayson", "chapix"],
-      ["hen", "chapix"],
-      ["hen", "jannisz"],
-      ["jannisz", "vadeal"],
-      ["vadeal", "rezon"],
-      ["vadeal", "noahreyli"],
-      ["rezon", "noahreyli"],
-      ["andilex", "nayte"],
-      ["stompy", "tschinken"],
-      ["koyota", "yuma"],
-      ["koyota", "rise"],
-      ["k1ng", "phzin"],
-      ["k1ng", "fazer"],
-      ["clix", "rapid"],
-      ["clix", "eomzo"],
-      ["khanada", "boltz"],
-      ["khanada", "ajerss"],
-      ["shxrk", "t3eny"],
-      ["tjino", "pablowingu"],
-      ["fks", "adapter"],
-      ["muz", "volx"],
-      ["alex", "volx"],
-      ["alex", "jace"],
-      ["volx", "jace"]
+      ["peterbot", "pollo"], ["peterbot", "cold"], ["peterbot", "ritual"], ["peterbot", "mero"], ["peterbot", "dukez"],
+      ["queasy", "veno"], ["queasy", "merstach"], ["queasy", "hen"], ["swizzy", "pixie"], ["swizzy", "vanyak3k"],
+      ["swizzy", "merstach"], ["acorn", "cold"], ["acorn", "boltz"], ["acorn", "edgey"], ["acorn", "ajerss"],
+      ["kami", "setty"], ["bugha", "mero"], ["bugha", "muz"], ["mero", "cooper"], ["mero", "deyy"],
+      ["mero", "reverse2k"], ["mero", "dukez"], ["deyy", "reverse2k"], ["vic0", "flickzy"], ["vic0", "malibuca"],
+      ["sky", "scroll"], ["epikwhale", "arkhram"], ["epikwhale", "rehx"], ["arkhram", "rehx"], ["zayt", "saf"],
+      ["zayt", "stretch"], ["saf", "stretch"], ["cented", "edgey"], ["cented", "commandment"], ["edgey", "commandment"],
+      ["edgey", "dukez"], ["avery", "commandment"], ["mongraal", "mitr0"], ["mongraal", "tayson"], ["mitr0", "tayson"],
+      ["tayson", "chapix"], ["hen", "chapix"], ["hen", "jannisz"], ["jannisz", "vadeal"], ["vadeal", "rezon"],
+      ["vadeal", "noahreyli"], ["rezon", "noahreyli"], ["andilex", "nayte"], ["stompy", "tschinken"], ["koyota", "yuma"],
+      ["koyota", "rise"], ["k1ng", "phzin"], ["k1ng", "fazer"], ["clix", "rapid"], ["clix", "eomzo"],
+      ["khanada", "boltz"], ["khanada", "ajerss"], ["shxrk", "t3eny"], ["tjino", "pablowingu"], ["fks", "adapter"],
+      ["muz", "volx"], ["alex", "volx"], ["alex", "jace"], ["volx", "jace"]
     ];
 
-    // Official 2025 FNCS Global Championship (Lyon) Trios Placement Points (4 pts per elim)
     const FNCS_2025_PLACEMENT_PTS = {
       1: 65, 2: 56, 3: 52, 4: 48, 5: 44, 6: 40,
       7: 38, 8: 36, 9: 33, 10: 30, 11: 27, 12: 24,
@@ -1363,20 +1391,27 @@
     };
 
     // ==========================================
-    // 2. GAME STATE
+    // 3. GAME STATE
     // ==========================================
     let mode = "finals"; // "finals" | "pvp"
     let pvpTurn = 1;     // 1 or 2
     let p1Roster = [];
     let p2Roster = [];
+    let p1Poi = null;
+    let p2Poi = null;
     let p1Rerolls = 1;
     let p2Rerolls = 1;
     let currentChoices = [];
+    let currentChoiceType = "player"; // "player" | "poi"
     let hasSpun = false;
     let lastEra = "";
+    let lastPoiIds = [];
     let simTimer = null;
 
     // DOM refs
+    const spinnerTitle = document.getElementById("spinnerTitle");
+    const reel1Label = document.getElementById("reel1Label");
+    const reel2Label = document.getElementById("reel2Label");
     const eraVal = document.getElementById("eraVal");
     const regionVal = document.getElementById("regionVal");
     const pickCounter = document.getElementById("pickCounter");
@@ -1403,6 +1438,18 @@
       return (mode === "pvp" && pvpTurn === 2) ? p2Roster : p1Roster;
     }
 
+    function getActivePoi() {
+      return (mode === "pvp" && pvpTurn === 2) ? p2Poi : p1Poi;
+    }
+
+    function setActivePoi(poi) {
+      if (mode === "pvp" && pvpTurn === 2) {
+        p2Poi = poi;
+      } else {
+        p1Poi = poi;
+      }
+    }
+
     function getActiveRerolls() {
       return (mode === "pvp" && pvpTurn === 2) ? p2Rerolls : p1Rerolls;
     }
@@ -1415,8 +1462,15 @@
       }
     }
 
-    function getStartingRerollsForMode() {
-      return 1;
+    function isActivePlayerInPoiPhase() {
+      return getActiveRoster().length === 3 && !getActivePoi();
+    }
+
+    function isDraftComplete() {
+      if (mode === "pvp") {
+        return p1Roster.length === 3 && Boolean(p1Poi) && p2Roster.length === 3 && Boolean(p2Poi);
+      }
+      return p1Roster.length === 3 && Boolean(p1Poi);
     }
 
     function getTierClass(ovr) {
@@ -1426,10 +1480,17 @@
       return "tier-rookie";
     }
 
+    function getPoiTierClass(tier) {
+      if (tier === "S") return "tier-mythic";
+      if (tier === "A") return "tier-champion";
+      if (tier === "B") return "tier-contender";
+      return "tier-rookie";
+    }
+
     // ==========================================
-    // 3. SYNERGY & TEAM RATING CALCULATOR
+    // 4. SYNERGY & TEAM RATING CALCULATOR
     // ==========================================
-    function calculateTeamStats(roster) {
+    function calculateTeamStats(roster, poi = null) {
       if (roster.length === 0) {
         return { igl: 0, mech: 0, clutch: 0, tags: [] };
       }
@@ -1462,7 +1523,6 @@
           tags.push({ text: "-1 No IGL Penalty", pos: false });
         }
 
-        // Same-Region synergy (+1 for 2 from same region, +2 for all 3 from same region)
         const regions = roster.map(p => p.region);
         const uniqueRegions = new Set(regions);
         if (uniqueRegions.size === 1) {
@@ -1474,7 +1534,6 @@
           tags.push({ text: `+1 Same-Region Duo (${sharedReg})`, pos: true });
         }
 
-        // Check real-life duo/trio chemistry
         let chemCount = 0;
         for (let i = 0; i < roster.length; i++) {
           for (let j = i + 1; j < roster.length; j++) {
@@ -1491,13 +1550,20 @@
           tags.push({ text: `+${chemBonus} Real-Life Teammate Chem`, pos: true });
         }
 
-        // Same-Chapter chemistry
         const eras = roster.map(p => p.era);
         const uniqueEras = new Set(eras);
         if (uniqueEras.size < 3) {
           mod += 1;
           tags.push({ text: "+1 Same-Era Meta Synergy", pos: true });
         }
+      }
+
+      if (poi) {
+        const sign = poi.perfMod >= 0 ? "+" : "";
+        tags.push({
+          text: `${poi.name} (${poi.tier}-Tier: ${sign}${poi.perfMod.toFixed(1)} Perf${poi.elimBonus ? `, +${poi.elimBonus} Elim` : ""})`,
+          pos: poi.perfMod >= 0
+        });
       }
 
       const clamp = v => Math.max(50, Math.min(99, v + mod));
@@ -1510,7 +1576,7 @@
     }
 
     // ==========================================
-    // 4. ERA-ONLY SPIN, REROLL & DRAFT LOGIC
+    // 5. ERA & POI SPIN, SINGLE-REROLL & DRAFT LOGIC
     // ==========================================
     function getValidEras(draftedIds) {
       return ERAS
@@ -1554,29 +1620,12 @@
           eraVal.textContent = chosenEraPool.era;
           regionVal.textContent = "All Regions (Mixed)";
           lastEra = chosenEraPool.era;
-          dealChoices(chosenEraPool);
+          dealPlayerChoices(chosenEraPool);
         }
       }, 55);
     }
 
-    function spinWheel() {
-      const roster = getActiveRoster();
-      if (roster.length >= 3 || hasSpun) return;
-      executeEraSpin(false);
-    }
-
-    function rerollChoices() {
-      const roster = getActiveRoster();
-      const rerollsLeft = getActiveRerolls();
-      if (roster.length >= 3 || !hasSpun || rerollsLeft <= 0) return;
-
-      setActiveRerolls(rerollsLeft - 1);
-      hasSpun = false;
-      updateRerollButton();
-      executeEraSpin(true);
-    }
-
-    function dealChoices(eraPool) {
+    function dealPlayerChoices(eraPool) {
       const remaining = [...eraPool.pool];
       const picked = [];
       for (let i = 0; i < 3 && remaining.length > 0; i++) {
@@ -1590,59 +1639,139 @@
         });
       }
       currentChoices = picked;
+      currentChoiceType = "player";
       hasSpun = true;
       renderChoices();
       updateRerollButton();
     }
 
-    function selectPlayer(index) {
+    function executePoiSpin(avoidPreviousSet) {
+      spinBtn.disabled = true;
+      rerollBtn.disabled = true;
+      choicesGrid.innerHTML = "";
+
+      let pool = [...POIS];
+      if (avoidPreviousSet && lastPoiIds.length > 0) {
+        const filtered = pool.filter(p => !lastPoiIds.includes(p.id));
+        if (filtered.length >= 3) pool = filtered;
+      }
+
+      // Deal 3 distinct POIs
+      const picked = [];
+      for (let i = 0; i < 3 && pool.length > 0; i++) {
+        const idx = Math.floor(Math.random() * pool.length);
+        picked.push(pool.splice(idx, 1)[0]);
+      }
+
+      let ticks = 0;
+      const anim = setInterval(() => {
+        const sample = POIS[Math.floor(Math.random() * POIS.length)];
+        eraVal.textContent = sample.name;
+        regionVal.textContent = `${sample.tier}-Tier (${sample.chapter})`;
+        ticks++;
+        if (ticks >= 10) {
+          clearInterval(anim);
+          eraVal.textContent = "Choose Drop Spot";
+          regionVal.textContent = "25-POI Map Pool";
+          lastPoiIds = picked.map(p => p.id);
+          currentChoices = picked;
+          currentChoiceType = "poi";
+          hasSpun = true;
+          renderChoices();
+          updateRerollButton();
+        }
+      }, 55);
+    }
+
+    function spinWheel() {
+      if (isDraftComplete() || hasSpun) return;
+      if (isActivePlayerInPoiPhase()) {
+        executePoiSpin(false);
+      } else {
+        executeEraSpin(false);
+      }
+    }
+
+    function rerollChoices() {
+      const rerollsLeft = getActiveRerolls();
+      if (isDraftComplete() || !hasSpun || rerollsLeft <= 0) return;
+
+      setActiveRerolls(rerollsLeft - 1);
+      hasSpun = false;
+      updateRerollButton();
+
+      if (currentChoiceType === "poi") {
+        executePoiSpin(true);
+      } else {
+        executeEraSpin(true);
+      }
+    }
+
+    function selectChoice(index) {
       const picked = currentChoices[index];
       if (!picked) return;
 
-      const roster = getActiveRoster();
-      roster.push(picked);
-      currentChoices = [];
-      hasSpun = false;
-      lastEra = "";
+      if (currentChoiceType === "poi") {
+        setActivePoi(picked);
+        currentChoices = [];
+        hasSpun = false;
+        lastPoiIds = [];
 
-      if (mode === "pvp" && pvpTurn === 1 && p1Roster.length === 3) {
-        pvpTurn = 2;
-        pvpBanner.textContent = "Player 2 Drafting — Pick your 3 pros to challenge Player 1!";
-        eraVal.textContent = "Ready to Spin";
-        regionVal.textContent = "—";
+        if (mode === "pvp" && pvpTurn === 1 && p1Roster.length === 3 && p1Poi) {
+          pvpTurn = 2;
+          pvpBanner.textContent = "Player 2 Drafting — Pick 3 pros & 1 POI to challenge Player 1!";
+          eraVal.textContent = "Ready to Spin";
+          regionVal.textContent = "—";
+        } else {
+          eraVal.textContent = `${picked.name} Locked`;
+          regionVal.textContent = `${picked.tier}-Tier Drop`;
+        }
+      } else {
+        const roster = getActiveRoster();
+        roster.push(picked);
+        currentChoices = [];
+        hasSpun = false;
+        lastEra = "";
+
+        if (roster.length === 3) {
+          eraVal.textContent = "Spin Drop Spot POI";
+          regionVal.textContent = "25 POIs Available";
+        }
       }
 
       updateUI();
     }
 
     // ==========================================
-    // 5. SIMULATION ENGINE (2025 GLOBAL CHAMPIONSHIP SCORING)
+    // 6. SIMULATION ENGINE (POI & CONTEST SYSTEM)
     // ==========================================
     function bellRandom(spread) {
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
     }
 
-    function simulateSingleMatch(teamStats, customRng = null) {
-      const rng = customRng !== null ? customRng : bellRandom(12.5);
-      const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + rng;
+    function simulateSingleMatch(teamStats, poi, contestDelta = 0, bonusElim = 0) {
+      const rng = bellRandom(12.5);
+      const poiBoost = poi ? poi.perfMod : 0;
+      const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + poiBoost + contestDelta + rng;
 
       let placement, elims;
+      const extraPoiElims = (poi ? poi.elimBonus : 0) + bonusElim;
 
       if (perf >= 98.4) {
         placement = 1;
-        elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1);
+        elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1 + extraPoiElims);
       } else if (perf >= 94.2) {
         placement = Math.random() < 0.45 ? 2 : 3;
-        elims = Math.max(2, Math.round((teamStats.mech - 80) * 0.18) + Math.floor(Math.random() * 2));
+        elims = Math.max(2, Math.round((teamStats.mech - 80) * 0.18) + Math.floor(Math.random() * 2) + extraPoiElims);
       } else if (perf >= 89.2) {
         placement = Math.floor(Math.random() * 7) + 4;
-        elims = Math.max(0, Math.round((teamStats.mech - 82) * 0.12) + Math.floor(Math.random() * 2));
+        elims = Math.max(0, Math.round((teamStats.mech - 82) * 0.12) + Math.floor(Math.random() * 2) + (extraPoiElims > 0 ? 1 : 0));
       } else if (perf >= 83.2) {
         placement = Math.floor(Math.random() * 10) + 11;
-        elims = Math.max(0, Math.round((teamStats.mech - 84) * 0.08) + (Math.random() < 0.45 ? 1 : 0));
+        elims = Math.max(0, Math.round((teamStats.mech - 84) * 0.08) + (Math.random() < 0.45 ? 1 : 0) + (bonusElim > 0 ? 1 : 0));
       } else {
         placement = Math.floor(Math.random() * 13) + 21;
-        elims = Math.random() < 0.35 ? 1 : 0;
+        elims = (Math.random() < 0.35 ? 1 : 0) + (bonusElim > 0 ? 1 : 0);
       }
 
       const placePts = FNCS_2025_PLACEMENT_PTS[placement] || 0;
@@ -1656,7 +1785,50 @@
       };
     }
 
-    function buildRandomRivalTrios(userRoster, count = 32) {
+    function assignPoiToRival(trioStats, poiCounts) {
+      const avgRating = (trioStats.igl + trioStats.mech + trioStats.clutch) / 3;
+      const sPois = POIS.filter(p => p.tier === "S");
+      const aPois = POIS.filter(p => p.tier === "A");
+      const bPois = POIS.filter(p => p.tier === "B");
+      const cPois = POIS.filter(p => p.tier === "C");
+
+      const pickFromBucket = (bucket, maxPerPoi) => {
+        const available = bucket.filter(p => (poiCounts[p.id] || 0) < maxPerPoi);
+        if (available.length === 0) return null;
+        return available[Math.floor(Math.random() * available.length)];
+      };
+
+      const roll = Math.random();
+      let chosen = null;
+
+      if (avgRating >= 93) {
+        if (roll < 0.55) chosen = pickFromBucket(sPois, 2);
+        if (!chosen && roll < 0.90) chosen = pickFromBucket(aPois, 2);
+        if (!chosen) chosen = pickFromBucket(bPois, 2);
+      } else if (avgRating >= 89) {
+        if (roll < 0.25) chosen = pickFromBucket(sPois, 2);
+        if (!chosen && roll < 0.72) chosen = pickFromBucket(aPois, 2);
+        if (!chosen) chosen = pickFromBucket(bPois, 2);
+      } else if (avgRating >= 85) {
+        if (roll < 0.45) chosen = pickFromBucket(bPois, 2);
+        if (!chosen && roll < 0.75) chosen = pickFromBucket(aPois, 2);
+        if (!chosen) chosen = pickFromBucket(cPois, 2);
+      } else {
+        if (roll < 0.65) chosen = pickFromBucket(cPois, 2);
+        if (!chosen) chosen = pickFromBucket(bPois, 2);
+      }
+
+      if (!chosen) {
+        const anyOpen = POIS.filter(p => (poiCounts[p.id] || 0) < 2);
+        const fallbackPool = anyOpen.length > 0 ? anyOpen : POIS;
+        chosen = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+      }
+
+      poiCounts[chosen.id] = (poiCounts[chosen.id] || 0) + 1;
+      return chosen;
+    }
+
+    function buildRandomRivalTrios(userRoster, userPoi, count = 32) {
       const draftedIds = new Set(userRoster.map(p => p.id));
       const basePool = PLAYERS.filter(p => !draftedIds.has(p.id));
       const allEraEntries = [];
@@ -1675,6 +1847,10 @@
       const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
       const rivals = [];
       const usedSquadKeys = new Set();
+      const poiCounts = {};
+      if (userPoi) {
+        poiCounts[userPoi.id] = 1;
+      }
 
       let igls = shuffle(allEraEntries.filter(p => p.role === "IGL"));
       let fraggers = shuffle(allEraEntries.filter(p => p.role === "Fragger"));
@@ -1687,7 +1863,7 @@
       };
 
       let guards = 0;
-      while (rivals.length < count && guards < 400) {
+      while (rivals.length < count && guards < 450) {
         guards++;
         refillIfNeeded();
         const p1 = igls.pop();
@@ -1703,40 +1879,95 @@
         usedSquadKeys.add(key);
 
         const trio = [p1, p2, p3];
+        const baseStats = calculateTeamStats(trio);
+        const poi = assignPoiToRival(baseStats, poiCounts);
+
         rivals.push({
+          id: `rival_${rivals.length}`,
           squad: `${p1.name} • ${p2.name} • ${p3.name}`,
-          stats: calculateTeamStats(trio),
+          stats: calculateTeamStats(trio, poi),
+          poi,
           pts: 0,
           wins: 0,
-          isUser: false
+          isUser: false,
+          isContested: false,
+          contestedBy: []
         });
       }
 
       return rivals;
     }
 
-    function renderLiveLeaderboard(userRoster, userPts, userWins, rivalTeams, currentGame) {
-      const userNames = userRoster.map(p => p.name).join(" • ");
+    // Resolve off-spawn contests at every shared POI for a single match
+    function resolveOffSpawnContests(lobbyTeams) {
+      const byPoi = {};
+      lobbyTeams.forEach(t => {
+        if (!t.poi) return;
+        if (!byPoi[t.poi.id]) byPoi[t.poi.id] = [];
+        byPoi[t.poi.id].push(t);
+      });
+
+      const outcomeMap = new Map();
+      lobbyTeams.forEach(t => {
+        outcomeMap.set(t.id, {
+          contested: false,
+          wonSpawn: true,
+          opponents: []
+        });
+      });
+
+      Object.values(byPoi).forEach(group => {
+        if (group.length <= 1) return;
+
+        // Roll off-spawn fight score (Mechanics + Clutch + RNG)
+        const scored = group.map(team => ({
+          team,
+          spawnScore: (team.stats.mech * 0.65) + (team.stats.clutch * 0.35) + bellRandom(10)
+        }));
+        scored.sort((a, b) => b.spawnScore - a.spawnScore);
+
+        scored.forEach((entry, idx) => {
+          const others = group.filter(o => o.id !== entry.team.id).map(o => o.squad);
+          outcomeMap.set(entry.team.id, {
+            contested: true,
+            wonSpawn: idx === 0,
+            opponents: others
+          });
+        });
+      });
+
+      return outcomeMap;
+    }
+
+    function renderLiveLeaderboard(userTeam, rivalTeams, currentGame) {
       const standings = [
         ...rivalTeams,
-        { squad: `${userNames} (YOU)`, pts: userPts, wins: userWins, isUser: true }
+        userTeam
       ];
 
       standings.sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
 
       const userRank = standings.findIndex(s => s.isUser) + 1;
       const leaderPts = standings[0].pts;
-      const top8 = standings.slice(0, 8);
-      if (userRank > 8) {
-        top8.push({ ...standings[userRank - 1], customRank: userRank });
+      const top10 = standings.slice(0, 10);
+      if (userRank > 10) {
+        top10.push({ ...standings[userRank - 1], customRank: userRank });
       }
 
-      const rowsHtml = top8.map((row, idx) => {
+      const rowsHtml = top10.map((row, idx) => {
         const rank = row.customRank || (idx + 1);
+        const badgeHtml = row.isContested
+          ? `<span class="contest-pill pill-con" title="Contested by ${row.contestedBy.join(", ")}">CONTESTED</span>`
+          : `<span class="contest-pill pill-uncon">UNCON</span>`;
+
         return `
           <tr class="${row.isUser ? "user-row" : ""}">
             <td>#${rank}</td>
             <td>${row.squad}</td>
+            <td class="lb-poi-cell">
+              <div><strong>${row.poi.name}</strong> (${row.poi.tier})</div>
+              <div>${badgeHtml}</div>
+            </td>
             <td>${row.wins} VR</td>
             <td><strong>${row.pts} pts</strong></td>
           </tr>
@@ -1744,7 +1975,7 @@
       }).join("");
 
       const heading = currentGame >= 12
-        ? "Final Lobby Standings — Top 8 Trio Leaderboard (33 Trios)"
+        ? "Final Lobby Standings — Top 10 Trio Leaderboard (33 Trios)"
         : `Live Lobby Standings — After Game ${currentGame} of 12 (33 Trios)`;
 
       leaderboardContainer.innerHTML = `
@@ -1755,8 +1986,9 @@
               <tr>
                 <th>Place</th>
                 <th>Trio Roster</th>
+                <th>Drop Spot (POI)</th>
                 <th>Wins</th>
-                <th>Total Points</th>
+                <th>Points</th>
               </tr>
             </thead>
             <tbody>${rowsHtml}</tbody>
@@ -1784,30 +2016,73 @@
       summaryScore.textContent = "";
       simBtn.disabled = true;
 
-      const p1Stats = calculateTeamStats(p1Roster);
-      const p2Stats = mode === "pvp" ? calculateTeamStats(p2Roster) : null;
-      const rivalTeams = mode === "finals" ? buildRandomRivalTrios(p1Roster, 32) : [];
+      const p1Stats = calculateTeamStats(p1Roster, p1Poi);
+      const p2Stats = mode === "pvp" ? calculateTeamStats(p2Roster, p2Poi) : null;
+
+      const userTeam = {
+        id: "user_team",
+        squad: `${p1Roster.map(p => p.name).join(" • ")} (YOU)`,
+        stats: p1Stats,
+        poi: p1Poi,
+        pts: 0,
+        wins: 0,
+        isUser: true,
+        isContested: false,
+        contestedBy: []
+      };
+
+      const rivalTeams = mode === "finals" ? buildRandomRivalTrios(p1Roster, p1Poi, 32) : [];
+
+      // Mark permanent POI contest status across the 33-trio lobby
+      if (mode === "finals") {
+        const allLobby = [userTeam, ...rivalTeams];
+        allLobby.forEach(team => {
+          const sameDrop = allLobby.filter(other => other.id !== team.id && other.poi.id === team.poi.id);
+          team.isContested = sameDrop.length > 0;
+          team.contestedBy = sameDrop.map(o => o.squad.replace(" (YOU)", ""));
+        });
+      }
 
       let game = 1;
       let p1Total = 0, p1Wins = 0, p1Elims = 0;
       let p2Total = 0, p2Wins = 0, p2Elims = 0;
 
       simBanner.className = "banner banner-running";
-      simBanner.textContent = mode === "pvp"
-        ? "Simulating 12-Game Head-to-Head Lobby..."
-        : "Grand Finals Live (33 Trios • 2025 Global Scoring: 65pt VR • 4pt/Kill)...";
+      if (mode === "pvp") {
+        const samePoi = p1Poi.id === p2Poi.id;
+        simBanner.innerHTML = samePoi
+          ? `<span>Simulating 12-Game Head-to-Head... <span class="contest-pill pill-con">CONTESTED AT ${p1Poi.name}</span></span>`
+          : `<span>Simulating 12-Game Head-to-Head... P1 (${p1Poi.name}) vs P2 (${p2Poi.name}) <span class="contest-pill pill-uncon">BOTH UNCONTESTED</span></span>`;
+      } else {
+        simBanner.innerHTML = userTeam.isContested
+          ? `<span>Grand Finals Live — Landing ${p1Poi.name} <span class="contest-pill pill-con">CONTESTED vs ${userTeam.contestedBy.join(" & ")}</span></span>`
+          : `<span>Grand Finals Live — Landing ${p1Poi.name} <span class="contest-pill pill-uncon">UNCONTESTED DROP</span></span>`;
+      }
 
       simTimer = setInterval(() => {
-        const r1 = simulateSingleMatch(p1Stats, bellRandom(12.5));
-
         if (mode === "pvp") {
-          const r2 = simulateSingleMatch(p2Stats, bellRandom(12.5));
+          const p1PvpObj = { id: "p1", squad: "Player 1", stats: p1Stats, poi: p1Poi };
+          const p2PvpObj = { id: "p2", squad: "Player 2", stats: p2Stats, poi: p2Poi };
+          const spawnMap = resolveOffSpawnContests([p1PvpObj, p2PvpObj]);
+          const s1 = spawnMap.get("p1");
+          const s2 = spawnMap.get("p2");
+
+          const cDelta1 = s1.contested ? (s1.wonSpawn ? 1.5 : -7.5) : 0;
+          const cDelta2 = s2.contested ? (s2.wonSpawn ? 1.5 : -7.5) : 0;
+          const bElim1 = (s1.contested && s1.wonSpawn) ? 1 : 0;
+          const bElim2 = (s2.contested && s2.wonSpawn) ? 1 : 0;
+
+          const r1 = simulateSingleMatch(p1Stats, p1Poi, cDelta1, bElim1);
+          const r2 = simulateSingleMatch(p2Stats, p2Poi, cDelta2, bElim2);
+
           let p1WonMatch = false;
           let p2WonMatch = false;
 
           if (r1.isWin && r2.isWin) {
             if (r1.perf >= r2.perf) {
               p1WonMatch = true;
+              r2.placement = 2;
+              r2.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (r2.elims * 4);
             } else {
               p2WonMatch = true;
               r1.placement = 2;
@@ -1826,23 +2101,44 @@
           p2Elims += r2.elims;
           if (p2WonMatch) p2Wins++;
 
+          const spawnTag = s1.contested
+            ? `<span class="contest-pill pill-con">CONTESTED: ${s1.wonSpawn ? "P1 WON SPAWN" : "P2 WON SPAWN"}</span>`
+            : `<span class="contest-pill pill-uncon">UNCONTESTED</span>`;
+
           const row = document.createElement("div");
           row.className = `match-row ${p1WonMatch || p2WonMatch ? "vr" : ""}`;
           row.innerHTML = `
-            <div><strong>Game ${game}</strong></div>
-            <div>P1: #${r1.placement} (${r1.elims}k) <strong>+${r1.points}</strong></div>
-            <div>P2: #${r2.placement} (${r2.elims}k) <strong>+${r2.points}</strong></div>
+            <div class="match-row-top">
+              <strong>Game ${game}</strong>
+              ${spawnTag}
+            </div>
+            <div class="match-row-sub">
+              <span>P1: #${r1.placement} (${r1.elims}k) <strong>+${r1.points}</strong></span>
+              <span>P2: #${r2.placement} (${r2.elims}k) <strong>+${r2.points}</strong></span>
+            </div>
           `;
           matchLog.appendChild(row);
           summaryScore.textContent = `P1: ${p1Total} pts (${p1Wins} VR) | P2: ${p2Total} pts (${p2Wins} VR)`;
         } else {
-          // Simulate all 32 AI rival trios with equal 12.5 RNG spread
-          const rivalResults = rivalTeams.map(rival => ({
-            rival,
-            res: simulateSingleMatch(rival.stats, bellRandom(12.5))
-          }));
+          const allLobby = [userTeam, ...rivalTeams];
+          const spawnMap = resolveOffSpawnContests(allLobby);
 
-          // Fair Victory Royale resolution: highest match performance (perf) wins the 1st-place VR
+          const userSpawn = spawnMap.get(userTeam.id);
+          const userContestDelta = userSpawn.contested ? (userSpawn.wonSpawn ? 1.5 : -7.5) : 0;
+          const userBonusElim = (userSpawn.contested && userSpawn.wonSpawn) ? 1 : 0;
+          const r1 = simulateSingleMatch(p1Stats, p1Poi, userContestDelta, userBonusElim);
+
+          const rivalResults = rivalTeams.map(rival => {
+            const sp = spawnMap.get(rival.id);
+            const cDelta = sp.contested ? (sp.wonSpawn ? 1.5 : -7.5) : 0;
+            const bElim = (sp.contested && sp.wonSpawn) ? 1 : 0;
+            return {
+              rival,
+              res: simulateSingleMatch(rival.stats, rival.poi, cDelta, bElim)
+            };
+          });
+
+          // Fair Victory Royale resolution by highest match perf
           const vrContenders = [];
           if (r1.isWin) vrContenders.push({ isUser: true, perf: r1.perf, res: r1 });
           rivalResults.forEach(entry => {
@@ -1855,7 +2151,6 @@
             const winner = vrContenders[0];
             userWonMatch = winner.isUser;
 
-            // Any other contender who rolled VR in the same lobby is placed 2nd instead
             vrContenders.slice(1).forEach(runnerUp => {
               runnerUp.res.placement = 2;
               runnerUp.res.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (runnerUp.res.elims * 4);
@@ -1865,27 +2160,41 @@
           p1Total += r1.points;
           p1Elims += r1.elims;
           if (userWonMatch) p1Wins++;
+          userTeam.pts = p1Total;
+          userTeam.wins = p1Wins;
 
-          rivalResults.forEach(({ rival, res }, idx) => {
+          rivalResults.forEach(({ rival, res }) => {
             rival.pts += res.points;
             if (res.placement === 1 && vrContenders[0] && !vrContenders[0].isUser && vrContenders[0].res === res) {
               rival.wins++;
             }
           });
 
+          const spawnPillHtml = userSpawn.contested
+            ? `<span class="contest-pill pill-con">${userSpawn.wonSpawn ? "CONTESTED • WON SPAWN" : "CONTESTED • LOST SPAWN"}</span>`
+            : `<span class="contest-pill pill-uncon">UNCONTESTED (${p1Poi.name})</span>`;
+
           const row = document.createElement("div");
           row.className = `match-row ${userWonMatch ? "vr" : ""}`;
           row.innerHTML = `
-            <div><strong>Game ${game}</strong></div>
-            <div>#${r1.placement} Place • ${r1.elims} Elims</div>
-            <div><strong>+${r1.points} pts</strong></div>
+            <div class="match-row-top">
+              <strong>Game ${game}</strong>
+              <strong>+${r1.points} pts</strong>
+            </div>
+            <div class="match-row-sub">
+              <span>#${r1.placement} Place • ${r1.elims} Elims</span>
+              ${spawnPillHtml}
+            </div>
           `;
           matchLog.appendChild(row);
-          summaryScore.textContent = `Total: ${p1Total} pts • ${p1Wins} Victory Royales`;
+          summaryScore.textContent = `Total: ${p1Total} pts • ${p1Wins} VR`;
 
-          const { userRank, leaderPts } = renderLiveLeaderboard(p1Roster, p1Total, p1Wins, rivalTeams, game);
+          const { userRank, leaderPts } = renderLiveLeaderboard(userTeam, rivalTeams, game);
           if (game < 12) {
-            simBanner.textContent = `Game ${game}/12 Complete — Currently #${userRank} (${p1Total} pts | 1st Place: ${leaderPts} pts)`;
+            const statusPill = userTeam.isContested
+              ? `<span class="contest-pill pill-con">CONTESTED @ ${p1Poi.name}</span>`
+              : `<span class="contest-pill pill-uncon">UNCON @ ${p1Poi.name}</span>`;
+            simBanner.innerHTML = `<span>Game ${game}/12 — Currently #${userRank} (${p1Total} pts | 1st: ${leaderPts} pts)</span>${statusPill}`;
           }
         }
 
@@ -1915,13 +2224,13 @@
             simBanner.className = "banner banner-win";
             simBanner.innerHTML = `<span>${winnerText}</span><button class="btn-secondary" onclick="resetDraft()">Rematch</button>`;
           } else {
-            const { userRank, leaderPts } = renderLiveLeaderboard(p1Roster, p1Total, p1Wins, rivalTeams, 12);
+            const { userRank, leaderPts } = renderLiveLeaderboard(userTeam, rivalTeams, 12);
             if (p1Wins === 12) {
               showTwelveZeroCelebration(p1Roster.map(p => p.name).join(" • "), p1Total, p1Elims);
             }
             const won = userRank === 1;
             simBanner.className = `banner ${won ? "banner-win" : "banner-loss"}`;
-            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! #1 Finish with ${p1Total} pts (${p1Wins} VR)` : `#${userRank} Place Finish — ${p1Total} pts (1st Place: ${leaderPts} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
+            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! #1 Finish with ${p1Total} pts (${p1Wins} VR) from ${p1Poi.name}` : `#${userRank} Place Finish — ${p1Total} pts (1st Place: ${leaderPts} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
           }
         }
 
@@ -1930,10 +2239,37 @@
     }
 
     // ==========================================
-    // 6. UI RENDERING
+    // 7. UI RENDERING
     // ==========================================
     function renderChoices() {
       choicesGrid.innerHTML = "";
+      if (currentChoiceType === "poi") {
+        currentChoices.forEach((poi, idx) => {
+          const sign = poi.perfMod >= 0 ? "+" : "";
+          const card = document.createElement("div");
+          card.className = `player-card ${getPoiTierClass(poi.tier)}`;
+          card.innerHTML = `
+            <div>
+              <div class="card-top">
+                <div class="ovr-badge">${poi.tier}</div>
+                <div class="role-pill">${poi.chapter}</div>
+              </div>
+              <div class="player-name">${poi.name}</div>
+              <div class="player-meta">${poi.riskLabel}</div>
+              <div class="player-note">${poi.note}</div>
+            </div>
+            <div class="mini-stats">
+              <div><span>${sign}${poi.perfMod.toFixed(1)}</span>PERF</div>
+              <div><span>+${poi.elimBonus}</span>ELIM</div>
+              <div><span>${poi.tier}-Tier</span>LOOT</div>
+            </div>
+          `;
+          card.onclick = () => selectChoice(idx);
+          choicesGrid.appendChild(card);
+        });
+        return;
+      }
+
       currentChoices.forEach((p, idx) => {
         const card = document.createElement("div");
         card.className = `player-card ${getTierClass(p.overall)}`;
@@ -1953,16 +2289,18 @@
             <div><span>${p.stats.clutch}</span>CLUTCH</div>
           </div>
         `;
-        card.onclick = () => selectPlayer(idx);
+        card.onclick = () => selectChoice(idx);
         choicesGrid.appendChild(card);
       });
     }
 
     function renderRoster() {
       const roster = getActiveRoster();
+      const poi = getActivePoi();
+
       rosterTitle.textContent = mode === "pvp"
-        ? `2. Player ${pvpTurn}'s Trio (${roster.length}/3)`
-        : `2. Your Drafted Trio (${roster.length}/3)`;
+        ? `2. Player ${pvpTurn}'s Trio (${roster.length}/3) & POI`
+        : `2. Your Drafted Trio (${roster.length}/3) & Drop Spot`;
 
       rosterSlots.innerHTML = "";
       for (let i = 0; i < 3; i++) {
@@ -1981,12 +2319,32 @@
           `;
         } else {
           slot.className = "slot";
-          slot.innerHTML = `<div class="slot-left"><small>Empty Slot #${i + 1} — Spin & draft a pro</small></div>`;
+          slot.innerHTML = `<div class="slot-left"><small>Empty Slot #${i + 1} — Spin &amp; draft a pro</small></div>`;
         }
         rosterSlots.appendChild(slot);
       }
 
-      const team = calculateTeamStats(roster);
+      // 4th Slot: Drop Spot POI
+      const poiSlot = document.createElement("div");
+      if (poi) {
+        const sign = poi.perfMod >= 0 ? "+" : "";
+        poiSlot.className = `slot filled slot-poi ${getPoiTierClass(poi.tier)}`;
+        poiSlot.innerHTML = `
+          <div class="slot-left">
+            <strong>Drop Spot: ${poi.name} <span style="color:var(--muted);font-weight:500;">(${poi.chapter})</span></strong>
+            <small>${poi.riskLabel} • ${sign}${poi.perfMod.toFixed(1)} Perf${poi.elimBonus ? `, +${poi.elimBonus} Elim` : ""} • ${poi.note}</small>
+          </div>
+          <div class="slot-right">
+            <div class="ovr-badge">${poi.tier}</div>
+          </div>
+        `;
+      } else {
+        poiSlot.className = "slot slot-poi";
+        poiSlot.innerHTML = `<div class="slot-left"><small>Drop Spot POI — ${roster.length === 3 ? "Spin to pick your landing spot!" : "Unlocks after drafting 3 pros"}</small></div>`;
+      }
+      rosterSlots.appendChild(poiSlot);
+
+      const team = calculateTeamStats(roster, poi);
       document.getElementById("statIgl").textContent = roster.length ? team.igl : "—";
       document.getElementById("statMech").textContent = roster.length ? team.mech : "—";
       document.getElementById("statClutch").textContent = roster.length ? team.clutch : "—";
@@ -2003,27 +2361,40 @@
 
     function updateRerollButton() {
       const rerollsLeft = getActiveRerolls();
-      const readyToSim = mode === "pvp"
-        ? (p1Roster.length === 3 && p2Roster.length === 3)
-        : (p1Roster.length === 3);
+      const done = isDraftComplete();
 
-      rerollBtn.textContent = `Reroll Era (${rerollsLeft} left)`;
-      rerollBtn.disabled = readyToSim || !hasSpun || rerollsLeft <= 0;
+      rerollBtn.textContent = `Reroll (${rerollsLeft} left)`;
+      rerollBtn.disabled = done || !hasSpun || rerollsLeft <= 0;
     }
 
     function updateUI() {
       const roster = getActiveRoster();
-      const readyToSim = mode === "pvp"
-        ? (p1Roster.length === 3 && p2Roster.length === 3)
-        : (p1Roster.length === 3);
+      const poiPhase = isActivePlayerInPoiPhase();
+      const done = isDraftComplete();
 
-      pickCounter.textContent = readyToSim
-        ? "Draft Complete"
-        : `Pick ${roster.length + 1} of 3`;
+      if (done) {
+        pickCounter.textContent = "Draft Complete (3 Pros + POI)";
+        spinnerTitle.textContent = "1. Draft Complete";
+        reel1Label.textContent = "Status";
+        reel2Label.textContent = "Ready";
+        spinBtn.textContent = "Draft Complete";
+      } else if (poiPhase) {
+        pickCounter.textContent = "Pick 4 of 4 (Drop Spot POI)";
+        spinnerTitle.textContent = "1. Drop Spot POI Spinner";
+        reel1Label.textContent = "Drop Spot Selection";
+        reel2Label.textContent = "Map Pool";
+        spinBtn.textContent = "Spin Drop Spot POI";
+      } else {
+        pickCounter.textContent = `Pick ${roster.length + 1} of 4 (Pro #${roster.length + 1})`;
+        spinnerTitle.textContent = "1. Chapter / Era Spinner";
+        reel1Label.textContent = "Chapter / Era";
+        reel2Label.textContent = "Pool Scope";
+        spinBtn.textContent = "Spin Chapter / Era";
+      }
 
-      spinBtn.disabled = readyToSim || hasSpun;
+      spinBtn.disabled = done || hasSpun;
       updateRerollButton();
-      simBtn.disabled = !readyToSim;
+      simBtn.disabled = !done;
       simBtn.textContent = mode === "pvp"
         ? "Simulate P1 vs P2 Grand Finals"
         : "Simulate 12-Game Grand Finals";
@@ -2036,13 +2407,16 @@
       if (simTimer) clearInterval(simTimer);
       p1Roster = [];
       p2Roster = [];
-      const startRerolls = getStartingRerollsForMode();
-      p1Rerolls = startRerolls;
-      p2Rerolls = startRerolls;
+      p1Poi = null;
+      p2Poi = null;
+      p1Rerolls = 1;
+      p2Rerolls = 1;
       pvpTurn = 1;
       currentChoices = [];
+      currentChoiceType = "player";
       hasSpun = false;
       lastEra = "";
+      lastPoiIds = [];
       eraVal.textContent = "Ready to Spin";
       regionVal.textContent = "—";
       leaderboardContainer.innerHTML = "";
@@ -2051,7 +2425,7 @@
 
       if (mode === "pvp") {
         pvpBanner.classList.add("visible");
-        pvpBanner.textContent = "Player 1 Drafting — Pick 3 pros first, then pass to Player 2!";
+        pvpBanner.textContent = "Player 1 Drafting — Pick 3 pros & 1 POI first, then pass to Player 2!";
       } else {
         pvpBanner.classList.remove("visible");
       }
