@@ -109,7 +109,7 @@
     /* Spinner Box */
     .spinner-display {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.3fr 1fr;
       gap: 12px;
       margin-bottom: 14px;
     }
@@ -408,7 +408,7 @@
     <header>
       <div class="brand">
         <h1>FNCS 12-0 // MULTI-ERA DRAFT</h1>
-        <p>Spin Chapters 2–7, build your Trio, and survive a 12-Game Grand Finals lobby.</p>
+        <p>Spin Chapters 2–7, draft across all regions, and survive a 12-Game Grand Finals lobby.</p>
       </div>
       <div class="mode-tabs">
         <button class="mode-btn active" data-mode="streak">12-0 Streak Mode</button>
@@ -425,7 +425,7 @@
       <!-- LEFT: SPINNER & DRAFT POOL -->
       <div class="card-box">
         <div class="section-title">
-          <span>1. Era & Region Spinner</span>
+          <span>1. Chapter / Era Spinner</span>
           <span id="pickCounter">Pick 1 of 3</span>
         </div>
 
@@ -435,14 +435,14 @@
             <div class="reel-val" id="eraVal">Ready to Spin</div>
           </div>
           <div class="reel">
-            <div class="reel-label">Region Pool</div>
+            <div class="reel-label">Pool Scope</div>
             <div class="reel-val" id="regionVal">—</div>
           </div>
         </div>
 
         <div class="spin-actions">
-          <button class="btn-primary" id="spinBtn">Spin Era & Region</button>
-          <button class="btn-reroll" id="rerollBtn" disabled>Reroll Spin (3 left)</button>
+          <button class="btn-primary" id="spinBtn">Spin Chapter / Era</button>
+          <button class="btn-reroll" id="rerollBtn" disabled>Reroll Era (3 left)</button>
         </div>
 
         <div class="choices-grid" id="choicesGrid"></div>
@@ -1195,6 +1195,7 @@
     let p2Rerolls = 1;
     let currentChoices = [];
     let hasSpun = false;
+    let lastEra = "";
     let simTimer = null;
 
     // DOM refs
@@ -1316,49 +1317,51 @@
     }
 
     // ==========================================
-    // 4. SPIN, REROLL & EQUAL-ODDS DRAFT LOGIC
+    // 4. ERA-ONLY SPIN, REROLL & DRAFT LOGIC
     // ==========================================
-    function getValidSpins(draftedIds) {
-      const valid = [];
-      for (const era of ERAS) {
-        const inEra = PLAYERS.filter(p => p.seasons[era] && !draftedIds.has(p.id));
-        if (inEra.length >= 3) {
-          valid.push({ era, region: "GLOBAL LAN (All Regions)", pool: inEra });
-        }
-        const regions = ["EU", "NAC", "NAE", "NAW", "BR", "ASIA", "OCE", "ME"];
-        for (const reg of regions) {
-          const inReg = inEra.filter(p => p.seasons[era].region === reg);
-          if (inReg.length >= 3) {
-            valid.push({ era, region: reg, pool: inReg });
-          }
-        }
-      }
-      return valid;
+    function getValidEras(draftedIds) {
+      return ERAS
+        .map(era => ({
+          era,
+          pool: PLAYERS.filter(p => p.seasons[era] && !draftedIds.has(p.id))
+        }))
+        .filter(entry => entry.pool.length >= 3);
     }
 
-    function executeSpinAnimation(onComplete) {
+    function pickNextEra(draftedIds, avoidCurrent) {
+      const validEras = getValidEras(draftedIds);
+      if (validEras.length === 0) return null;
+
+      let candidates = validEras;
+      if (avoidCurrent && lastEra) {
+        const filtered = validEras.filter(entry => entry.era !== lastEra);
+        if (filtered.length > 0) candidates = filtered;
+      }
+
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+
+    function executeEraSpin(avoidCurrent) {
       const roster = getActiveRoster();
       const draftedIds = new Set(roster.map(p => p.id));
-      const validSpins = getValidSpins(draftedIds);
-      const chosenSpin = validSpins[Math.floor(Math.random() * validSpins.length)];
+      const chosenEraPool = pickNextEra(draftedIds, avoidCurrent);
+      if (!chosenEraPool) return;
 
       spinBtn.disabled = true;
       rerollBtn.disabled = true;
       choicesGrid.innerHTML = "";
+      regionVal.textContent = "All Regions (Mixed)";
 
       let ticks = 0;
       const anim = setInterval(() => {
-        const randEra = ERAS[Math.floor(Math.random() * ERAS.length)];
-        const randRegs = ["EU", "NAC", "NAE", "NAW", "BR", "ASIA", "OCE", "ME", "GLOBAL LAN"];
-        eraVal.textContent = randEra;
-        regionVal.textContent = randRegs[Math.floor(Math.random() * randRegs.length)];
+        eraVal.textContent = ERAS[Math.floor(Math.random() * ERAS.length)];
         ticks++;
         if (ticks >= 10) {
           clearInterval(anim);
-          eraVal.textContent = chosenSpin.era;
-          regionVal.textContent = chosenSpin.region;
-          dealChoices(chosenSpin);
-          if (onComplete) onComplete();
+          eraVal.textContent = chosenEraPool.era;
+          regionVal.textContent = "All Regions (Mixed)";
+          lastEra = chosenEraPool.era;
+          dealChoices(chosenEraPool);
         }
       }, 55);
     }
@@ -1366,7 +1369,7 @@
     function spinWheel() {
       const roster = getActiveRoster();
       if (roster.length >= 3 || hasSpun) return;
-      executeSpinAnimation();
+      executeEraSpin(false);
     }
 
     function rerollChoices() {
@@ -1377,21 +1380,21 @@
       setActiveRerolls(rerollsLeft - 1);
       hasSpun = false;
       updateRerollButton();
-      executeSpinAnimation();
+      executeEraSpin(true);
     }
 
-    function dealChoices(spin) {
-      const remaining = [...spin.pool];
+    function dealChoices(eraPool) {
+      const remaining = [...eraPool.pool];
       const picked = [];
       for (let i = 0; i < 3 && remaining.length > 0; i++) {
-        // Uniform random draw so every eligible player is equally likely to appear
+        // Uniform random draw across all regions in the spun era
         const idx = Math.floor(Math.random() * remaining.length);
         const chosen = remaining.splice(idx, 1)[0];
         picked.push({
           id: chosen.id,
           name: chosen.name,
-          era: spin.era,
-          ...chosen.seasons[spin.era]
+          era: eraPool.era,
+          ...chosen.seasons[eraPool.era]
         });
       }
       currentChoices = picked;
@@ -1408,6 +1411,7 @@
       roster.push(picked);
       currentChoices = [];
       hasSpun = false;
+      lastEra = "";
 
       if (mode === "pvp" && pvpTurn === 1 && p1Roster.length === 3) {
         pvpTurn = 2;
@@ -1742,7 +1746,7 @@
         ? (p1Roster.length === 3 && p2Roster.length === 3)
         : (p1Roster.length === 3);
 
-      rerollBtn.textContent = `Reroll Spin (${rerollsLeft} left)`;
+      rerollBtn.textContent = `Reroll Era (${rerollsLeft} left)`;
       rerollBtn.disabled = readyToSim || !hasSpun || rerollsLeft <= 0;
     }
 
@@ -1779,6 +1783,7 @@
       pvpTurn = 1;
       currentChoices = [];
       hasSpun = false;
+      lastEra = "";
       eraVal.textContent = "Ready to Spin";
       regionVal.textContent = "—";
       leaderboardContainer.innerHTML = "";
