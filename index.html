@@ -78,11 +78,109 @@
       color: #060911;
     }
 
+    /* Pass & Play Lobby Setup Card */
+    .pvp-setup-card {
+      background: var(--panel);
+      border: 1px solid var(--accent-2);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      display: none;
+    }
+    .pvp-setup-card.visible { display: block; }
+
+    .setup-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .setup-top-row h2 {
+      font-size: 1.05rem;
+      color: #e0e7ff;
+    }
+    .player-count-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel-2);
+      padding: 6px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+    }
+    .player-count-control label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .player-count-control select {
+      background: var(--bg);
+      color: #fff;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .player-names-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .name-input-wrap {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .name-input-wrap label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .name-input-wrap input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .name-input-wrap input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .setup-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .snake-preview {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
     .grid-main {
       display: grid;
       grid-template-columns: 1.35fr 1fr;
       gap: 20px;
     }
+    .grid-main.hidden { display: none; }
     @media (max-width: 900px) {
       .grid-main { grid-template-columns: 1fr; }
     }
@@ -105,6 +203,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     /* Spinner Box */
@@ -253,6 +352,32 @@
       font-size: 0.72rem;
     }
     .mini-stats span { display: block; font-weight: 800; font-size: 0.85rem; color: #fff; }
+
+    /* Player Switcher Pills in Pass & Play */
+    .pvp-roster-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .pvp-tab-pill {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pvp-tab-pill.viewing {
+      border-color: var(--accent);
+      color: #fff;
+      background: rgba(56, 189, 248, 0.16);
+    }
+    .pvp-tab-pill.on-clock {
+      box-shadow: 0 0 0 1px var(--mythic);
+    }
 
     /* Roster & POI Slots */
     .roster-slots { display: flex; flex-direction: column; gap: 10px; }
@@ -415,7 +540,7 @@
 
     .match-log {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
       gap: 10px;
     }
     .match-row {
@@ -433,13 +558,20 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 6px;
     }
     .match-row-sub {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 3px;
       font-size: 0.74rem;
       color: var(--muted);
+    }
+    .match-human-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
     }
     .match-row.vr {
       border-color: var(--mythic);
@@ -553,15 +685,15 @@
     .pvp-header {
       background: rgba(129, 140, 248, 0.15);
       border: 1px solid var(--accent-2);
-      padding: 9px 12px;
+      padding: 10px 14px;
       border-radius: 8px;
-      margin-bottom: 12px;
-      font-size: 0.85rem;
+      margin-bottom: 14px;
+      font-size: 0.86rem;
       font-weight: 700;
       color: #c7d2fe;
       display: none;
     }
-    .pvp-header.visible { display: block; }
+    .pvp-header.visible { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
   </style>
 </head>
 <body>
@@ -572,16 +704,46 @@
         <p>Spin Chapters 2–7, claim your Drop Spot POI, and battle a 33-Trio 12-Game Grand Finals lobby.</p>
       </div>
       <div class="mode-tabs">
-        <button class="mode-btn active" data-mode="finals">Grand Finals (Points)</button>
-        <button class="mode-btn" data-mode="pvp">Pass &amp; Play PvP</button>
+        <button class="mode-btn active" data-mode="finals">Grand Finals (Solo vs AI)</button>
+        <button class="mode-btn" data-mode="pvp">Pass &amp; Play (2–8 Players)</button>
       </div>
     </header>
 
-    <div id="pvpBanner" class="pvp-header">
-      Player 1 Drafting — Pick 3 pros &amp; 1 POI first, then pass to Player 2!
+    <!-- PRE-DRAFT PASS & PLAY SETUP -->
+    <div id="pvpSetupCard" class="pvp-setup-card">
+      <div class="setup-top-row">
+        <div>
+          <h2>Pass &amp; Play Snake Draft Setup</h2>
+          <p style="font-size: 0.8rem; color: var(--muted);">Set 2 to 8 players, enter their names, and compete in a 33-trio Grand Finals lobby with snake draft order.</p>
+        </div>
+        <div class="player-count-control">
+          <label for="humanCountSelect">Players:</label>
+          <select id="humanCountSelect">
+            <option value="2" selected>2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4">4 Players</option>
+            <option value="5">5 Players</option>
+            <option value="6">6 Players</option>
+            <option value="7">7 Players</option>
+            <option value="8">8 Players</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="player-names-grid" id="playerNamesGrid"></div>
+
+      <div class="setup-footer">
+        <div class="snake-preview" id="snakePreview"></div>
+        <button class="btn-primary" id="startPvpDraftBtn" style="max-width: 240px;">Start Snake Draft</button>
+      </div>
     </div>
 
-    <div class="grid-main">
+    <div id="pvpBanner" class="pvp-header">
+      <span id="pvpBannerText">On the Clock</span>
+      <span id="pvpSnakeOrderBadge" style="font-size:0.76rem;color:#e0e7ff;"></span>
+    </div>
+
+    <div class="grid-main" id="draftGrid">
       <!-- LEFT: SPINNER & DRAFT POOL -->
       <div class="card-box">
         <div class="section-title">
@@ -614,6 +776,8 @@
           <span id="rosterTitle">2. Your Drafted Trio &amp; Drop Spot</span>
           <button class="btn-secondary" id="resetBtn">Reset Draft</button>
         </div>
+
+        <div class="pvp-roster-tabs" id="pvpRosterTabs" style="display:none;"></div>
 
         <div class="roster-slots" id="rosterSlots"></div>
 
@@ -1468,16 +1632,18 @@
     const CONTEST_LOSS_PERF_DELTA = -18.0;
 
     // ==========================================
-    // 3. GAME STATE
+    // 3. GAME & SNAKE DRAFT STATE
     // ==========================================
     let mode = "finals"; // "finals" | "pvp"
-    let pvpTurn = 1;     // 1 or 2
-    let p1Roster = [];
-    let p2Roster = [];
-    let p1Poi = null;
-    let p2Poi = null;
-    let p1Rerolls = 1;
-    let p2Rerolls = 1;
+    let humanCount = 2;
+    let savedPlayerNames = ["Player 1", "Player 2", "Player 3", "Player 4", "Player 5", "Player 6", "Player 7", "Player 8"];
+    let pvpSetupConfirmed = false;
+
+    let humanPlayers = []; // [{ index, name, roster: [], poi: null, rerolls: 1 }]
+    let snakeOrder = [];   // Array of { playerIndex, roundIndex, type: "pro" | "poi" }
+    let snakeStep = 0;     // Current index inside snakeOrder
+    let viewingPlayerIndex = 0;
+
     let currentChoices = [];
     let currentChoiceType = "player"; // "player" | "poi"
     let hasSpun = false;
@@ -1488,6 +1654,13 @@
     let simTimer = null;
 
     // DOM refs
+    const pvpSetupCard = document.getElementById("pvpSetupCard");
+    const humanCountSelect = document.getElementById("humanCountSelect");
+    const playerNamesGrid = document.getElementById("playerNamesGrid");
+    const snakePreview = document.getElementById("snakePreview");
+    const startPvpDraftBtn = document.getElementById("startPvpDraftBtn");
+
+    const draftGrid = document.getElementById("draftGrid");
     const spinnerTitle = document.getElementById("spinnerTitle");
     const reel1Label = document.getElementById("reel1Label");
     const reel2Label = document.getElementById("reel2Label");
@@ -1499,6 +1672,7 @@
     const choicesGrid = document.getElementById("choicesGrid");
     const rosterSlots = document.getElementById("rosterSlots");
     const rosterTitle = document.getElementById("rosterTitle");
+    const pvpRosterTabs = document.getElementById("pvpRosterTabs");
     const simBtn = document.getElementById("simBtn");
     const resetBtn = document.getElementById("resetBtn");
     const simPanel = document.getElementById("simPanel");
@@ -1513,44 +1687,78 @@
     const contestedSummaryContainer = document.getElementById("contestedSummaryContainer");
     const summaryScore = document.getElementById("summaryScore");
     const pvpBanner = document.getElementById("pvpBanner");
+    const pvpBannerText = document.getElementById("pvpBannerText");
+    const pvpSnakeOrderBadge = document.getElementById("pvpSnakeOrderBadge");
 
-    function getActiveRoster() {
-      return (mode === "pvp" && pvpTurn === 2) ? p2Roster : p1Roster;
-    }
-
-    function getActivePoi() {
-      return (mode === "pvp" && pvpTurn === 2) ? p2Poi : p1Poi;
-    }
-
-    function setActivePoi(poi) {
-      if (mode === "pvp" && pvpTurn === 2) {
-        p2Poi = poi;
-      } else {
-        p1Poi = poi;
+    function buildSnakeOrder(numPlayers) {
+      // 4 Rounds total:
+      // Round 0 (Pro #1): 0 -> 1 -> ... -> N-1
+      // Round 1 (Pro #2): N-1 -> ... -> 1 -> 0
+      // Round 2 (Pro #3): 0 -> 1 -> ... -> N-1
+      // Round 3 (POI):    N-1 -> ... -> 1 -> 0
+      const order = [];
+      for (let round = 0; round < 4; round++) {
+        const forward = round % 2 === 0;
+        const type = round < 3 ? "pro" : "poi";
+        if (forward) {
+          for (let i = 0; i < numPlayers; i++) {
+            order.push({ playerIndex: i, roundIndex: round, type });
+          }
+        } else {
+          for (let i = numPlayers - 1; i >= 0; i--) {
+            order.push({ playerIndex: i, roundIndex: round, type });
+          }
+        }
       }
+      return order;
     }
 
-    function getActiveRerolls() {
-      return (mode === "pvp" && pvpTurn === 2) ? p2Rerolls : p1Rerolls;
-    }
-
-    function setActiveRerolls(val) {
-      if (mode === "pvp" && pvpTurn === 2) {
-        p2Rerolls = val;
-      } else {
-        p1Rerolls = val;
+    function initHumanDraftState(count, names) {
+      humanPlayers = [];
+      for (let i = 0; i < count; i++) {
+        const cleanName = (names[i] || "").trim() || `Player ${i + 1}`;
+        humanPlayers.push({
+          index: i,
+          name: cleanName,
+          roster: [],
+          poi: null,
+          rerolls: 1
+        });
       }
+      snakeOrder = buildSnakeOrder(count);
+      snakeStep = 0;
+      viewingPlayerIndex = 0;
     }
 
-    function isActivePlayerInPoiPhase() {
-      return getActiveRoster().length === 3 && !getActivePoi();
+    function getCurrentSnakeTurn() {
+      if (snakeStep >= snakeOrder.length) return null;
+      return snakeOrder[snakeStep];
+    }
+
+    function getActiveHuman() {
+      const turn = getCurrentSnakeTurn();
+      if (!turn) return humanPlayers[0];
+      return humanPlayers[turn.playerIndex];
     }
 
     function isDraftComplete() {
-      if (mode === "pvp") {
-        return p1Roster.length === 3 && Boolean(p1Poi) && p2Roster.length === 3 && Boolean(p2Poi);
-      }
-      return p1Roster.length === 3 && Boolean(p1Poi);
+      return snakeStep >= snakeOrder.length && humanPlayers.length > 0;
+    }
+
+    function isActivePlayerInPoiPhase() {
+      const turn = getCurrentSnakeTurn();
+      return Boolean(turn && turn.type === "poi");
+    }
+
+    // Track exact player+era keys across ALL human rosters so no 2 humans can have the exact same player-era
+    function getAllHumanClaimedEraKeys() {
+      const keys = new Set();
+      humanPlayers.forEach(hp => {
+        hp.roster.forEach(p => {
+          keys.add(`${p.id}::${p.era}`);
+        });
+      });
+      return keys;
     }
 
     function getTierClass(ovr) {
@@ -1568,7 +1776,65 @@
     }
 
     // ==========================================
-    // 4. SYNERGY & TEAM RATING CALCULATOR
+    // 4. PRE-DRAFT PASS & PLAY LOBBY RENDER
+    // ==========================================
+    function renderPvpSetupForm() {
+      humanCount = parseInt(humanCountSelect.value, 10) || 2;
+      playerNamesGrid.innerHTML = "";
+
+      for (let i = 0; i < humanCount; i++) {
+        const wrap = document.createElement("div");
+        wrap.className = "name-input-wrap";
+        const defaultVal = savedPlayerNames[i] || `Player ${i + 1}`;
+        wrap.innerHTML = `
+          <label for="pName_${i}">Player ${i + 1} Name</label>
+          <input type="text" id="pName_${i}" maxlength="22" placeholder="Player ${i + 1}" value="${defaultVal.replace(/"/g, "&quot;")}" />
+        `;
+        const input = wrap.querySelector("input");
+        input.addEventListener("input", () => {
+          savedPlayerNames[i] = input.value;
+          updateSnakePreviewText();
+        });
+        playerNamesGrid.appendChild(wrap);
+      }
+
+      updateSnakePreviewText();
+    }
+
+    function updateSnakePreviewText() {
+      const labels = [];
+      for (let i = 0; i < humanCount; i++) {
+        labels.push((savedPlayerNames[i] || "").trim() || `Player ${i + 1}`);
+      }
+      const fwd = labels.join(" → ");
+      const rev = [...labels].reverse().join(" → ");
+      snakePreview.innerHTML = `<strong>Snake Order:</strong> Pro 1 (${fwd}) • Pro 2 (${rev}) • Pro 3 (${fwd}) • POI (${rev})`;
+    }
+
+    function confirmPvpSetup() {
+      const names = [];
+      for (let i = 0; i < humanCount; i++) {
+        const inp = document.getElementById(`pName_${i}`);
+        const val = inp ? inp.value.trim() : "";
+        savedPlayerNames[i] = val || `Player ${i + 1}`;
+        names.push(savedPlayerNames[i]);
+      }
+      pvpSetupConfirmed = true;
+      pvpSetupCard.classList.remove("visible");
+      draftGrid.classList.remove("hidden");
+      initHumanDraftState(humanCount, names);
+      currentChoices = [];
+      currentChoiceType = "player";
+      hasSpun = false;
+      lastEra = "";
+      lastPoiIds = [];
+      eraVal.textContent = "Ready to Spin";
+      regionVal.textContent = "—";
+      updateUI();
+    }
+
+    // ==========================================
+    // 5. SYNERGY & TEAM RATING CALCULATOR
     // ==========================================
     function calculateTeamStats(roster, poi = null) {
       if (roster.length === 0) {
@@ -1656,19 +1922,27 @@
     }
 
     // ==========================================
-    // 5. ERA & POI SPIN, SINGLE-REROLL & DRAFT LOGIC
+    // 6. ERA & POI SPIN, SINGLE-REROLL & DRAFT LOGIC
     // ==========================================
-    function getValidEras(draftedIds) {
+    function getValidErasForActiveHuman() {
+      const activeHuman = getActiveHuman();
+      const ownPlayerIds = new Set(activeHuman.roster.map(p => p.id));
+      const globalEraKeys = getAllHumanClaimedEraKeys();
+
       return ERAS
         .map(era => ({
           era,
-          pool: PLAYERS.filter(p => p.seasons[era] && !draftedIds.has(p.id))
+          pool: PLAYERS.filter(p =>
+            Boolean(p.seasons[era]) &&
+            !ownPlayerIds.has(p.id) &&
+            !globalEraKeys.has(`${p.id}::${era}`)
+          )
         }))
         .filter(entry => entry.pool.length >= 3);
     }
 
-    function pickNextEra(draftedIds, avoidCurrent) {
-      const validEras = getValidEras(draftedIds);
+    function pickNextEra(avoidCurrent) {
+      const validEras = getValidErasForActiveHuman();
       if (validEras.length === 0) return null;
 
       let candidates = validEras;
@@ -1681,9 +1955,7 @@
     }
 
     function executeEraSpin(avoidCurrent) {
-      const roster = getActiveRoster();
-      const draftedIds = new Set(roster.map(p => p.id));
-      const chosenEraPool = pickNextEra(draftedIds, avoidCurrent);
+      const chosenEraPool = pickNextEra(avoidCurrent);
       if (!chosenEraPool) return;
 
       spinBtn.disabled = true;
@@ -1730,6 +2002,7 @@
       rerollBtn.disabled = true;
       choicesGrid.innerHTML = "";
 
+      // Humans CAN pick the same POI to contest each other!
       let pool = [...POIS];
       if (avoidPreviousSet && lastPoiIds.length > 0) {
         const filtered = pool.filter(p => !lastPoiIds.includes(p.id));
@@ -1772,10 +2045,10 @@
     }
 
     function rerollChoices() {
-      const rerollsLeft = getActiveRerolls();
-      if (isDraftComplete() || !hasSpun || rerollsLeft <= 0) return;
+      const activeHuman = getActiveHuman();
+      if (isDraftComplete() || !hasSpun || activeHuman.rerolls <= 0) return;
 
-      setActiveRerolls(rerollsLeft - 1);
+      activeHuman.rerolls -= 1;
       hasSpun = false;
       updateRerollButton();
 
@@ -1788,41 +2061,37 @@
 
     function selectChoice(index) {
       const picked = currentChoices[index];
-      if (!picked) return;
+      const activeHuman = getActiveHuman();
+      if (!picked || !activeHuman) return;
 
       if (currentChoiceType === "poi") {
-        setActivePoi(picked);
-        currentChoices = [];
-        hasSpun = false;
-        lastPoiIds = [];
-
-        if (mode === "pvp" && pvpTurn === 1 && p1Roster.length === 3 && p1Poi) {
-          pvpTurn = 2;
-          pvpBanner.textContent = "Player 2 Drafting — Pick 3 pros & 1 POI to challenge Player 1!";
-          eraVal.textContent = "Ready to Spin";
-          regionVal.textContent = "—";
-        } else {
-          eraVal.textContent = `${picked.name} Locked`;
-          regionVal.textContent = `${picked.tier}-Tier Drop`;
-        }
+        activeHuman.poi = picked;
       } else {
-        const roster = getActiveRoster();
-        roster.push(picked);
-        currentChoices = [];
-        hasSpun = false;
-        lastEra = "";
+        activeHuman.roster.push(picked);
+      }
 
-        if (roster.length === 3) {
-          eraVal.textContent = "Spin Drop Spot POI";
-          regionVal.textContent = "25 POIs Available";
-        }
+      currentChoices = [];
+      hasSpun = false;
+      lastEra = "";
+      lastPoiIds = [];
+      snakeStep++;
+
+      if (isDraftComplete()) {
+        eraVal.textContent = "All Rosters & POIs Locked";
+        regionVal.textContent = `${humanPlayers.length} Human + ${33 - humanPlayers.length} AI Trios`;
+        viewingPlayerIndex = 0;
+      } else {
+        const nextTurn = getCurrentSnakeTurn();
+        viewingPlayerIndex = nextTurn.playerIndex;
+        eraVal.textContent = nextTurn.type === "poi" ? "Spin Drop Spot POI" : "Ready to Spin";
+        regionVal.textContent = nextTurn.type === "poi" ? "25 POIs Available" : "—";
       }
 
       updateUI();
     }
 
     // ==========================================
-    // 6. SIMULATION ENGINE (POI & CONTEST SYSTEM)
+    // 7. SIMULATION ENGINE (33-TRIO LOBBY + MULTI-HUMAN CONTESTS)
     // ==========================================
     function bellRandom(spread) {
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
@@ -1943,19 +2212,20 @@
       return chosen;
     }
 
-    function buildRandomRivalTrios(userRoster, userPoi, count = 32) {
-      const draftedIds = new Set(userRoster.map(p => p.id));
-      const basePool = PLAYERS.filter(p => !draftedIds.has(p.id));
+    function buildRandomRivalTrios(humanTeams, count) {
+      const claimedEraKeys = getAllHumanClaimedEraKeys();
       const allEraEntries = [];
 
-      basePool.forEach(p => {
+      PLAYERS.forEach(p => {
         Object.keys(p.seasons).forEach(era => {
-          allEraEntries.push({
-            id: p.id,
-            name: p.name,
-            era,
-            ...p.seasons[era]
-          });
+          if (!claimedEraKeys.has(`${p.id}::${era}`)) {
+            allEraEntries.push({
+              id: p.id,
+              name: p.name,
+              era,
+              ...p.seasons[era]
+            });
+          }
         });
       });
 
@@ -1963,10 +2233,17 @@
       const rivals = [];
       const usedSquadKeys = new Set();
       const poiCounts = {};
-      if (userPoi) {
-        poiCounts[userPoi.id] = 1;
-      }
-      const contestedUsedCount = { value: 0 };
+
+      // Count POIs already claimed by human players (including multi-human contests!)
+      const contestedPoiIds = new Set();
+      humanTeams.forEach(ht => {
+        if (!ht.poi) return;
+        poiCounts[ht.poi.id] = (poiCounts[ht.poi.id] || 0) + 1;
+        if (poiCounts[ht.poi.id] >= 2) {
+          contestedPoiIds.add(ht.poi.id);
+        }
+      });
+      const contestedUsedCount = { value: contestedPoiIds.size };
 
       let igls = shuffle(allEraEntries.filter(p => p.role === "IGL"));
       let fraggers = shuffle(allEraEntries.filter(p => p.role === "Fragger"));
@@ -1992,11 +2269,14 @@
         rivals.push({
           id: `rival_${idx}`,
           squad: `${trio[0].name} • ${trio[1].name} • ${trio[2].name}`,
+          ownerLabel: "AI",
           stats: calculateTeamStats(trio, poi),
           poi,
           pts: 0,
           wins: 0,
+          elims: 0,
           spawnWins: 0,
+          finalRank: 1,
           isUser: false,
           isContested: false,
           contestedBy: []
@@ -2015,9 +2295,8 @@
         addRivalTrio([p1, p2, p3]);
       }
 
-      // Guarantee full 32 rival trios (33 trios in lobby) even if role buckets were skewed
       let fallbackGuards = 0;
-      while (rivals.length < count && fallbackGuards < 1200) {
+      while (rivals.length < count && fallbackGuards < 1500) {
         fallbackGuards++;
         const shuffled = shuffle(allEraEntries);
         if (shuffled.length < 3) break;
@@ -2074,13 +2353,15 @@
     }
 
     function paintLeaderboardDom(standings, currentGame) {
-      const userRank = standings.findIndex(s => s.isUser) + 1;
       const totalTeams = standings.length;
       const rowsToShow = showAllStandings ? standings : (() => {
         const top10 = standings.slice(0, 10);
-        if (userRank > 10) {
-          top10.push({ ...standings[userRank - 1], customRank: userRank });
-        }
+        const includedIds = new Set(top10.map(r => r.id));
+        standings.forEach((team, idx) => {
+          if (team.isUser && !includedIds.has(team.id)) {
+            top10.push({ ...team, customRank: idx + 1 });
+          }
+        });
         return top10;
       })();
 
@@ -2143,24 +2424,18 @@
       `;
     }
 
-    function renderLiveLeaderboard(userTeam, rivalTeams, currentGame) {
-      const standings = [
-        ...rivalTeams,
-        userTeam
-      ];
-
+    function renderLiveLeaderboard(allLobbyTeams, currentGame) {
+      const standings = [...allLobbyTeams];
       standings.sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
       standings.forEach((team, i) => {
         team.finalRank = i + 1;
       });
 
-      const userRank = standings.findIndex(s => s.isUser) + 1;
       const leaderPts = standings[0].pts;
       latestStandingsState = { standings, currentGame };
-
       paintLeaderboardDom(standings, currentGame);
 
-      return { userRank, leaderPts, standings };
+      return { leaderPts, standings };
     }
 
     function renderContestedPoisSummary(standings) {
@@ -2188,6 +2463,9 @@
       }
 
       entries.sort((a, b) => {
+        const aHuman = a.teams.some(t => t.isUser) ? 0 : 1;
+        const bHuman = b.teams.some(t => t.isUser) ? 0 : 1;
+        if (aHuman !== bHuman) return aHuman - bHuman;
         const bestA = Math.min(...a.teams.map(t => t.finalRank));
         const bestB = Math.min(...b.teams.map(t => t.finalRank));
         return bestA - bestB;
@@ -2196,6 +2474,7 @@
       const itemsHtml = entries.map(group => {
         const sortedTeams = [...group.teams].sort((a, b) => (b.spawnWins - a.spawnWins) || (b.pts - a.pts));
         const hasUser = sortedTeams.some(t => t.isUser);
+        const humanCountAtPoi = sortedTeams.filter(t => t.isUser).length;
         const topSpawnWinner = sortedTeams[0];
 
         const teamsLines = sortedTeams.map(t => {
@@ -2208,11 +2487,15 @@
           `;
         }).join("");
 
+        const badgeText = humanCountAtPoi >= 2
+          ? `${humanCountAtPoi} HUMANS CONTESTED`
+          : `${sortedTeams.length} TRIOS CONTESTED`;
+
         return `
           <div class="contested-item ${hasUser ? "user-involved" : ""}">
             <div class="contested-item-header">
               <span class="contested-poi-name">${group.poi.name} (${group.poi.tier}-Tier • ${group.poi.chapter})</span>
-              <span class="contest-pill pill-con">${sortedTeams.length} TRIOS CONTESTED</span>
+              <span class="contest-pill pill-con">${badgeText}</span>
             </div>
             <div class="contested-matchup">${teamsLines}</div>
           </div>
@@ -2246,185 +2529,149 @@
       summaryScore.textContent = "";
       simBtn.disabled = true;
 
-      const p1Stats = calculateTeamStats(p1Roster, p1Poi);
-      const p2Stats = mode === "pvp" ? calculateTeamStats(p2Roster, p2Poi) : null;
-
-      const userTeam = {
-        id: "user_team",
-        squad: `${p1Roster.map(p => p.name).join(" • ")} (YOU)`,
-        stats: p1Stats,
-        poi: p1Poi,
+      const humanTeams = humanPlayers.map(hp => ({
+        id: `human_${hp.index}`,
+        ownerLabel: hp.name,
+        squad: `[${hp.name}] ${hp.roster.map(p => p.name).join(" • ")}`,
+        stats: calculateTeamStats(hp.roster, hp.poi),
+        poi: hp.poi,
         pts: 0,
         wins: 0,
+        elims: 0,
         spawnWins: 0,
         finalRank: 1,
         isUser: true,
         isContested: false,
         contestedBy: []
-      };
+      }));
 
-      const rivalTeams = mode === "finals" ? buildRandomRivalTrios(p1Roster, p1Poi, 32) : [];
+      const aiCount = 33 - humanTeams.length;
+      const rivalTeams = buildRandomRivalTrios(humanTeams, aiCount);
+      const allLobby = [...humanTeams, ...rivalTeams];
 
-      if (mode === "finals") {
-        const allLobby = [userTeam, ...rivalTeams];
-        allLobby.forEach(team => {
-          const sameDrop = allLobby.filter(other => other.id !== team.id && other.poi.id === team.poi.id);
-          team.isContested = sameDrop.length > 0;
-          team.contestedBy = sameDrop.map(o => o.squad.replace(" (YOU)", ""));
-        });
-      }
+      // Mark contested status across all 33 teams (Human vs Human, Human vs AI, AI vs AI)
+      allLobby.forEach(team => {
+        const sameDrop = allLobby.filter(other => other.id !== team.id && other.poi.id === team.poi.id);
+        team.isContested = sameDrop.length > 0;
+        team.contestedBy = sameDrop.map(o => o.squad);
+      });
 
       let game = 1;
-      let p1Total = 0, p1Wins = 0, p1Elims = 0, p1SpawnWins = 0;
-      let p2Total = 0, p2Wins = 0, p2Elims = 0, p2SpawnWins = 0;
 
       simBanner.className = "banner banner-running";
-      if (mode === "pvp") {
-        const samePoi = p1Poi.id === p2Poi.id;
-        simBanner.innerHTML = samePoi
-          ? `<span>Simulating 12-Game Head-to-Head... <span class="contest-pill pill-con">CONTESTED AT ${p1Poi.name}</span></span>`
-          : `<span>Simulating 12-Game Head-to-Head... P1 (${p1Poi.name}) vs P2 (${p2Poi.name}) <span class="contest-pill pill-uncon">BOTH UNCONTESTED</span></span>`;
+      if (mode === "finals") {
+        const ht = humanTeams[0];
+        simBanner.innerHTML = ht.isContested
+          ? `<span>Grand Finals Live — Landing ${ht.poi.name} <span class="contest-pill pill-con">CONTESTED vs ${ht.contestedBy.join(" & ")}</span></span>`
+          : `<span>Grand Finals Live — Landing ${ht.poi.name} <span class="contest-pill pill-uncon">UNCONTESTED DROP</span></span>`;
       } else {
-        simBanner.innerHTML = userTeam.isContested
-          ? `<span>Grand Finals Live — Landing ${p1Poi.name} <span class="contest-pill pill-con">CONTESTED vs ${userTeam.contestedBy.join(" & ")}</span></span>`
-          : `<span>Grand Finals Live — Landing ${p1Poi.name} <span class="contest-pill pill-uncon">UNCONTESTED DROP</span></span>`;
+        const humanContests = humanTeams.filter(h => h.isContested).length;
+        simBanner.innerHTML = `<span>33-Trio Pass &amp; Play Grand Finals Live (${humanTeams.length} Humans + ${aiCount} AI)</span><span class="contest-pill ${humanContests > 0 ? "pill-con" : "pill-uncon"}">${humanContests} Human Trio(s) Contested</span>`;
       }
 
       simTimer = setInterval(() => {
-        if (mode === "pvp") {
-          const p1PvpObj = { id: "p1", squad: "Player 1", stats: p1Stats, poi: p1Poi };
-          const p2PvpObj = { id: "p2", squad: "Player 2", stats: p2Stats, poi: p2Poi };
-          const spawnMap = resolveOffSpawnContests([p1PvpObj, p2PvpObj]);
-          const s1 = spawnMap.get("p1");
-          const s2 = spawnMap.get("p2");
+        const spawnMap = resolveOffSpawnContests(allLobby);
 
-          if (s1.contested && s1.wonSpawn) p1SpawnWins++;
-          if (s2.contested && s2.wonSpawn) p2SpawnWins++;
-
-          const r1 = simulateSingleMatch(p1Stats, p1Poi, s1);
-          const r2 = simulateSingleMatch(p2Stats, p2Poi, s2);
-
-          let p1WonMatch = false;
-          let p2WonMatch = false;
-
-          if (r1.isWin && r2.isWin) {
-            if (r1.perf >= r2.perf) {
-              p1WonMatch = true;
-              r2.placement = 2;
-              r2.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (r2.elims * 4);
-            } else {
-              p2WonMatch = true;
-              r1.placement = 2;
-              r1.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (r1.elims * 4);
-            }
-          } else {
-            p1WonMatch = r1.isWin;
-            p2WonMatch = r2.isWin;
+        const matchEntries = allLobby.map(team => {
+          const sp = spawnMap.get(team.id);
+          if (sp.contested && sp.wonSpawn) {
+            team.spawnWins++;
           }
+          return {
+            team,
+            spawn: sp,
+            res: simulateSingleMatch(team.stats, team.poi, sp)
+          };
+        });
 
-          p1Total += r1.points;
-          p1Elims += r1.elims;
-          if (p1WonMatch) p1Wins++;
+        // Resolve single Victory Royale per match across all 33 trios
+        const vrContenders = matchEntries.filter(e => e.res.isWin);
+        let humanWonThisGame = false;
+        if (vrContenders.length > 0) {
+          vrContenders.sort((a, b) => b.res.perf - a.res.perf);
+          const winnerEntry = vrContenders[0];
+          if (winnerEntry.team.isUser) {
+            humanWonThisGame = true;
+          }
+          vrContenders.slice(1).forEach(runnerUp => {
+            runnerUp.res.placement = 2;
+            runnerUp.res.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (runnerUp.res.elims * 4);
+            runnerUp.res.isWin = false;
+          });
+        }
 
-          p2Total += r2.points;
-          p2Elims += r2.elims;
-          if (p2WonMatch) p2Wins++;
+        // Accumulate totals
+        matchEntries.forEach(({ team, res }) => {
+          team.pts += res.points;
+          team.elims += res.elims;
+          if (res.placement === 1) {
+            team.wins++;
+          }
+        });
 
-          const spawnTag = s1.contested
-            ? `<span class="contest-pill pill-con">CONTESTED: ${s1.wonSpawn ? "P1 WON SPAWN" : "P2 WON SPAWN"}</span>`
-            : `<span class="contest-pill pill-uncon">UNCONTESTED</span>`;
+        // Render Match Card for Human Teams
+        const humanMatchEntries = matchEntries.filter(e => e.team.isUser);
+        const row = document.createElement("div");
+        row.className = `match-row ${humanWonThisGame ? "vr" : ""}`;
 
-          const row = document.createElement("div");
-          row.className = `match-row ${p1WonMatch || p2WonMatch ? "vr" : ""}`;
+        if (humanMatchEntries.length === 1) {
+          const hm = humanMatchEntries[0];
+          const spawnPillHtml = hm.spawn.contested
+            ? `<span class="contest-pill pill-con">${hm.spawn.wonSpawn ? "CONTESTED • WON SPAWN" : "CONTESTED • WIPED"}</span>`
+            : `<span class="contest-pill pill-uncon">UNCON (${hm.team.poi.name})</span>`;
+
           row.innerHTML = `
             <div class="match-row-top">
               <strong>Game ${game}</strong>
-              ${spawnTag}
+              <strong>+${hm.res.points} pts</strong>
             </div>
             <div class="match-row-sub">
-              <span>P1: #${r1.placement} (${r1.elims}k) <strong>+${r1.points}</strong></span>
-              <span>P2: #${r2.placement} (${r2.elims}k) <strong>+${r2.points}</strong></span>
+              <div class="match-human-line">
+                <span>#${hm.res.placement} Place • ${hm.res.elims} Elims</span>
+                ${spawnPillHtml}
+              </div>
             </div>
           `;
-          matchLog.appendChild(row);
-          summaryScore.textContent = `P1: ${p1Total} pts (${p1Wins} VR) | P2: ${p2Total} pts (${p2Wins} VR)`;
         } else {
-          const allLobby = [userTeam, ...rivalTeams];
-          const spawnMap = resolveOffSpawnContests(allLobby);
+          const linesHtml = humanMatchEntries.map(hm => {
+            const spBadge = hm.spawn.contested
+              ? `<span class="contest-pill pill-con">${hm.spawn.wonSpawn ? "WON SPAWN" : "LOST SPAWN"}</span>`
+              : `<span class="contest-pill pill-uncon">UNCON</span>`;
+            return `
+              <div class="match-human-line">
+                <span><strong>${hm.team.ownerLabel}</strong>: #${hm.res.placement} (${hm.res.elims}k) <strong>+${hm.res.points}</strong></span>
+                ${spBadge}
+              </div>
+            `;
+          }).join("");
 
-          const userSpawn = spawnMap.get(userTeam.id);
-          if (userSpawn.contested && userSpawn.wonSpawn) {
-            userTeam.spawnWins++;
-          }
-          const r1 = simulateSingleMatch(p1Stats, p1Poi, userSpawn);
-
-          const rivalResults = rivalTeams.map(rival => {
-            const sp = spawnMap.get(rival.id);
-            if (sp.contested && sp.wonSpawn) {
-              rival.spawnWins++;
-            }
-            return {
-              rival,
-              res: simulateSingleMatch(rival.stats, rival.poi, sp)
-            };
-          });
-
-          const vrContenders = [];
-          if (r1.isWin) vrContenders.push({ isUser: true, perf: r1.perf, res: r1 });
-          rivalResults.forEach(entry => {
-            if (entry.res.isWin) vrContenders.push({ isUser: false, perf: entry.res.perf, res: entry.res });
-          });
-
-          let userWonMatch = false;
-          if (vrContenders.length > 0) {
-            vrContenders.sort((a, b) => b.perf - a.perf);
-            const winner = vrContenders[0];
-            userWonMatch = winner.isUser;
-
-            vrContenders.slice(1).forEach(runnerUp => {
-              runnerUp.res.placement = 2;
-              runnerUp.res.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (runnerUp.res.elims * 4);
-            });
-          }
-
-          p1Total += r1.points;
-          p1Elims += r1.elims;
-          if (userWonMatch) p1Wins++;
-          userTeam.pts = p1Total;
-          userTeam.wins = p1Wins;
-
-          rivalResults.forEach(({ rival, res }) => {
-            rival.pts += res.points;
-            if (res.placement === 1 && vrContenders[0] && !vrContenders[0].isUser && vrContenders[0].res === res) {
-              rival.wins++;
-            }
-          });
-
-          const spawnPillHtml = userSpawn.contested
-            ? `<span class="contest-pill pill-con">${userSpawn.wonSpawn ? "CONTESTED • WON SPAWN" : "CONTESTED • WIPED OFF-SPAWN"}</span>`
-            : `<span class="contest-pill pill-uncon">UNCONTESTED (${p1Poi.name})</span>`;
-
-          const row = document.createElement("div");
-          row.className = `match-row ${userWonMatch ? "vr" : ""}`;
           row.innerHTML = `
             <div class="match-row-top">
               <strong>Game ${game}</strong>
-              <strong>+${r1.points} pts</strong>
+              <span style="font-size:0.72rem;color:var(--muted);">${humanMatchEntries.length} Human Trios</span>
             </div>
-            <div class="match-row-sub">
-              <span>#${r1.placement} Place • ${r1.elims} Elims</span>
-              ${spawnPillHtml}
-            </div>
+            <div class="match-row-sub">${linesHtml}</div>
           `;
-          matchLog.appendChild(row);
-          summaryScore.textContent = `Total: ${p1Total} pts • ${p1Wins} VR`;
+        }
+        matchLog.appendChild(row);
 
-          const { userRank, leaderPts } = renderLiveLeaderboard(userTeam, rivalTeams, game);
+        const { leaderPts, standings } = renderLiveLeaderboard(allLobby, game);
+
+        if (mode === "finals") {
+          const ht = humanTeams[0];
+          summaryScore.textContent = `Total: ${ht.pts} pts • ${ht.wins} VR`;
           if (game < 12) {
-            const statusPill = userTeam.isContested
-              ? `<span class="contest-pill pill-con">CONTESTED @ ${p1Poi.name} (${userTeam.spawnWins}/${game} Spawn Wins)</span>`
-              : `<span class="contest-pill pill-uncon">UNCON @ ${p1Poi.name}</span>`;
-            simBanner.innerHTML = `<span>Game ${game}/12 — Currently #${userRank} (${p1Total} pts | 1st: ${leaderPts} pts)</span>${statusPill}`;
+            const statusPill = ht.isContested
+              ? `<span class="contest-pill pill-con">CONTESTED @ ${ht.poi.name} (${ht.spawnWins}/${game} Spawn Wins)</span>`
+              : `<span class="contest-pill pill-uncon">UNCON @ ${ht.poi.name}</span>`;
+            simBanner.innerHTML = `<span>Game ${game}/12 — Currently #${ht.finalRank} (${ht.pts} pts | 1st: ${leaderPts} pts)</span>${statusPill}`;
+          }
+        } else {
+          const sortedHumans = [...humanTeams].sort((a, b) => a.finalRank - b.finalRank);
+          const topHuman = sortedHumans[0];
+          summaryScore.textContent = sortedHumans.slice(0, 3).map(h => `${h.ownerLabel}: #${h.finalRank} (${h.pts})`).join(" | ");
+          if (game < 12) {
+            simBanner.innerHTML = `<span>Game ${game}/12 — Best Human: ${topHuman.ownerLabel} at #${topHuman.finalRank} (${topHuman.pts} pts | Lobby 1st: ${leaderPts} pts)</span>`;
           }
         }
 
@@ -2432,62 +2679,30 @@
           clearInterval(simTimer);
           simBtn.disabled = false;
 
-          if (mode === "pvp") {
-            const p1TwelveZero = p1Wins === 12;
-            const p2TwelveZero = p2Wins === 12;
-            if (p1TwelveZero || p2TwelveZero) {
-              const winnerSquad = p1TwelveZero
-                ? `Player 1 (${p1Roster.map(p => p.name).join(" • ")})`
-                : `Player 2 (${p2Roster.map(p => p.name).join(" • ")})`;
-              showTwelveZeroCelebration(
-                winnerSquad,
-                p1TwelveZero ? p1Total : p2Total,
-                p1TwelveZero ? p1Elims : p2Elims
-              );
-            }
+          renderContestedPoisSummary(standings);
 
-            if (p1Poi.id === p2Poi.id) {
-              renderContestedPoisSummary([
-                {
-                  id: "p1",
-                  squad: `Player 1 (${p1Roster.map(p => p.name).join(" • ")})`,
-                  poi: p1Poi,
-                  pts: p1Total,
-                  spawnWins: p1SpawnWins,
-                  finalRank: p1Total >= p2Total ? 1 : 2,
-                  isUser: true,
-                  isContested: true
-                },
-                {
-                  id: "p2",
-                  squad: `Player 2 (${p2Roster.map(p => p.name).join(" • ")})`,
-                  poi: p2Poi,
-                  pts: p2Total,
-                  spawnWins: p2SpawnWins,
-                  finalRank: p2Total > p1Total ? 1 : 2,
-                  isUser: true,
-                  isContested: true
-                }
-              ]);
-            }
+          const twelveWinHuman = humanTeams.find(h => h.wins === 12);
+          if (twelveWinHuman) {
+            showTwelveZeroCelebration(twelveWinHuman.squad, twelveWinHuman.pts, twelveWinHuman.elims);
+          }
 
-            const winnerText = p1Total > p2Total
-              ? `PLAYER 1 WINS THE FNCS TROPHY! (${p1Total} vs ${p2Total} pts)`
-              : p2Total > p1Total
-                ? `PLAYER 2 WINS THE FNCS TROPHY! (${p2Total} vs ${p1Total} pts)`
-                : `DEAD TIE AT ${p1Total} POINTS!`;
-            simBanner.className = "banner banner-win";
-            simBanner.innerHTML = `<span>${winnerText}</span><button class="btn-secondary" onclick="resetDraft()">Rematch</button>`;
-          } else {
-            const { userRank, leaderPts, standings } = renderLiveLeaderboard(userTeam, rivalTeams, 12);
-            renderContestedPoisSummary(standings);
-
-            if (p1Wins === 12) {
-              showTwelveZeroCelebration(p1Roster.map(p => p.name).join(" • "), p1Total, p1Elims);
-            }
-            const won = userRank === 1;
+          if (mode === "finals") {
+            const ht = humanTeams[0];
+            const won = ht.finalRank === 1;
             simBanner.className = `banner ${won ? "banner-win" : "banner-loss"}`;
-            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! #1 Finish with ${p1Total} pts (${p1Wins} VR) from ${p1Poi.name}` : `#${userRank} Place Finish — ${p1Total} pts (1st Place: ${leaderPts} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
+            simBanner.innerHTML = `<span>${won ? `FNCS CHAMPIONS! #1 Finish with ${ht.pts} pts (${ht.wins} VR) from ${ht.poi.name}` : `#${ht.finalRank} Place Finish — ${ht.pts} pts (1st Place: ${leaderPts} pts)`}</span><button class="btn-secondary" onclick="resetDraft()">Draft Again</button>`;
+          } else {
+            const sortedHumans = [...humanTeams].sort((a, b) => a.finalRank - b.finalRank);
+            const bestHuman = sortedHumans[0];
+            const lobbyChamp = standings[0];
+            const humanWonLobby = lobbyChamp.isUser;
+
+            simBanner.className = `banner ${humanWonLobby ? "banner-win" : "banner-loss"}`;
+            const headline = humanWonLobby
+              ? `${bestHuman.ownerLabel.toUpperCase()} WINS THE 33-TRIO FNCS GRAND FINALS! (#1 Overall • ${bestHuman.pts} pts, ${bestHuman.wins} VR)`
+              : `TOP HUMAN: ${bestHuman.ownerLabel.toUpperCase()} (#${bestHuman.finalRank} Overall • ${bestHuman.pts} pts) | Lobby 1st: ${lobbyChamp.squad} (${lobbyChamp.pts} pts)`;
+
+            simBanner.innerHTML = `<span>${headline}</span><button class="btn-secondary" onclick="resetDraft()">New Snake Draft</button>`;
           }
         }
 
@@ -2496,13 +2711,20 @@
     }
 
     // ==========================================
-    // 7. UI RENDERING
+    // 8. UI RENDERING
     // ==========================================
     function renderChoices() {
       choicesGrid.innerHTML = "";
       if (currentChoiceType === "poi") {
         currentChoices.forEach((poi, idx) => {
           const sign = poi.perfMod >= 0 ? "+" : "";
+          const humansAlreadyHere = humanPlayers
+            .filter(hp => hp.poi && hp.poi.id === poi.id)
+            .map(hp => hp.name);
+          const humanContestNote = humansAlreadyHere.length > 0
+            ? ` • CONTESTS ${humansAlreadyHere.join(" & ")}!`
+            : "";
+
           const card = document.createElement("div");
           card.className = `player-card ${getPoiTierClass(poi.tier)}`;
           card.innerHTML = `
@@ -2512,7 +2734,7 @@
                 <div class="role-pill">${poi.chapter}</div>
               </div>
               <div class="player-name">${poi.name}</div>
-              <div class="player-meta">${poi.riskLabel}</div>
+              <div class="player-meta">${poi.riskLabel}${humanContestNote}</div>
               <div class="player-note">${poi.note}</div>
             </div>
             <div class="mini-stats">
@@ -2551,12 +2773,42 @@
       });
     }
 
+    function renderPvpRosterTabs() {
+      if (mode !== "pvp" || humanPlayers.length <= 1) {
+        pvpRosterTabs.style.display = "none";
+        return;
+      }
+
+      pvpRosterTabs.style.display = "flex";
+      pvpRosterTabs.innerHTML = "";
+      const activeTurn = getCurrentSnakeTurn();
+
+      humanPlayers.forEach((hp, idx) => {
+        const pill = document.createElement("button");
+        pill.type = "button";
+        const isOnClock = activeTurn && activeTurn.playerIndex === idx;
+        pill.className = `pvp-tab-pill ${viewingPlayerIndex === idx ? "viewing" : ""} ${isOnClock ? "on-clock" : ""}`;
+        const progress = hp.poi ? "Ready" : `${hp.roster.length}/3`;
+        pill.textContent = `${hp.name} (${progress})`;
+        pill.onclick = () => {
+          viewingPlayerIndex = idx;
+          renderRoster();
+        };
+        pvpRosterTabs.appendChild(pill);
+      });
+    }
+
     function renderRoster() {
-      const roster = getActiveRoster();
-      const poi = getActivePoi();
+      const targetPlayer = humanPlayers[viewingPlayerIndex] || humanPlayers[0];
+      if (!targetPlayer) return;
+
+      const roster = targetPlayer.roster;
+      const poi = targetPlayer.poi;
+
+      renderPvpRosterTabs();
 
       rosterTitle.textContent = mode === "pvp"
-        ? `2. Player ${pvpTurn}'s Trio (${roster.length}/3) & POI`
+        ? `2. ${targetPlayer.name}'s Trio (${roster.length}/3) & Drop Spot`
         : `2. Your Drafted Trio (${roster.length}/3) & Drop Spot`;
 
       rosterSlots.innerHTML = "";
@@ -2596,7 +2848,7 @@
         `;
       } else {
         poiSlot.className = "slot slot-poi";
-        poiSlot.innerHTML = `<div class="slot-left"><small>Drop Spot POI — ${roster.length === 3 ? "Spin to pick your landing spot!" : "Unlocks after drafting 3 pros"}</small></div>`;
+        poiSlot.innerHTML = `<div class="slot-left"><small>Drop Spot POI — ${roster.length === 3 ? "Spin to pick your landing spot!" : "Unlocks in Round 4 (POI Snake Round)"}</small></div>`;
       }
       rosterSlots.appendChild(poiSlot);
 
@@ -2616,7 +2868,8 @@
     }
 
     function updateRerollButton() {
-      const rerollsLeft = getActiveRerolls();
+      const activeHuman = getActiveHuman();
+      const rerollsLeft = activeHuman ? activeHuman.rerolls : 0;
       const done = isDraftComplete();
 
       rerollBtn.textContent = `Reroll (${rerollsLeft} left)`;
@@ -2624,25 +2877,60 @@
     }
 
     function updateUI() {
-      const roster = getActiveRoster();
-      const poiPhase = isActivePlayerInPoiPhase();
+      if (mode === "pvp" && !pvpSetupConfirmed) {
+        pvpSetupCard.classList.add("visible");
+        draftGrid.classList.add("hidden");
+        pvpBanner.classList.remove("visible");
+        renderPvpSetupForm();
+        return;
+      }
+
+      pvpSetupCard.classList.remove("visible");
+      draftGrid.classList.remove("hidden");
+
       const done = isDraftComplete();
+      const turn = getCurrentSnakeTurn();
+      const activeHuman = getActiveHuman();
+
+      if (mode === "pvp") {
+        pvpBanner.classList.add("visible");
+        if (done) {
+          pvpBannerText.textContent = `All ${humanPlayers.length} Players Ready! Click Simulate to enter the 33-Trio Grand Finals Lobby.`;
+          pvpSnakeOrderBadge.textContent = "Snake Draft Complete";
+        } else {
+          const roundLabel = turn.type === "poi"
+            ? "Round 4/4: Drop Spot POI"
+            : `Round ${turn.roundIndex + 1}/4: Pro #${turn.roundIndex + 1}`;
+          pvpBannerText.textContent = `ON THE CLOCK: ${activeHuman.name} (${roundLabel})`;
+          pvpSnakeOrderBadge.textContent = `Pick ${snakeStep + 1} of ${snakeOrder.length}`;
+        }
+      } else {
+        pvpBanner.classList.remove("visible");
+      }
 
       if (done) {
-        pickCounter.textContent = "Draft Complete (3 Pros + POI)";
+        pickCounter.textContent = "Draft Complete";
         spinnerTitle.textContent = "1. Draft Complete";
         reel1Label.textContent = "Status";
-        reel2Label.textContent = "Ready";
+        reel2Label.textContent = "Lobby";
         spinBtn.textContent = "Draft Complete";
-      } else if (poiPhase) {
-        pickCounter.textContent = "Pick 4 of 4 (Drop Spot POI)";
-        spinnerTitle.textContent = "1. Drop Spot POI Spinner";
+      } else if (turn.type === "poi") {
+        pickCounter.textContent = mode === "pvp"
+          ? `${activeHuman.name} • Round 4/4 (Drop Spot POI)`
+          : "Pick 4 of 4 (Drop Spot POI)";
+        spinnerTitle.textContent = mode === "pvp"
+          ? `1. ${activeHuman.name}'s POI Spinner`
+          : "1. Drop Spot POI Spinner";
         reel1Label.textContent = "Drop Spot Selection";
         reel2Label.textContent = "Map Pool";
         spinBtn.textContent = "Spin Drop Spot POI";
       } else {
-        pickCounter.textContent = `Pick ${roster.length + 1} of 4 (Pro #${roster.length + 1})`;
-        spinnerTitle.textContent = "1. Chapter / Era Spinner";
+        pickCounter.textContent = mode === "pvp"
+          ? `${activeHuman.name} • Round ${turn.roundIndex + 1}/4 (Pro #${turn.roundIndex + 1})`
+          : `Pick ${turn.roundIndex + 1} of 4 (Pro #${turn.roundIndex + 1})`;
+        spinnerTitle.textContent = mode === "pvp"
+          ? `1. ${activeHuman.name}'s Chapter / Era Spinner`
+          : "1. Chapter / Era Spinner";
         reel1Label.textContent = "Chapter / Era";
         reel2Label.textContent = "Pool Scope";
         spinBtn.textContent = "Spin Chapter / Era";
@@ -2652,7 +2940,7 @@
       updateRerollButton();
       simBtn.disabled = !done;
       simBtn.textContent = mode === "pvp"
-        ? "Simulate P1 vs P2 Grand Finals"
+        ? `Simulate 33-Trio Grand Finals (${humanPlayers.length} Humans)`
         : "Simulate 12-Game Grand Finals";
 
       renderChoices();
@@ -2661,13 +2949,6 @@
 
     function resetDraft() {
       if (simTimer) clearInterval(simTimer);
-      p1Roster = [];
-      p2Roster = [];
-      p1Poi = null;
-      p2Poi = null;
-      p1Rerolls = 1;
-      p2Rerolls = 1;
-      pvpTurn = 1;
       currentChoices = [];
       currentChoiceType = "player";
       hasSpun = false;
@@ -2682,10 +2963,9 @@
       simPanel.classList.remove("visible");
 
       if (mode === "pvp") {
-        pvpBanner.classList.add("visible");
-        pvpBanner.textContent = "Player 1 Drafting — Pick 3 pros & 1 POI first, then pass to Player 2!";
+        pvpSetupConfirmed = false;
       } else {
-        pvpBanner.classList.remove("visible");
+        initHumanDraftState(1, ["You"]);
       }
       updateUI();
     }
@@ -2695,6 +2975,8 @@
     rerollBtn.addEventListener("click", rerollChoices);
     simBtn.addEventListener("click", runSimulation);
     resetBtn.addEventListener("click", resetDraft);
+    humanCountSelect.addEventListener("change", renderPvpSetupForm);
+    startPvpDraftBtn.addEventListener("click", confirmPvpSetup);
 
     document.querySelectorAll(".mode-btn").forEach(btn => {
       btn.addEventListener("click", () => {
