@@ -1457,11 +1457,11 @@
       if (roster.length === 3) {
         const roles = new Set(roster.map(p => p.role));
         if (roles.size === 3) {
-          mod += 3;
-          tags.push({ text: "+3 True Trio (IGL/Fragger/Support)", pos: true });
+          mod += 1;
+          tags.push({ text: "+1 True Trio (IGL/Fragger/Support)", pos: true });
         } else if (!roles.has("IGL")) {
-          mod -= 5;
-          tags.push({ text: "-5 No IGL Penalty", pos: false });
+          mod -= 1;
+          tags.push({ text: "-1 No IGL Penalty", pos: false });
         }
 
         // Same-Region synergy (+1 for 2 from same region, +2 for all 3 from same region)
