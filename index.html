@@ -394,7 +394,7 @@
 
     .sim-split {
       display: grid;
-      grid-template-columns: 1.2fr 1.15fr;
+      grid-template-columns: 1.15fr 1.2fr;
       gap: 18px;
       align-items: start;
     }
@@ -410,7 +410,7 @@
 
     .match-log {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
       gap: 10px;
     }
     .match-row {
@@ -653,37 +653,37 @@
     // ==========================================
     const POIS = [
       // S-TIER (7 POIs)
-      { id: "stark", name: "Stark Industries", chapter: "Chapter 2", tier: "S", perfMod: 2.0, elimBonus: 1, riskLabel: "High Contest Risk", note: "Unibeam Mythics, vault & Stark robot loot" },
-      { id: "agency", name: "The Agency", chapter: "Chapter 2", tier: "S", perfMod: 1.8, elimBonus: 1, riskLabel: "High Contest Risk", note: "Dead-center map control + Midas Drum Gun" },
-      { id: "tilted", name: "Tilted Towers", chapter: "Chapter 1", tier: "S", perfMod: 1.7, elimBonus: 1, riskLabel: "High Contest Risk", note: "Center map, max mats & high early elim potential" },
-      { id: "lavish", name: "Lavish Lair", chapter: "Chapter 5", tier: "S", perfMod: 1.6, elimBonus: 1, riskLabel: "High Contest Risk", note: "Medallion + Oscar's Frenzy Auto Shotgun" },
-      { id: "crime_city", name: "Crime City", chapter: "Chapter 6", tier: "S", perfMod: 1.6, elimBonus: 1, riskLabel: "High Contest Risk", note: "Vaults, black market loot & dense chests" },
-      { id: "reality_reign", name: "Reality's Reign", chapter: "Chapter 7", tier: "S", perfMod: 1.6, elimBonus: 1, riskLabel: "High Contest Risk", note: "Geno/Eggman fortress with Override Console & mythic AR" },
-      { id: "rig_shark", name: "The Rig / The Shark", chapter: "Chapter 2", tier: "S", perfMod: 1.5, elimBonus: 1, riskLabel: "High Contest Risk", note: "Skye's Assault Rifle & Grappler mobility" },
+      { id: "stark", name: "Stark Industries", chapter: "Chapter 2", tier: "S", perfMod: 1.4, elimBonus: 1, riskLabel: "High Contest Risk", note: "Unibeam Mythics, vault & Stark robot loot" },
+      { id: "agency", name: "The Agency", chapter: "Chapter 2", tier: "S", perfMod: 1.3, elimBonus: 1, riskLabel: "High Contest Risk", note: "Dead-center map control + Midas Drum Gun" },
+      { id: "tilted", name: "Tilted Towers", chapter: "Chapter 1", tier: "S", perfMod: 1.2, elimBonus: 1, riskLabel: "High Contest Risk", note: "Center map, max mats & high early elim potential" },
+      { id: "lavish", name: "Lavish Lair", chapter: "Chapter 5", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Medallion + Oscar's Frenzy Auto Shotgun" },
+      { id: "crime_city", name: "Crime City", chapter: "Chapter 6", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Vaults, black market loot & dense chests" },
+      { id: "reality_reign", name: "Reality's Reign", chapter: "Chapter 7", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Geno/Eggman fortress with Override Console & mythic AR" },
+      { id: "rig_shark", name: "The Rig / The Shark", chapter: "Chapter 2", tier: "S", perfMod: 1.0, elimBonus: 1, riskLabel: "High Contest Risk", note: "Skye's Assault Rifle & Grappler mobility" },
 
       // A-TIER (6 POIs)
-      { id: "slappy", name: "Slappy Shores", chapter: "Chapter 4", tier: "A", perfMod: 1.2, elimBonus: 0, riskLabel: "Moderate Risk", note: "Slap barrels & elite endgame rotation stamina" },
-      { id: "mega_city", name: "Mega City", chapter: "Chapter 4", tier: "A", perfMod: 1.2, elimBonus: 0, riskLabel: "Moderate Risk", note: "Grind rails, vaults & high chest count" },
-      { id: "lazy_lake", name: "Lazy Lake", chapter: "Chapter 2", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Clean splits, high chest density & central rotations" },
-      { id: "sweaty_sands", name: "Sweaty Sands", chapter: "Chapter 2", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Massive loot pool & gold/upgrade economy" },
-      { id: "lonewolf", name: "Lonewolf Lair", chapter: "Chapter 6", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Fletcher Kane boss loot & medallion" },
-      { id: "green_hill", name: "Green Hill Zone", chapter: "Chapter 7", tier: "A", perfMod: 1.1, elimBonus: 0, riskLabel: "Moderate Risk", note: "Boost pads/loops for fast early-game rotates & boss loot" },
+      { id: "slappy", name: "Slappy Shores", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Slap barrels & elite endgame rotation stamina" },
+      { id: "mega_city", name: "Mega City", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Grind rails, vaults & high chest count" },
+      { id: "lazy_lake", name: "Lazy Lake", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Clean splits, high chest density & central rotations" },
+      { id: "sweaty_sands", name: "Sweaty Sands", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Massive loot pool & gold/upgrade economy" },
+      { id: "lonewolf", name: "Lonewolf Lair", chapter: "Chapter 6", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Fletcher Kane boss loot & medallion" },
+      { id: "green_hill", name: "Green Hill Zone", chapter: "Chapter 7", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Boost pads/loops for fast early-game rotates & boss loot" },
 
       // B-TIER (6 POIs)
-      { id: "pleasant", name: "Pleasant Park", chapter: "Chapter 2", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Classic safe splits & predictable mid-map rotates" },
-      { id: "retail", name: "Retail Row", chapter: "Chapter 1", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Reliable loot & easy surge tags" },
-      { id: "frenzy", name: "Frenzy Farm", chapter: "Chapter 2", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Open sightlines for surge & central position" },
-      { id: "coney", name: "Coney Crossroads", chapter: "Chapter 3", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Solid mid-map hub with vehicle spawns" },
-      { id: "anvil", name: "Anvil Square", chapter: "Chapter 4", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Good cover & balanced chest count" },
-      { id: "stone_sanctum", name: "Stone Sanctum", chapter: "Chapter 7", tier: "B", perfMod: 0.2, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Quiet drop with shifting temple walls" },
+      { id: "pleasant", name: "Pleasant Park", chapter: "Chapter 2", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Classic safe splits & predictable mid-map rotates" },
+      { id: "retail", name: "Retail Row", chapter: "Chapter 1", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Reliable loot & easy surge tags" },
+      { id: "frenzy", name: "Frenzy Farm", chapter: "Chapter 2", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Open sightlines for surge & central position" },
+      { id: "coney", name: "Coney Crossroads", chapter: "Chapter 3", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Solid mid-map hub with vehicle spawns" },
+      { id: "anvil", name: "Anvil Square", chapter: "Chapter 4", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Good cover & balanced chest count" },
+      { id: "stone_sanctum", name: "Stone Sanctum", chapter: "Chapter 7", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Quiet drop with shifting temple walls" },
 
       // C-TIER (6 POIs)
-      { id: "coral", name: "Coral Castle", chapter: "Chapter 2", tier: "C", perfMod: -1.5, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Low-ground pit, poor mats & brutal uphill rotations" },
-      { id: "junk", name: "Junk Junction", chapter: "Chapter 1", tier: "C", perfMod: -1.3, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far northwest corner & sparse chest count" },
-      { id: "stealthy", name: "Stealthy Stronghold", chapter: "Chapter 2", tier: "C", perfMod: -1.1, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Walled-in choke points & slow zone pulls" },
-      { id: "haunted", name: "Haunted Hills", chapter: "Chapter 1", tier: "C", perfMod: -1.1, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Edge-map isolation & weak upgrade/heal economy" },
-      { id: "sleepy", name: "Sleepy Sound", chapter: "Chapter 3", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far edge rotates with limited mobility" },
-      { id: "shifty", name: "Shifty Shafts", chapter: "Chapter 1", tier: "C", perfMod: -0.8, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Cramped tunnels & low trio loot capacity" }
+      { id: "coral", name: "Coral Castle", chapter: "Chapter 2", tier: "C", perfMod: -1.2, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Low-ground pit, poor mats & brutal uphill rotations" },
+      { id: "junk", name: "Junk Junction", chapter: "Chapter 1", tier: "C", perfMod: -1.0, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far northwest corner & sparse chest count" },
+      { id: "stealthy", name: "Stealthy Stronghold", chapter: "Chapter 2", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Walled-in choke points & slow zone pulls" },
+      { id: "haunted", name: "Haunted Hills", chapter: "Chapter 1", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Edge-map isolation & weak upgrade/heal economy" },
+      { id: "sleepy", name: "Sleepy Sound", chapter: "Chapter 3", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far edge rotates with limited mobility" },
+      { id: "shifty", name: "Shifty Shafts", chapter: "Chapter 1", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Cramped tunnels & low trio loot capacity" }
     ];
 
     // ==========================================
@@ -1440,11 +1440,13 @@
       13: 21, 14: 18, 15: 15, 16: 12, 17: 9
     };
 
-    // Contest Tuning Constants:
-    // Losing off-spawn severely punishes placement (early wipe), while winning off-spawn grants +1 elim
-    // but only +0.3 momentum (scuffed mats/heals/late rotation compared to an uncontested drop).
-    const CONTEST_WIN_PERF_DELTA = 0.3;
-    const CONTEST_LOSS_PERF_DELTA = -13.5;
+    // Contest & Macro Tuning:
+    // Uncontested drops get +2.0 clean loot/surge/rotate edge;
+    // Contested drop winners get only +0.1 edge (+1 elim) from scuffed early fights;
+    // Contested drop losers take -18.0 penalty and wipe off-spawn (0 elims, 26th-33rd).
+    const UNCON_CLEAN_PERF_DELTA = 2.0;
+    const CONTEST_WIN_PERF_DELTA = 0.1;
+    const CONTEST_LOSS_PERF_DELTA = -18.0;
 
     // ==========================================
     // 3. GAME STATE
@@ -1806,7 +1808,7 @@
     }
 
     function simulateSingleMatch(teamStats, poi, spawnOutcome = null) {
-      const rng = bellRandom(12.5);
+      const rng = bellRandom(12.0);
       const poiBoost = poi ? poi.perfMod : 0;
 
       let contestDelta = 0;
@@ -1821,6 +1823,8 @@
           contestDelta = CONTEST_LOSS_PERF_DELTA;
           lostOffSpawn = true;
         }
+      } else {
+        contestDelta = UNCON_CLEAN_PERF_DELTA;
       }
 
       const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + poiBoost + contestDelta + rng;
@@ -1829,9 +1833,9 @@
       const extraPoiElims = (poi && !lostOffSpawn ? poi.elimBonus : 0) + bonusElim;
 
       if (lostOffSpawn) {
-        // Wiped off-spawn: eliminated 25th-33rd (0 placement points) with at most 0-1 knocks finished
-        placement = Math.floor(Math.random() * 9) + 25;
-        elims = Math.random() < 0.25 ? 1 : 0;
+        // Wiped off-spawn: eliminated 26th-33rd with 0 elims and 0 placement points
+        placement = Math.floor(Math.random() * 8) + 26;
+        elims = 0;
       } else if (perf >= 98.4) {
         placement = 1;
         elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1 + extraPoiElims);
@@ -1860,42 +1864,38 @@
       };
     }
 
-    function assignPoiToRival(trioStats, poiCounts) {
+    function assignPoiToRival(trioStats, poiCounts, contestedUsedCount) {
       const avgRating = (trioStats.igl + trioStats.mech + trioStats.clutch) / 3;
       const sPois = POIS.filter(p => p.tier === "S");
       const aPois = POIS.filter(p => p.tier === "A");
       const bPois = POIS.filter(p => p.tier === "B");
       const cPois = POIS.filter(p => p.tier === "C");
 
-      // Prefer uncontested POIs first within the bucket so contests stay realistic (around 5-8 POIs per lobby)
-      const pickFromBucket = (bucket, maxPerPoi) => {
+      // Strong preference for completely uncontested POIs so most of the lobby (and Top 10) is uncontested
+      const pickUncontestedFromBucket = bucket => {
         const uncon = bucket.filter(p => (poiCounts[p.id] || 0) === 0);
-        if (uncon.length > 0) {
-          return uncon[Math.floor(Math.random() * uncon.length)];
-        }
-        const available = bucket.filter(p => (poiCounts[p.id] || 0) < maxPerPoi);
-        if (available.length === 0) return null;
-        return available[Math.floor(Math.random() * available.length)];
+        if (uncon.length === 0) return null;
+        return uncon[Math.floor(Math.random() * uncon.length)];
       };
 
       const roll = Math.random();
       let chosen = null;
 
       if (avgRating >= 93) {
-        if (roll < 0.48) chosen = pickFromBucket(sPois, 2);
-        if (!chosen && roll < 0.88) chosen = pickFromBucket(aPois, 2);
-        if (!chosen) chosen = pickFromBucket(bPois, 2);
+        if (roll < 0.55) chosen = pickUncontestedFromBucket(sPois);
+        if (!chosen && roll < 0.90) chosen = pickUncontestedFromBucket(aPois);
+        if (!chosen) chosen = pickUncontestedFromBucket(bPois);
       } else if (avgRating >= 89) {
-        if (roll < 0.22) chosen = pickFromBucket(sPois, 2);
-        if (!chosen && roll < 0.68) chosen = pickFromBucket(aPois, 2);
-        if (!chosen) chosen = pickFromBucket(bPois, 2);
+        if (roll < 0.25) chosen = pickUncontestedFromBucket(sPois);
+        if (!chosen && roll < 0.72) chosen = pickUncontestedFromBucket(aPois);
+        if (!chosen) chosen = pickUncontestedFromBucket(bPois);
       } else if (avgRating >= 85) {
-        if (roll < 0.48) chosen = pickFromBucket(bPois, 2);
-        if (!chosen && roll < 0.78) chosen = pickFromBucket(aPois, 2);
-        if (!chosen) chosen = pickFromBucket(cPois, 2);
+        if (roll < 0.55) chosen = pickUncontestedFromBucket(bPois);
+        if (!chosen && roll < 0.82) chosen = pickUncontestedFromBucket(aPois);
+        if (!chosen) chosen = pickUncontestedFromBucket(cPois);
       } else {
-        if (roll < 0.68) chosen = pickFromBucket(cPois, 2);
-        if (!chosen) chosen = pickFromBucket(bPois, 2);
+        if (roll < 0.72) chosen = pickUncontestedFromBucket(cPois);
+        if (!chosen) chosen = pickUncontestedFromBucket(bPois);
       }
 
       if (!chosen) {
@@ -1903,12 +1903,24 @@
         if (anyUncon.length > 0) {
           chosen = anyUncon[Math.floor(Math.random() * anyUncon.length)];
         } else {
-          const anyOpen = POIS.filter(p => (poiCounts[p.id] || 0) < 2);
-          const fallbackPool = anyOpen.length > 0 ? anyOpen : POIS;
-          chosen = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+          // Only contest an already-claimed POI if we have fewer than 6 contested POIs in the lobby
+          const canContestMore = contestedUsedCount.value < 6;
+          const contestable = canContestMore
+            ? POIS.filter(p => (poiCounts[p.id] || 0) === 1 && (p.tier === "S" || p.tier === "A" || Math.random() < 0.35))
+            : [];
+          if (contestable.length > 0) {
+            chosen = contestable[Math.floor(Math.random() * contestable.length)];
+            contestedUsedCount.value++;
+          } else {
+            const fallbackPool = POIS.filter(p => (poiCounts[p.id] || 0) < 2);
+            chosen = (fallbackPool.length > 0 ? fallbackPool : POIS)[Math.floor(Math.random() * (fallbackPool.length > 0 ? fallbackPool.length : POIS.length))];
+          }
         }
       }
 
+      if ((poiCounts[chosen.id] || 0) === 1) {
+        contestedUsedCount.value++;
+      }
       poiCounts[chosen.id] = (poiCounts[chosen.id] || 0) + 1;
       return chosen;
     }
@@ -1936,6 +1948,7 @@
       if (userPoi) {
         poiCounts[userPoi.id] = 1;
       }
+      const contestedUsedCount = { value: 0 };
 
       let igls = shuffle(allEraEntries.filter(p => p.role === "IGL"));
       let fraggers = shuffle(allEraEntries.filter(p => p.role === "Fragger"));
@@ -1965,7 +1978,7 @@
 
         const trio = [p1, p2, p3];
         const baseStats = calculateTeamStats(trio);
-        const poi = assignPoiToRival(baseStats, poiCounts);
+        const poi = assignPoiToRival(baseStats, poiCounts, contestedUsedCount);
 
         rivals.push({
           id: `rival_${rivals.length}`,
@@ -2004,9 +2017,10 @@
       Object.values(byPoi).forEach(group => {
         if (group.length <= 1) return;
 
+        // Off-spawn fights are volatile: heavy RNG noise so even strong teams drop spawns regularly
         const scored = group.map(team => ({
           team,
-          spawnScore: (team.stats.mech * 0.65) + (team.stats.clutch * 0.35) + bellRandom(10)
+          spawnScore: (team.stats.mech * 0.45) + (team.stats.clutch * 0.25) + bellRandom(18)
         }));
         scored.sort((a, b) => b.spawnScore - a.spawnScore);
 
@@ -2103,14 +2117,13 @@
       if (entries.length === 0) {
         contestedSummaryContainer.innerHTML = `
           <div class="leaderboard-box">
-            <div class="lb-title">Post-Tournament Top Contested POIs</div>
-            <div style="font-size:0.8rem;color:var(--muted);">Every trio landed uncontested across all 25 POIs in this lobby.</div>
+            <div class="lb-title">Post-Tournament Contested POIs Summary</div>
+            <div style="font-size:0.8rem;color:var(--muted);">No POIs were multi-contested in this 33-trio lobby.</div>
           </div>
         `;
         return;
       }
 
-      // Sort contested POIs by highest-finishing team at that drop spot
       entries.sort((a, b) => {
         const bestA = Math.min(...a.teams.map(t => t.finalRank));
         const bestB = Math.min(...b.teams.map(t => t.finalRank));
