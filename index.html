@@ -3,948 +3,722 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FNCS Trio & POI Draft Simulator</title>
+  <title>FNCS Grand Finals // Multi-Era Squad & POI Draft</title>
   <style>
     :root {
-      --bg: #0b0e17;
-      --panel: #131826;
-      --panel-2: #1a2133;
-      --border: #28324d;
-      --text: #eef2ff;
-      --muted: #94a3b8;
+      --bg: #090d16;
+      --panel: #111827;
+      --panel-2: #182236;
+      --border: #26334d;
+      --text: #f3f6fc;
+      --muted: #93a4c3;
       --accent: #38bdf8;
-      --accent-2: #a855f7;
-      --gold: #facc15;
-      --green: #22c55e;
-      --red: #ef4444;
-      --orange: #fb923c;
+      --accent-2: #818cf8;
+      --win: #22c55e;
+      --loss: #ef4444;
+      --mythic: #fbbf24;
+      --champion: #c084fc;
+      --contender: #38bdf8;
+      --rookie: #94a3b8;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, -apple-system, sans-serif; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: radial-gradient(circle at top, #172038 0%, var(--bg) 60%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: radial-gradient(circle at top, #131d33 0%, var(--bg) 60%);
       color: var(--text);
       min-height: 100vh;
-      padding: 24px 16px 60px;
+      padding: 20px;
+      line-height: 1.45;
     }
 
-    .container {
-      max-width: 1160px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1180px; margin: 0 auto; }
 
     header {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
+      gap: 14px;
+      padding-bottom: 18px;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
     }
 
-    h1 {
+    .brand h1 {
       font-size: 1.65rem;
-      letter-spacing: -0.02em;
-      background: linear-gradient(90deg, #38bdf8, #c084fc, #facc15);
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    .brand p { color: var(--muted); font-size: 0.88rem; }
 
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 4px;
-    }
-
-    .controls-top {
+    .mode-tabs {
       display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .mode-switch {
-      display: flex;
+      gap: 8px;
       background: var(--panel);
-      border: 1px solid var(--border);
+      padding: 5px;
       border-radius: 10px;
-      padding: 4px;
+      border: 1px solid var(--border);
     }
-
     .mode-btn {
       background: transparent;
       border: none;
       color: var(--muted);
       padding: 8px 14px;
       border-radius: 7px;
-      cursor: pointer;
       font-weight: 600;
       font-size: 0.85rem;
-      transition: 0.2s;
+      cursor: pointer;
+      transition: 0.18s;
     }
-
     .mode-btn.active {
-      background: var(--accent);
-      color: #06101a;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #060911;
     }
 
-    button.btn-secondary {
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 9px 14px;
-      border-radius: 9px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.85rem;
-      transition: 0.2s;
-    }
-
-    button.btn-secondary:hover:not(:disabled) { border-color: var(--accent); }
-    button.btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
-
-    /* Pass & Play Turn Banner */
-    .pvp-banner {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      background: linear-gradient(90deg, rgba(56, 189, 248, 0.14), rgba(168, 85, 247, 0.14));
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 18px;
-    }
-
-    .pvp-banner.visible { display: flex; }
-
-    .pvp-turn-text {
-      font-weight: 800;
-      font-size: 0.95rem;
-      color: #e0f2fe;
-    }
-
-    .pvp-order-badge {
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid var(--border);
-      color: var(--gold);
-    }
-
-    /* Pre-Draft Pass & Play Setup Card */
+    /* Pass & Play Lobby Setup Card */
     .pvp-setup-card {
-      display: none;
       background: var(--panel);
-      border: 1px solid var(--border);
+      border: 1px solid var(--accent-2);
       border-radius: 14px;
-      padding: 22px;
-      margin-bottom: 22px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      display: none;
     }
-
     .pvp-setup-card.visible { display: block; }
 
-    .pvp-setup-header {
+    .setup-top-row {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-
-    .pvp-setup-header h2 {
-      font-size: 1.15rem;
+    .setup-top-row h2 {
+      font-size: 1.05rem;
+      color: #e0e7ff;
     }
-
-    .player-count-select {
+    .player-count-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       background: var(--panel-2);
+      padding: 6px 12px;
+      border-radius: 9px;
       border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 8px;
+    }
+    .player-count-control label {
+      font-size: 0.82rem;
+      color: var(--muted);
       font-weight: 700;
-      font-size: 0.9rem;
+    }
+    .player-count-control select {
+      background: var(--bg);
+      color: #fff;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
       cursor: pointer;
     }
 
     .player-names-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
-
     .name-input-wrap {
       background: var(--panel-2);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
+      border-radius: 9px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
-
     .name-input-wrap label {
-      display: block;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.8px;
       color: var(--muted);
-      margin-bottom: 5px;
       font-weight: 700;
     }
-
     .name-input-wrap input {
-      width: 100%;
       background: var(--bg);
       border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 10px;
-      border-radius: 7px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      color: #fff;
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-size: 0.88rem;
+      font-weight: 700;
     }
-
     .name-input-wrap input:focus {
       outline: none;
       border-color: var(--accent);
     }
 
+    .setup-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
     .snake-preview {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
-      background: rgba(15, 23, 42, 0.65);
-      border: 1px dashed var(--border);
-      border-radius: 9px;
-      padding: 10px 12px;
-      margin-bottom: 16px;
-      line-height: 1.45;
     }
 
-    .snake-preview strong { color: var(--accent); }
-
-    .grid {
+    .grid-main {
       display: grid;
-      grid-template-columns: 1.25fr 1fr;
+      grid-template-columns: 1.35fr 1fr;
       gap: 20px;
-      align-items: start;
     }
-
-    .grid.hidden { display: none; }
-
+    .grid-main.hidden { display: none; }
     @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
+      .grid-main { grid-template-columns: 1fr; }
     }
 
-    .card {
+    .card-box {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 18px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     }
 
-    .card-header {
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--muted);
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
       gap: 8px;
       flex-wrap: wrap;
-    }
-
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-    }
-
-    .pill {
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      color: var(--accent);
-      font-weight: 600;
     }
 
     /* Spinner Box */
-    .spinner-box {
+    .spinner-display {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .reel {
       background: var(--panel-2);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-
-    .wheel-readout {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .reel {
-      background: var(--bg);
-      border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 14px;
-      min-width: 155px;
+      padding: 14px;
+      text-align: center;
     }
-
-    .reel-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-    }
-
-    .reel-val {
-      font-size: 1rem;
-      font-weight: 800;
-      margin-top: 3px;
-      color: var(--gold);
-    }
+    .reel-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+    .reel-val { font-size: 1.1rem; font-weight: 800; margin-top: 4px; color: #fff; }
 
     .spin-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .spin-actions { grid-template-columns: 1fr; }
     }
 
-    .btn-spin {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 11px 18px;
+    .btn-primary {
+      width: 100%;
+      padding: 12px 18px;
       border-radius: 10px;
+      border: none;
+      font-weight: 800;
+      font-size: 0.95rem;
       cursor: pointer;
-      font-size: 0.92rem;
-      transition: transform 0.15s, opacity 0.2s;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #070b14;
+      transition: transform 0.12s, opacity 0.15s;
     }
-
-    .btn-spin:hover:not(:disabled) { transform: translateY(-1px); }
-    .btn-spin:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .btn-reroll {
-      background: var(--bg);
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      font-weight: 700;
-      padding: 10px 14px;
+      width: 100%;
+      padding: 12px 14px;
       border-radius: 10px;
+      border: 1px solid var(--accent);
+      font-weight: 800;
+      font-size: 0.88rem;
       cursor: pointer;
-      font-size: 0.85rem;
-      transition: 0.15s;
+      background: rgba(56, 189, 248, 0.14);
+      color: #e0f2fe;
+      transition: transform 0.12s, opacity 0.15s, background 0.15s;
     }
-
     .btn-reroll:hover:not(:disabled) {
-      background: rgba(250, 204, 21, 0.12);
+      transform: translateY(-1px);
+      background: rgba(56, 189, 248, 0.24);
+    }
+    .btn-reroll:disabled { opacity: 0.4; cursor: not-allowed; border-color: var(--border); color: var(--muted); }
+
+    .btn-secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-secondary.active-toggle {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--accent);
+      color: #e0f2fe;
     }
 
-    .btn-reroll:disabled {
-      opacity: 0.35;
-      border-color: var(--border);
-      color: var(--muted);
-      cursor: not-allowed;
-    }
-
-    /* Choices */
+    /* Draft Choices */
     .choices-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
+      margin-top: 16px;
     }
-
-    @media (max-width: 680px) {
+    @media (max-width: 600px) {
       .choices-grid { grid-template-columns: 1fr; }
     }
 
     .player-card {
       background: var(--panel-2);
-      border: 1.5px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 12px;
-      padding: 14px;
+      padding: 13px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 12px;
-      cursor: pointer;
-      transition: transform 0.16s, border-color 0.16s, box-shadow 0.16s;
     }
-
     .player-card:hover {
       transform: translateY(-3px);
-      border-color: var(--accent);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
     }
 
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-    }
+    .tier-mythic { border-color: var(--mythic); background: linear-gradient(160deg, rgba(251,191,36,0.16), var(--panel-2) 65%); }
+    .tier-champion { border-color: var(--champion); background: linear-gradient(160deg, rgba(192,132,252,0.14), var(--panel-2) 65%); }
+    .tier-contender { border-color: var(--contender); background: linear-gradient(160deg, rgba(56,189,248,0.12), var(--panel-2) 65%); }
+    .tier-rookie { border-color: var(--rookie); }
 
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .ovr-badge {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 900;
-      padding: 3px 9px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.06);
+      line-height: 1;
+      padding: 5px 8px;
+      border-radius: 7px;
+      background: rgba(0,0,0,0.4);
     }
-
-    .tier-mythic .ovr-badge { color: #facc15; border: 1px solid rgba(250, 204, 21, 0.45); }
-    .tier-champion .ovr-badge { color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.45); }
-    .tier-contender .ovr-badge { color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.45); }
-    .tier-rookie .ovr-badge { color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.35); }
+    .tier-mythic .ovr-badge { color: var(--mythic); }
+    .tier-champion .ovr-badge { color: var(--champion); }
+    .tier-contender .ovr-badge { color: var(--contender); }
+    .tier-rookie .ovr-badge { color: var(--rookie); }
 
     .role-pill {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid var(--border);
-      color: #cbd5e1;
-      text-align: right;
+      padding: 3px 7px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.08);
+      text-transform: uppercase;
     }
 
-    .player-name {
-      font-size: 1.05rem;
-      font-weight: 800;
-      margin-top: 8px;
-    }
-
-    .player-meta {
-      font-size: 0.76rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .player-note {
-      font-size: 0.78rem;
-      color: #cbd5e1;
-      margin-top: 8px;
-      line-height: 1.35;
-    }
+    .player-name { font-size: 1.05rem; font-weight: 800; margin-top: 8px; }
+    .player-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .player-note { font-size: 0.74rem; color: #cbd5e1; margin-top: 8px; min-height: 32px; }
 
     .mini-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      background: var(--bg);
-      padding: 8px;
-      border-radius: 8px;
+      gap: 4px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
       text-align: center;
       font-size: 0.72rem;
     }
+    .mini-stats span { display: block; font-weight: 800; font-size: 0.85rem; color: #fff; }
 
-    .mini-stats span { display: block; font-weight: 800; font-size: 0.85rem; color: var(--text); }
-
-    /* Roster & Team Rating */
+    /* Player Switcher Pills in Pass & Play */
     .pvp-roster-tabs {
       display: flex;
-      gap: 6px;
       flex-wrap: wrap;
+      gap: 6px;
       margin-bottom: 12px;
     }
-
     .pvp-tab-pill {
       background: var(--panel-2);
       border: 1px solid var(--border);
       color: var(--muted);
       padding: 5px 10px;
-      border-radius: 8px;
+      border-radius: 7px;
       font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.15s;
     }
-
     .pvp-tab-pill.viewing {
       border-color: var(--accent);
-      color: var(--text);
-      background: rgba(56, 189, 248, 0.15);
+      color: #fff;
+      background: rgba(56, 189, 248, 0.16);
     }
-
     .pvp-tab-pill.on-clock {
-      box-shadow: inset 0 0 0 1px var(--gold);
-      color: var(--gold);
+      box-shadow: 0 0 0 1px var(--mythic);
     }
 
-    .roster-slots {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
+    /* Roster & POI Slots */
+    .roster-slots { display: flex; flex-direction: column; gap: 10px; }
     .slot {
       background: var(--panel-2);
       border: 1px dashed var(--border);
       border-radius: 10px;
-      padding: 11px 13px;
+      padding: 11px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       min-height: 58px;
-    }
-
-    .slot.filled { border-style: solid; }
-
-    .slot.slot-poi {
-      border-color: rgba(251, 146, 60, 0.45);
-      background: rgba(251, 146, 60, 0.06);
-    }
-
-    .slot-left strong { font-size: 0.92rem; display: block; }
-    .slot-left small { font-size: 0.75rem; color: var(--muted); }
-
-    .slot-right {
-      display: flex;
-      align-items: center;
       gap: 10px;
     }
+    .slot.filled { border-style: solid; }
+    .slot-poi { margin-top: 2px; }
+    .slot-left strong { font-size: 0.96rem; display: block; }
+    .slot-left small { color: var(--muted); font-size: 0.76rem; }
+    .slot-right { text-align: right; flex-shrink: 0; }
 
-    .team-rating-box {
-      background: linear-gradient(145deg, #182238, #111726);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
-    }
-
-    .rating-grid {
+    /* Team Ratings & Synergy */
+    .team-bars {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-top: 10px;
-      text-align: center;
+      margin-top: 14px;
     }
-
-    .rating-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
+    .stat-box {
+      background: var(--panel-2);
+      padding: 10px;
       border-radius: 9px;
-      padding: 8px 6px;
+      text-align: center;
+      border: 1px solid var(--border);
     }
-
-    .rating-box .val { font-size: 1.2rem; font-weight: 900; color: var(--accent); }
-    .rating-box .lbl { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; }
+    .stat-box .val { font-size: 1.35rem; font-weight: 900; color: var(--accent); }
+    .stat-box .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
 
     .synergy-list {
+      margin-top: 12px;
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 10px;
     }
-
     .syn-tag {
-      font-size: 0.72rem;
-      padding: 3px 8px;
+      font-size: 0.74rem;
+      padding: 4px 8px;
       border-radius: 6px;
       font-weight: 600;
     }
+    .syn-pos { background: rgba(34, 197, 94, 0.16); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.35); }
+    .syn-neg { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
 
-    .syn-pos { background: rgba(34, 197, 94, 0.14); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-    .syn-neg { background: rgba(239, 68, 68, 0.14); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-    .btn-sim {
-      width: 100%;
-      background: linear-gradient(135deg, #22c55e, #10b981);
-      border: none;
-      color: #052e16;
-      font-weight: 800;
-      padding: 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: 0.2s;
-    }
-
-    .btn-sim:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* Simulation / Bracket Area */
-    .sim-panel {
-      margin-top: 22px;
-      display: none;
-    }
-
+    /* Simulation Feed */
+    .sim-panel { margin-top: 20px; display: none; }
     .sim-panel.visible { display: block; }
 
     .banner {
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-radius: 10px;
-      font-weight: 700;
       margin-bottom: 14px;
+      font-weight: 700;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
     }
+    .banner-running { background: rgba(56, 189, 248, 0.14); border: 1px solid var(--accent); }
+    .banner-win { background: rgba(34, 197, 94, 0.18); border: 1px solid var(--win); color: #bbf7d0; }
+    .banner-loss { background: rgba(239, 68, 68, 0.18); border: 1px solid var(--loss); color: #fecaca; }
 
-    .banner-win { background: rgba(34, 197, 94, 0.16); border: 1px solid var(--green); color: #86efac; }
-    .banner-loss { background: rgba(239, 68, 68, 0.16); border: 1px solid var(--red); color: #fca5a5; }
-    .banner-running { background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent); color: #bae6fd; }
+    .contest-pill {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      vertical-align: middle;
+    }
+    .pill-uncon {
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+    .pill-con {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+    }
+
+    /* Perfect 12-Win Celebration Screen */
+    .twelve-zero-screen {
+      display: none;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(192, 132, 252, 0.16), rgba(34, 197, 94, 0.14));
+      border: 2px solid var(--mythic);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(251, 191, 36, 0.18);
+      animation: fadeIn 0.35s ease;
+    }
+    .twelve-zero-screen.visible { display: block; }
+    .twelve-zero-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: #090d16;
+      background: var(--mythic);
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .twelve-zero-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #fef08a;
+      margin-bottom: 6px;
+    }
+    .twelve-zero-sub {
+      color: #e2e8f0;
+      font-size: 0.92rem;
+      margin-bottom: 16px;
+    }
+    .twelve-zero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 540px;
+      margin: 0 auto 18px;
+    }
+    .tz-stat {
+      background: rgba(9, 13, 22, 0.65);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .tz-stat strong { display: block; font-size: 1.25rem; color: var(--mythic); }
+    .tz-stat span { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+
+    .sim-split {
+      display: grid;
+      grid-template-columns: 1.15fr 1.2fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .sim-split { grid-template-columns: 1fr; }
+    }
+
+    .right-sim-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
 
     .match-log {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
       gap: 10px;
-      margin-top: 12px;
     }
-
     .match-row {
       background: var(--panel-2);
       border: 1px solid var(--border);
       border-radius: 9px;
       padding: 10px 12px;
-      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.83rem;
+      animation: fadeIn 0.25s ease;
     }
-
-    .match-row.vr { border-color: var(--gold); background: rgba(250, 204, 21, 0.08); }
-
     .match-row-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      gap: 6px;
     }
-
     .match-row-sub {
-      font-size: 0.74rem;
-      color: var(--muted);
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      margin-top: 4px;
+      gap: 3px;
+      font-size: 0.74rem;
+      color: var(--muted);
     }
-
     .match-human-line {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
     }
-
-    .contest-pill {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 5px;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .pill-con {
-      background: rgba(239, 68, 68, 0.18);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.45);
-    }
-
-    .pill-uncon {
-      background: rgba(34, 197, 94, 0.15);
-      color: #86efac;
-      border: 1px solid rgba(34, 197, 94, 0.35);
+    .match-row.vr {
+      border-color: var(--mythic);
+      background: rgba(251, 191, 36, 0.12);
     }
 
     .leaderboard-box {
-      margin-top: 14px;
       background: var(--panel-2);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 12px;
+      padding: 12px 14px;
+      animation: fadeIn 0.3s ease;
+      overflow-x: auto;
     }
-
     .lb-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
       margin-bottom: 8px;
+      flex-wrap: wrap;
     }
-
     .lb-title {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--muted);
+      font-size: 0.76rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 1px;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 0;
     }
-
     .lb-toggle-btn {
-      padding: 6px 11px;
-      font-size: 0.75rem;
-      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 0.73rem;
+      border-radius: 6px;
     }
-
-    .lb-toggle-btn.active-toggle {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: rgba(250, 204, 21, 0.1);
-    }
-
-    .lb-scroll-wrap {
-      overflow-x: auto;
-    }
-
     .lb-scroll-wrap.expanded {
-      max-height: 440px;
+      max-height: 520px;
       overflow-y: auto;
+      padding-right: 2px;
     }
-
-    table.lb-table {
+    .lb-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
+      font-size: 0.81rem;
     }
-
-    table.lb-table th, table.lb-table td {
+    .lb-table th, .lb-table td {
+      padding: 7px 6px;
       text-align: left;
-      padding: 7px 8px;
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: middle;
     }
-
-    table.lb-table th {
-      color: var(--muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      position: sticky;
-      top: 0;
-      background: var(--panel-2);
-      z-index: 1;
+    .lb-table th { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; }
+    .lb-table tr.user-row {
+      background: rgba(56, 189, 248, 0.16);
+      color: #fff;
+      font-weight: 800;
     }
-
-    tr.user-row { background: rgba(56, 189, 248, 0.14); font-weight: 700; }
-
+    .lb-table tr.user-row td:first-child { color: var(--accent); }
     .lb-poi-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
+      font-size: 0.74rem;
+      color: #cbd5e1;
+      line-height: 1.35;
     }
 
     /* Post-Tournament Contested POIs Summary */
     .contested-summary-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 10px;
-      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-
     .contested-item {
-      background: var(--bg);
+      background: rgba(9, 13, 22, 0.55);
       border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 10px 12px;
-      font-size: 0.78rem;
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 0.79rem;
     }
-
     .contested-item.user-involved {
       border-color: rgba(56, 189, 248, 0.55);
-      background: rgba(56, 189, 248, 0.06);
+      background: rgba(56, 189, 248, 0.08);
     }
-
     .contested-item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 5px;
       gap: 8px;
-      margin-bottom: 6px;
     }
-
     .contested-poi-name {
       font-weight: 800;
-      color: var(--text);
+      color: #fff;
       font-size: 0.84rem;
     }
-
     .contested-matchup {
-      color: var(--muted);
-      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      color: #cbd5e1;
+      font-size: 0.75rem;
     }
-
-    .contested-matchup strong {
-      color: var(--text);
-    }
-
     .spawn-winner-tag {
-      color: var(--gold);
+      color: #86efac;
       font-weight: 700;
     }
 
-    .empty-msg {
-      color: var(--muted);
-      font-size: 0.85rem;
-      padding: 18px;
-      text-align: center;
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      grid-column: 1 / -1;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* 12-0 Perfect Sweep Celebration Overlay */
-    .twelve-zero-screen {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 999;
-      background: radial-gradient(circle at 50% 35%, rgba(250, 204, 21, 0.22), rgba(168, 85, 247, 0.16) 45%, rgba(7, 10, 18, 0.96) 85%);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .twelve-zero-screen.visible {
-      display: flex;
-      animation: fadeInScreen 0.35s ease-out;
-    }
-
-    @keyframes fadeInScreen {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .tz-card {
-      max-width: 560px;
-      width: 100%;
-      background: linear-gradient(160deg, #1b2338, #0f1422);
-      border: 2px solid var(--gold);
-      box-shadow: 0 0 60px rgba(250, 204, 21, 0.28);
-      border-radius: 20px;
-      padding: 32px 26px;
-    }
-
-    .tz-badge {
-      display: inline-block;
-      padding: 5px 14px;
-      border-radius: 999px;
-      background: rgba(250, 204, 21, 0.16);
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      font-weight: 800;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .pvp-header {
+      background: rgba(129, 140, 248, 0.15);
+      border: 1px solid var(--accent-2);
+      padding: 10px 14px;
+      border-radius: 8px;
       margin-bottom: 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #c7d2fe;
+      display: none;
     }
-
-    .tz-title {
-      font-size: 2.2rem;
-      font-weight: 950;
-      letter-spacing: -0.03em;
-      background: linear-gradient(90deg, #fef08a, #facc15, #38bdf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-    }
-
-    .tz-sub {
-      color: #cbd5e1;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-
-    .tz-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 22px;
-    }
-
-    .tz-stat-box {
-      background: rgba(11, 14, 23, 0.75);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 8px;
-    }
-
-    .tz-stat-box strong {
-      display: block;
-      font-size: 1.25rem;
-      color: var(--gold);
-    }
-
-    .tz-stat-box span {
-      font-size: 0.72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .tz-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .pvp-header.visible { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
   </style>
 </head>
 <body>
-  <!-- 12-0 Perfect Sweep Celebration Overlay -->
-  <div id="twelveZeroScreen" class="twelve-zero-screen">
-    <div class="tz-card">
-      <div class="tz-badge">12 / 12 VICTORY ROYALES</div>
-      <div id="tzTitle" class="tz-title">12-0 PERFECT SWEEP!</div>
-      <p id="tzSub" class="tz-sub">Your trio won every single Grand Finals match in dominant fashion.</p>
-      <div class="tz-stats">
-        <div class="tz-stat-box"><strong id="tzRecord">12W - 0L</strong><span>Match Record</span></div>
-        <div class="tz-stat-box"><strong id="tzPts">0 pts</strong><span>Total Points</span></div>
-        <div class="tz-stat-box"><strong id="tzElims">0</strong><span>Total Elims</span></div>
-      </div>
-      <div class="tz-actions">
-        <button id="tzKeepBtn" class="btn-secondary">View Standings</button>
-        <button id="tzNewDraftBtn" class="btn-spin">Start New Draft</button>
-      </div>
-    </div>
-  </div>
-
   <div class="container">
     <header>
-      <div>
-        <h1>FNCS Trio &amp; POI Draft Simulator</h1>
-        <p class="subtitle">Spin Chapter eras, draft a 3-pro trio &amp; drop spot POI, and simulate a 33-trio FNCS Grand Finals</p>
+      <div class="brand">
+        <h1>FNCS GRAND FINALS // MULTI-ERA &amp; POI DRAFT</h1>
+        <p>Spin Chapters 2–7, claim your Drop Spot POI, and battle a 33-Trio 12-Game Grand Finals lobby.</p>
       </div>
-      <div class="controls-top">
-        <div class="mode-switch">
-          <button class="mode-btn active" data-mode="finals">Grand Finals</button>
-          <button class="mode-btn" data-mode="pvp">Pass &amp; Play</button>
-        </div>
-        <button class="btn-secondary" id="resetBtn">Reset Draft</button>
+      <div class="mode-tabs">
+        <button class="mode-btn active" data-mode="finals">Grand Finals (Solo vs AI)</button>
+        <button class="mode-btn" data-mode="pvp">Pass &amp; Play (2–8 Players)</button>
       </div>
     </header>
 
-    <!-- Pass & Play Active Turn Banner -->
-    <div id="pvpBanner" class="pvp-banner">
-      <div id="pvpBannerText" class="pvp-turn-text">ON THE CLOCK: Player 1</div>
-      <div id="pvpSnakeOrderBadge" class="pvp-order-badge">Pick 1</div>
-    </div>
-
-    <!-- Pass & Play Pre-Draft Setup -->
+    <!-- PRE-DRAFT PASS & PLAY SETUP -->
     <div id="pvpSetupCard" class="pvp-setup-card">
-      <div class="pvp-setup-header">
+      <div class="setup-top-row">
         <div>
-          <h2>Pass &amp; Play Lobby Setup (2–8 Players)</h2>
-          <p class="subtitle">Each player drafts 3 pros across eras + 1 drop spot POI in snake order, then all humans enter the 33-trio Grand Finals.</p>
+          <h2>Pass &amp; Play Snake Draft Setup</h2>
+          <p style="font-size: 0.8rem; color: var(--muted);">Set 2 to 8 players, enter their names, and compete in a 33-trio Grand Finals lobby with snake draft order.</p>
         </div>
-        <div>
-          <label for="humanCountSelect" style="font-size:0.78rem;color:var(--muted);margin-right:6px;font-weight:700;">Players:</label>
-          <select id="humanCountSelect" class="player-count-select">
+        <div class="player-count-control">
+          <label for="humanCountSelect">Players:</label>
+          <select id="humanCountSelect">
             <option value="2" selected>2 Players</option>
             <option value="3">3 Players</option>
             <option value="4">4 Players</option>
@@ -955,584 +729,979 @@
           </select>
         </div>
       </div>
-      <div id="playerNamesGrid" class="player-names-grid"></div>
-      <div id="snakePreview" class="snake-preview"></div>
-      <button id="startPvpDraftBtn" class="btn-spin">Lock In Players &amp; Start Snake Draft</button>
+
+      <div class="player-names-grid" id="playerNamesGrid"></div>
+
+      <div class="setup-footer">
+        <div class="snake-preview" id="snakePreview"></div>
+        <button class="btn-primary" id="startPvpDraftBtn" style="max-width: 240px;">Start Snake Draft</button>
+      </div>
     </div>
 
-    <div id="draftGrid" class="grid">
-      <!-- Left: Spinner + 3 Choices -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title" id="spinnerTitle">1. Chapter / Era Spinner</div>
-          <div class="pill" id="pickCounter">Pick 1 of 4</div>
+    <div id="pvpBanner" class="pvp-header">
+      <span id="pvpBannerText">On the Clock</span>
+      <span id="pvpSnakeOrderBadge" style="font-size:0.76rem;color:#e0e7ff;"></span>
+    </div>
+
+    <div class="grid-main" id="draftGrid">
+      <!-- LEFT: SPINNER & DRAFT POOL -->
+      <div class="card-box">
+        <div class="section-title">
+          <span id="spinnerTitle">1. Chapter / Era Spinner</span>
+          <span id="pickCounter">Pick 1 of 4 (Pro #1)</span>
         </div>
 
-        <div class="spinner-box">
-          <div class="wheel-readout">
-            <div class="reel">
-              <div class="reel-label" id="reel1Label">Chapter / Era</div>
-              <div class="reel-val" id="eraVal">Ready to Spin</div>
-            </div>
-            <div class="reel">
-              <div class="reel-label" id="reel2Label">Pool Scope</div>
-              <div class="reel-val" id="regionVal" style="color:#38bdf8;">—</div>
-            </div>
+        <div class="spinner-display">
+          <div class="reel">
+            <div class="reel-label" id="reel1Label">Chapter / Era</div>
+            <div class="reel-val" id="eraVal">Ready to Spin</div>
           </div>
-          <div class="spin-actions">
-            <button class="btn-reroll" id="rerollBtn" disabled>Reroll (1 left)</button>
-            <button class="btn-spin" id="spinBtn">Spin Chapter / Era</button>
+          <div class="reel">
+            <div class="reel-label" id="reel2Label">Pool Scope</div>
+            <div class="reel-val" id="regionVal">—</div>
           </div>
         </div>
 
-        <div id="choicesGrid" class="choices-grid">
-          <div class="empty-msg">Spin the wheel to reveal 3 drafted options. Each player gets 1 reroll per draft!</div>
+        <div class="spin-actions">
+          <button class="btn-primary" id="spinBtn">Spin Chapter / Era</button>
+          <button class="btn-reroll" id="rerollBtn" disabled>Reroll (1 left)</button>
         </div>
+
+        <div class="choices-grid" id="choicesGrid"></div>
       </div>
 
-      <!-- Right: Roster + Drop Spot + Team Rating -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title" id="rosterTitle">2. Your Drafted Trio &amp; Drop Spot</div>
-          <div class="pill">33-Trio Lobby</div>
+      <!-- RIGHT: DRAFTED TRIO, POI & SYNERGY -->
+      <div class="card-box">
+        <div class="section-title">
+          <span id="rosterTitle">2. Your Drafted Trio &amp; Drop Spot</span>
+          <button class="btn-secondary" id="resetBtn">Reset Draft</button>
         </div>
 
-        <div id="pvpRosterTabs" class="pvp-roster-tabs" style="display:none;"></div>
+        <div class="pvp-roster-tabs" id="pvpRosterTabs" style="display:none;"></div>
 
         <div class="roster-slots" id="rosterSlots"></div>
 
-        <div class="team-rating-box">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <strong style="font-size:0.9rem;">Trio &amp; Drop Spot Projection</strong>
-            <span style="font-size:0.75rem;color:var(--muted);">Role • Chem • POI</span>
+        <div class="team-bars">
+          <div class="stat-box">
+            <div class="val" id="statIgl">—</div>
+            <div class="lbl">Team IGL</div>
           </div>
-          <div class="rating-grid">
-            <div class="rating-box"><div class="val" id="statIgl">—</div><div class="lbl">IGLing</div></div>
-            <div class="rating-box"><div class="val" id="statMech">—</div><div class="lbl">Mechanics</div></div>
-            <div class="rating-box"><div class="val" id="statClutch">—</div><div class="lbl">Clutch</div></div>
+          <div class="stat-box">
+            <div class="val" id="statMech">—</div>
+            <div class="lbl">Team Mech</div>
           </div>
-          <div class="synergy-list" id="synergyList"></div>
+          <div class="stat-box">
+            <div class="val" id="statClutch">—</div>
+            <div class="lbl">Endgame</div>
+          </div>
         </div>
 
-        <button class="btn-sim" id="simBtn" disabled>Simulate 12-Game Grand Finals</button>
+        <div class="synergy-list" id="synergyList"></div>
+
+        <button class="btn-primary" id="simBtn" style="margin-top: 16px;" disabled>
+          Simulate 12-Game Finals
+        </button>
       </div>
     </div>
 
-    <!-- Simulation Output -->
-    <div class="card sim-panel" id="simPanel">
-      <div class="card-header">
-        <div class="card-title">3. 12-Game FNCS Grand Finals Broadcast</div>
-        <div class="pill" id="summaryScore"></div>
+    <!-- SIMULATION RESULTS -->
+    <div class="card-box sim-panel" id="simPanel">
+      <div class="section-title">
+        <span>3. Grand Finals Match Log &amp; Live Standings</span>
+        <span id="summaryScore"></span>
       </div>
-      <div id="simBanner" class="banner banner-running">Simulating...</div>
-      <div id="leaderboardContainer"></div>
-      <div id="contestedSummaryContainer"></div>
-      <div class="match-log" id="matchLog"></div>
+
+      <div class="twelve-zero-screen" id="twelveZeroScreen">
+        <div class="twelve-zero-badge">PERFECT 12-WIN GRAND FINALS SWEEP</div>
+        <div class="twelve-zero-title" id="tzTitle">ALL 12 VICTORY ROYALES!</div>
+        <div class="twelve-zero-sub" id="tzSub">Dominated every single match in the 12-game Grand Finals lobby.</div>
+        <div class="twelve-zero-stats">
+          <div class="tz-stat"><strong id="tzPts">0</strong><span>Total Points</span></div>
+          <div class="tz-stat"><strong id="tzElims">0</strong><span>Total Eliminations</span></div>
+          <div class="tz-stat"><strong>12 / 12</strong><span>Victory Royales</span></div>
+        </div>
+        <button class="btn-primary" style="max-width: 240px;" onclick="resetDraft()">Draft Again</button>
+      </div>
+
+      <div class="banner banner-running" id="simBanner">Simulating matches...</div>
+      <div class="sim-split">
+        <div class="match-log" id="matchLog"></div>
+        <div class="right-sim-col">
+          <div id="leaderboardContainer"></div>
+          <div id="contestedSummaryContainer"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
     // ==========================================
-    // 1. ERAS, POIS & PRO PLAYER DATABASE
+    // 1. 25-POI DROP SPOT DATABASE (CHAPTERS 1-7)
+    // ==========================================
+    const POIS = [
+      // S-TIER (7 POIs)
+      { id: "stark", name: "Stark Industries", chapter: "Chapter 2", tier: "S", perfMod: 1.4, elimBonus: 1, riskLabel: "High Contest Risk", note: "Unibeam Mythics, vault & Stark robot loot" },
+      { id: "agency", name: "The Agency", chapter: "Chapter 2", tier: "S", perfMod: 1.3, elimBonus: 1, riskLabel: "High Contest Risk", note: "Dead-center map control + Midas Drum Gun" },
+      { id: "tilted", name: "Tilted Towers", chapter: "Chapter 1", tier: "S", perfMod: 1.2, elimBonus: 1, riskLabel: "High Contest Risk", note: "Center map, max mats & high early elim potential" },
+      { id: "lavish", name: "Lavish Lair", chapter: "Chapter 5", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Medallion + Oscar's Frenzy Auto Shotgun" },
+      { id: "crime_city", name: "Crime City", chapter: "Chapter 6", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Vaults, black market loot & dense chests" },
+      { id: "reality_reign", name: "Reality's Reign", chapter: "Chapter 7", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Geno/Eggman fortress with Override Console & mythic AR" },
+      { id: "rig_shark", name: "The Rig / The Shark", chapter: "Chapter 2", tier: "S", perfMod: 1.0, elimBonus: 1, riskLabel: "High Contest Risk", note: "Skye's Assault Rifle & Grappler mobility" },
+
+      // A-TIER (6 POIs)
+      { id: "slappy", name: "Slappy Shores", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Slap barrels & elite endgame rotation stamina" },
+      { id: "mega_city", name: "Mega City", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Grind rails, vaults & high chest count" },
+      { id: "lazy_lake", name: "Lazy Lake", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Clean splits, high chest density & central rotations" },
+      { id: "sweaty_sands", name: "Sweaty Sands", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Massive loot pool & gold/upgrade economy" },
+      { id: "lonewolf", name: "Lonewolf Lair", chapter: "Chapter 6", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Fletcher Kane boss loot & medallion" },
+      { id: "green_hill", name: "Green Hill Zone", chapter: "Chapter 7", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Boost pads/loops for fast early-game rotates & boss loot" },
+
+      // B-TIER (6 POIs)
+      { id: "pleasant", name: "Pleasant Park", chapter: "Chapter 2", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Classic safe splits & predictable mid-map rotates" },
+      { id: "retail", name: "Retail Row", chapter: "Chapter 1", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Reliable loot & easy surge tags" },
+      { id: "frenzy", name: "Frenzy Farm", chapter: "Chapter 2", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Open sightlines for surge & central position" },
+      { id: "coney", name: "Coney Crossroads", chapter: "Chapter 3", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Solid mid-map hub with vehicle spawns" },
+      { id: "anvil", name: "Anvil Square", chapter: "Chapter 4", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Good cover & balanced chest count" },
+      { id: "stone_sanctum", name: "Stone Sanctum", chapter: "Chapter 7", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Quiet drop with shifting temple walls" },
+
+      // C-TIER (6 POIs)
+      { id: "coral", name: "Coral Castle", chapter: "Chapter 2", tier: "C", perfMod: -1.2, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Low-ground pit, poor mats & brutal uphill rotations" },
+      { id: "junk", name: "Junk Junction", chapter: "Chapter 1", tier: "C", perfMod: -1.0, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far northwest corner & sparse chest count" },
+      { id: "stealthy", name: "Stealthy Stronghold", chapter: "Chapter 2", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Walled-in choke points & slow zone pulls" },
+      { id: "haunted", name: "Haunted Hills", chapter: "Chapter 1", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Edge-map isolation & weak upgrade/heal economy" },
+      { id: "sleepy", name: "Sleepy Sound", chapter: "Chapter 3", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far edge rotates with limited mobility" },
+      { id: "shifty", name: "Shifty Shafts", chapter: "Chapter 1", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Cramped tunnels & low trio loot capacity" }
+    ];
+
+    // ==========================================
+    // 2. MULTI-ERA FNCS DATABASE
     // ==========================================
     const ERAS = [
-      "Chapter 1 (og)",
-      "Chapter 2 (Box / Surge)",
-      "Chapter 3 (Spray / Zero-Build)",
-      "Chapter 4 (Heists / Kinetic)",
-      "Chapter 5 (Mods / Medallions)",
-      "Chapter 6 (Sprites / Mobility)"
+      "Chapter 2 (2019-2021)",
+      "Chapter 3 (2022)",
+      "Chapter 4 (2023)",
+      "Chapter 5 (2024)",
+      "Chapter 6 (2025)",
+      "Chapter 7 (2026)"
     ];
 
-    const POIS = [
-      { id: "agency", name: "The Agency", tier: "S", chapter: "Ch2", riskLabel: "High Contest • Mythic Vault", perfMod: 2.4, elimBonus: 2, note: "Drum Gun + central map rotations." },
-      { id: "stark", name: "Stark Industries", tier: "S", chapter: "Ch2", riskLabel: "High Contest • Iron Man Loot", perfMod: 2.6, elimBonus: 2, note: "Elite surge & repulsors/unibeam power." },
-      { id: "megacity", name: "MEGA City", tier: "S", chapter: "Ch4", riskLabel: "High Contest • Grind Rails", perfMod: 2.0, elimBonus: 1, note: "Fast vertical rotates & high-tier loot." },
-      { id: "fencing", name: "Fencing Fields", tier: "S", chapter: "Ch5", riskLabel: "High Contest • Society Medallion", perfMod: 2.3, elimBonus: 2, note: "Huge fight tempo & shield sustain." },
-      { id: "seaport", name: "Seaport City", tier: "S", chapter: "Ch6", riskLabel: "High Contest • Black Market", perfMod: 2.1, elimBonus: 2, note: "Exotic weapons & strong late rotates." },
-      { id: "tilted", name: "Tilted Towers", tier: "A", chapter: "Ch1", riskLabel: "Heavy Early Fights • High Elims", perfMod: 1.5, elimBonus: 2, note: "Non-stop early engagements & surge tags." },
-      { id: "pleasant", name: "Pleasant Park", tier: "A", chapter: "Ch1", riskLabel: "Classic Drop • Balanced Loot", perfMod: 1.2, elimBonus: 1, note: "Clean split houses & reliable rotates." },
-      { id: "lazy", name: "Lazy Lake", tier: "A", chapter: "Ch2", riskLabel: "Medium-High Contest • Big POI", perfMod: 1.4, elimBonus: 1, note: "Plenty of mats, fish, and surge angles." },
-      { id: "misty", name: "Misty Meadows", tier: "A", chapter: "Ch2", riskLabel: "Medium Contest • High Ground", perfMod: 1.3, elimBonus: 1, note: "Mountain overlooks & steady loot." },
-      { id: "coney", name: "Coney Crossroads", tier: "A", chapter: "Ch3", riskLabel: "Medium Contest • Central Hub", perfMod: 1.1, elimBonus: 1, note: "Central position trims long edge runs." },
-      { id: "slappy", name: "Slappy Shores", tier: "A", chapter: "Ch4", riskLabel: "Medium Contest • Slurp Barrels", perfMod: 1.5, elimBonus: 1, note: "Instant slurp heals & heavy metal/wood." },
-      { id: "lavish", name: "Lavish Lair", tier: "A", chapter: "Ch5", riskLabel: "Medium-High Contest • Boss Loot", perfMod: 1.6, elimBonus: 1, note: "Strong compounds & mobility options." },
-      { id: "demon_dojo", name: "Demon's Dojo", tier: "A", chapter: "Ch6", riskLabel: "Medium Contest • Shrine Buffs", perfMod: 1.4, elimBonus: 1, note: "Rotation shrines & clean early loot." },
-      { id: "retail", name: "Retail Row", tier: "B", chapter: "Ch1", riskLabel: "Moderate Contest • Split POI", perfMod: 0.6, elimBonus: 1, note: "Shop side + houses split cleanly." },
-      { id: "dirty", name: "Dirty Docks", tier: "B", chapter: "Ch2", riskLabel: "Low-Med Contest • Max Mats", perfMod: 0.7, elimBonus: 0, note: "Endless wood/metal & boats/trucks." },
-      { id: "sweaty", name: "Sweaty Sands", tier: "B", chapter: "Ch2", riskLabel: "Moderate Contest • Coastline", perfMod: 0.5, elimBonus: 1, note: "Boardwalk fights & fishing spots." },
-      { id: "daily_bugle", name: "The Daily Bugle", tier: "B", chapter: "Ch3", riskLabel: "Moderate Contest • Web-Shooters", perfMod: 0.9, elimBonus: 1, note: "Fast aerial rotates when uncontested." },
-      { id: "frenzy_fields", name: "Frenzy Fields", tier: "B", chapter: "Ch4", riskLabel: "Low-Med Contest • Open Fields", perfMod: 0.5, elimBonus: 0, note: "Easy farming & early surge tags." },
-      { id: "snooty", name: "Snooty Steppes", tier: "B", chapter: "Ch5", riskLabel: "Moderate Contest • Villas", perfMod: 0.8, elimBonus: 1, note: "Layered compounds & vault loot." },
-      { id: "shogun_arena", name: "Shogun's Arena", tier: "B", chapter: "Ch6", riskLabel: "Moderate Contest • High-Risk Yard", perfMod: 0.7, elimBonus: 1, note: "Fast fight pace if uncontested." },
-      { id: "lucky", name: "Lucky Landing", tier: "C", chapter: "Ch1", riskLabel: "Low Contest • Edge Safe", perfMod: -0.4, elimBonus: 0, note: "Safe uncontested start, long zones." },
-      { id: "steamy_edge", name: "Steamy Stacks (Edge)", tier: "C", chapter: "Ch2", riskLabel: "Low Contest • Far Edge", perfMod: -0.3, elimBonus: 0, note: "Great loot, harsh storm pull penalty." },
-      { id: "logjam", name: "Logjam Lumberyard", tier: "C", chapter: "Ch3", riskLabel: "Low Contest • Wood Heavy", perfMod: -0.2, elimBonus: 0, note: "Max wood fast, low surge action." },
-      { id: "breakwater", name: "Breakwater Bay", tier: "C", chapter: "Ch4", riskLabel: "Low Contest • Coastal", perfMod: -0.5, elimBonus: 0, note: "Quiet drop; needs early zone luck." },
-      { id: "restored_reels", name: "Restored Reels", tier: "C", chapter: "Ch5", riskLabel: "Low Contest • Small Drop", perfMod: -0.6, elimBonus: 0, note: "Quick loot, tight surge opportunities." }
-    ];
-
-    // Ratings reflect requested edits:
-    // - NAW reduced (Rehx & Arkham ~88)
-    // - Chap changed to Fragger with updated stats
-    // - Rise split into Rise (Asia) and Rise (NA)
-    // - Swizzy 95, Shark 95, Tayson 96, Peterbot 99, Bugha 96, Vico 94, Chapix 91
-    // - Asia & Brazil players reduced by 2 ratings
-    // - Peterbot 2023 & Acorn notes fixed (no Kwanti 2023 FNCS win)
-    // - Khanada changed to Support
     const PLAYERS = [
       {
         id: "peterbot", name: "Peterbot",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 95, role: "Fragger", region: "NAC", stats: { igling: 84, mechanics: 99, clutch: 94 }, note: "Explosive mechanical prodigy breaking out in NA." },
-          "Chapter 5 (Mods / Medallions)": { overall: 99, role: "Fragger", region: "NAC", stats: { igling: 92, mechanics: 99, clutch: 99 }, note: "Dominant FNCS champion run with peak fight control." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 99, role: "Fragger", region: "NAC", stats: { igling: 93, mechanics: 99, clutch: 99 }, note: "Relentless fragger anchoring top-tier lobbies." }
-        }
-      },
-      {
-        id: "bugha", name: "Bugha",
-        seasons: {
-          "Chapter 1 (og)": { overall: 96, role: "IGL", region: "NAE", stats: { igling: 95, mechanics: 96, clutch: 97 }, note: "World Cup champion with elite endgame composure." },
-          "Chapter 2 (Box / Surge)": { overall: 94, role: "IGL", region: "NAE", stats: { igling: 95, mechanics: 93, clutch: 95 }, note: "Consistent NA East IGL & surge caller." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 92, role: "IGL", region: "NAC", stats: { igling: 93, mechanics: 91, clutch: 93 }, note: "Veteran caller adapting across metas." }
-        }
-      },
-      {
-        id: "tayson", name: "TaySon",
-        seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 96, role: "Fragger", region: "EU", stats: { igling: 86, mechanics: 98, clutch: 96 }, note: "Multi-time EU FNCS champion with crisp mechanics." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 93, role: "Fragger", region: "EU", stats: { igling: 85, mechanics: 95, clutch: 93 }, note: "High-tempo EU fragger & lobby threat." },
-          "Chapter 5 (Mods / Medallions)": { overall: 92, role: "Fragger", region: "EU", stats: { igling: 85, mechanics: 94, clutch: 92 }, note: "Veteran EU powerhouse in stacked finals." }
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 78, stats: { igling: 64, mechanics: 87, clutch: 76 }, note: "Raw mechanical rookie; 4th at 2021 NAE Grand Royale" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 87, stats: { igling: 71, mechanics: 94, clutch: 85 }, note: "First FNCS title in C3S2 with Bylah" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 90, stats: { igling: 74, mechanics: 96, clutch: 88 }, note: "C4 Major 3 Grand Finalist & 2023 Copenhagen LAN qualifier with Bylah" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 99, stats: { igling: 86, mechanics: 99, clutch: 99 }, note: "Major 2, Major 3 & 2024 Global LAN Champion" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 95, stats: { igling: 85, mechanics: 98, clutch: 94 }, note: "Won C6 Major 1 NAC with Mero & Dukez" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 91, stats: { igling: 84, mechanics: 96, clutch: 90 }, note: "Summit qualifier; 23rd at Antwerp Global LAN" }
         }
       },
       {
         id: "queasy", name: "Queasy",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 95, role: "IGL", region: "EU", stats: { igling: 96, mechanics: 94, clutch: 95 }, note: "Calculated EU IGL known for disciplined macro." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 96, role: "IGL", region: "EU", stats: { igling: 97, mechanics: 95, clutch: 96 }, note: "Top-tier EU caller with clinical endgames." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 95, role: "IGL", region: "EU", stats: { igling: 96, mechanics: 94, clutch: 95 }, note: "Consistent EU finals contender." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 88, stats: { igling: 91, mechanics: 85, clutch: 89 }, note: "Breakout C2S6 EU Champion with TruleX & Jur3ky" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 96, mechanics: 88, clutch: 94 }, note: "C3S1 EU Champion & 2nd at 2022 Invitational LAN" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 96, stats: { igling: 98, mechanics: 89, clutch: 96 }, note: "C4 Major 2 Winner & 2nd at Copenhagen Global LAN" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 90, stats: { igling: 94, mechanics: 86, clutch: 90 }, note: "Consistent EU Grand Finals contender" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 97, stats: { igling: 99, mechanics: 90, clutch: 97 }, note: "2025 Lyon Global Champion with SwizzY & Merstach" },
+          "Chapter 7 (2026)": { region: "NAC", role: "IGL", overall: 86, stats: { igling: 91, mechanics: 83, clutch: 86 }, note: "Competed across NAC & EU Majors" }
+        }
+      },
+      {
+        id: "tayson", name: "TaySon",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 96, stats: { igling: 96, mechanics: 94, clutch: 96 }, note: "Won Solo, Trio (C2S4), All-Star & Grand Royale titles" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 91, stats: { igling: 93, mechanics: 89, clutch: 91 }, note: "Consistent EU Grand Finals top-5 finisher" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 94, stats: { igling: 96, mechanics: 90, clutch: 94 }, note: "5th FNCS title in C4 Major 1 with Merstach" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 85, stats: { igling: 89, mechanics: 82, clutch: 85 }, note: "Veteran IGL in EU Majors" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 83, stats: { igling: 88, mechanics: 80, clutch: 83 }, note: "C6 Major 2 EU Grand Finalist" }
+        }
+      },
+      {
+        id: "swizzy", name: "SwizzY",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "ASIA", role: "Fragger", overall: 77, stats: { igling: 67, mechanics: 83, clutch: 76 }, note: "Breakout C2S8 Asia FNCS Champion" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 82, stats: { igling: 71, mechanics: 88, clutch: 81 }, note: "Transitioned to EU Grand Finals lobbies" },
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 91, stats: { igling: 77, mechanics: 96, clutch: 90 }, note: "C4 Major 3 EU Champion with Putrick" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 93, stats: { igling: 80, mechanics: 97, clutch: 92 }, note: "Back-to-back C5 Major 1 & Major 2 EU Champion" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 95, stats: { igling: 83, mechanics: 97, clutch: 95 }, note: "2025 Lyon Global Champion with Queasy & Merstach" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 95, stats: { igling: 84, mechanics: 97, clutch: 95 }, note: "Back-to-Back 2026 Antwerp Global Champion with Pixie" }
         }
       },
       {
         id: "mero", name: "Mero",
         seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 94, role: "Fragger", region: "NAE", stats: { igling: 84, mechanics: 96, clutch: 95 }, note: "Fearless box-fighter and FNCS champion." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 96, role: "Fragger", region: "NAE", stats: { igling: 86, mechanics: 97, clutch: 96 }, note: "Back-to-back title threat with elite mechanics." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 95, role: "Fragger", region: "NAC", stats: { igling: 87, mechanics: 96, clutch: 95 }, note: "Premier NAC fragger in high-pressure lobbies." }
-        }
-      },
-      {
-        id: "epikhwhale", name: "EpikWhale",
-        seasons: {
-          "Chapter 1 (og)": { overall: 88, role: "IGL", region: "NAW", stats: { igling: 89, mechanics: 88, clutch: 88 }, note: "Dominant West coast presence with steady rotates." },
-          "Chapter 2 (Box / Surge)": { overall: 88, role: "IGL", region: "NAW", stats: { igling: 90, mechanics: 87, clutch: 88 }, note: "Consistent NAW leader and surge fragger." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 87, role: "IGL", region: "NAW", stats: { igling: 88, mechanics: 87, clutch: 87 }, note: "Reliable West caller across shifting metas." }
-        }
-      },
-      {
-        id: "rehx", name: "Rehx",
-        seasons: {
-          "Chapter 1 (og)": { overall: 88, role: "Support", region: "NAW", stats: { igling: 85, mechanics: 89, clutch: 89 }, note: "High-energy NAW support player." },
-          "Chapter 2 (Box / Surge)": { overall: 88, role: "Support", region: "NAW", stats: { igling: 86, mechanics: 89, clutch: 89 }, note: "Dependable West anchor and tarp/heal support." }
-        }
-      },
-      {
-        id: "arkham", name: "Arkham",
-        seasons: {
-          "Chapter 1 (og)": { overall: 88, role: "IGL", region: "NAW", stats: { igling: 90, mechanics: 87, clutch: 88 }, note: "Sharp NAW shot-caller with calm mid-games." },
-          "Chapter 2 (Box / Surge)": { overall: 88, role: "IGL", region: "NAW", stats: { igling: 90, mechanics: 87, clutch: 88 }, note: "Tactical West IGL built for stacked lobbies." }
-        }
-      },
-      {
-        id: "swizzy", name: "Swizzy",
-        seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 95, role: "Fragger", region: "EU", stats: { igling: 84, mechanics: 97, clutch: 95 }, note: "High-impact EU fragger with sharp aim and pace." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 95, role: "Fragger", region: "EU", stats: { igling: 85, mechanics: 97, clutch: 95 }, note: "Explosive EU fighter turning clean openings into wipes." }
-        }
-      },
-      {
-        id: "shark", name: "Shark",
-        seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 95, role: "IGL", region: "EU", stats: { igling: 96, mechanics: 93, clutch: 95 }, note: "Vocal EU IGL and FNCS winner with strong macro." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 92, role: "IGL", region: "EU", stats: { igling: 93, mechanics: 91, clutch: 92 }, note: "Experienced EU caller guiding steady finals runs." }
-        }
-      },
-      {
-        id: "vico", name: "Vico",
-        seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 94, role: "Fragger", region: "EU", stats: { igling: 83, mechanics: 96, clutch: 94 }, note: "Fast, aggressive EU fragger with strong fight IQ." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 94, role: "Fragger", region: "EU", stats: { igling: 84, mechanics: 96, clutch: 94 }, note: "High-output EU fragger in stacked lobbies." }
-        }
-      },
-      {
-        id: "chapix", name: "Chapix",
-        seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 91, role: "Support", region: "EU", stats: { igling: 84, mechanics: 92, clutch: 92 }, note: "Veteran EU support & anchor with strong endgame sense." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 91, role: "Support", region: "EU", stats: { igling: 85, mechanics: 92, clutch: 91 }, note: "Reliable EU support player in high-pressure games." }
-        }
-      },
-      {
-        id: "cold", name: "Cold",
-        seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 95, role: "Support", region: "NAC", stats: { igling: 89, mechanics: 96, clutch: 96 }, note: "Composed NAC anchor with top-tier utility & clutch play." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 96, role: "Support", region: "NAC", stats: { igling: 90, mechanics: 96, clutch: 97 }, note: "Elite NAC support player anchoring championship trios." }
-        }
-      },
-      {
-        id: "acorn", name: "Acorn",
-        seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "IGL", region: "NAE", stats: { igling: 94, mechanics: 90, clutch: 92 }, note: "Smart NAE IGL with strong surge & zone reads." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 93, role: "IGL", region: "NAE", stats: { igling: 95, mechanics: 91, clutch: 93 }, note: "Sharp NAE caller leading clean top-placement runs." },
-          "Chapter 5 (Mods / Medallions)": { overall: 95, role: "IGL", region: "NAC", stats: { igling: 96, mechanics: 93, clutch: 95 }, note: "Top NAC IGL steering high-surge championship squads." }
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 95, stats: { igling: 78, mechanics: 97, clutch: 95 }, note: "4x NAE Trio FNCS Champion" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 92, stats: { igling: 79, mechanics: 95, clutch: 92 }, note: "2x NAE Duo FNCS Champion (C3S1 & C3S3)" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 96, stats: { igling: 82, mechanics: 97, clutch: 96 }, note: "2023 Copenhagen FNCS Global Champion with Cooper" }
         }
       },
       {
         id: "pollo", name: "Pollo",
         seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 95, role: "Fragger", region: "NAC", stats: { igling: 85, mechanics: 97, clutch: 95 }, note: "High-voltage NAC fragger with clinical piece control." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 95, role: "Fragger", region: "NAC", stats: { igling: 86, mechanics: 97, clutch: 95 }, note: "Relentless NAC entry & clean-up fragger." }
-        }
-      },
-      {
-        id: "clix", name: "Clix",
-        seasons: {
-          "Chapter 1 (og)": { overall: 91, role: "Fragger", region: "NAE", stats: { igling: 82, mechanics: 95, clutch: 90 }, note: "Flashy mechanical standout & box-fight icon." },
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "Fragger", region: "NAE", stats: { igling: 84, mechanics: 96, clutch: 91 }, note: "High-pace NAE fragger with heavy surge output." },
-          "Chapter 5 (Mods / Medallions)": { overall: 92, role: "Fragger", region: "NAC", stats: { igling: 85, mechanics: 95, clutch: 92 }, note: "Veteran NAC fragger with deep finals experience." }
-        }
-      },
-      {
-        id: "khanada", name: "Khanada",
-        seasons: {
-          "Chapter 1 (og)": { overall: 91, role: "Support", region: "NAE", stats: { igling: 87, mechanics: 93, clutch: 91 }, note: "Tenacious NAE support & clutch anchor." },
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "Support", region: "NAE", stats: { igling: 89, mechanics: 93, clutch: 92 }, note: "Disciplined NAE support keeping squads alive late." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 91, role: "Support", region: "NAC", stats: { igling: 88, mechanics: 92, clutch: 91 }, note: "Seasoned NAC support player in stacked lobbies." }
-        }
-      },
-      {
-        id: "kami", name: "Kami",
-        seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 94, role: "IGL", region: "EU", stats: { igling: 95, mechanics: 93, clutch: 94 }, note: "Methodical EU IGL with championship pedigree." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 93, role: "IGL", region: "EU", stats: { igling: 94, mechanics: 92, clutch: 93 }, note: "Composed EU caller excelling in stacked endgames." }
-        }
-      },
-      {
-        id: "setty", name: "Setty",
-        seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 94, role: "Support", region: "EU", stats: { igling: 88, mechanics: 95, clutch: 95 }, note: "Clutch EU support & tarp anchor." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 93, role: "Support", region: "EU", stats: { igling: 87, mechanics: 94, clutch: 94 }, note: "High-IQ EU support player in chaotic lobbies." }
-        }
-      },
-      {
-        id: "jannis", name: "JannisZ",
-        seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 93, role: "Support", region: "EU", stats: { igling: 87, mechanics: 94, clutch: 94 }, note: "Veteran EU support with calm endgame execution." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 92, role: "Support", region: "EU", stats: { igling: 86, mechanics: 93, clutch: 93 }, note: "Reliable EU anchor & surge contributor." }
-        }
-      },
-      {
-        id: "mitr0", name: "Mitr0",
-        seasons: {
-          "Chapter 1 (og)": { overall: 94, role: "Fragger", region: "EU", stats: { igling: 83, mechanics: 96, clutch: 94 }, note: "Aggressive EU pioneer with iconic W-key pressure." },
-          "Chapter 2 (Box / Surge)": { overall: 89, role: "Fragger", region: "EU", stats: { igling: 81, mechanics: 92, clutch: 89 }, note: "High-tempo EU fragger." }
-        }
-      },
-      {
-        id: "mongraal", name: "Mongraal",
-        seasons: {
-          "Chapter 1 (og)": { overall: 93, role: "Fragger", region: "EU", stats: { igling: 80, mechanics: 97, clutch: 91 }, note: "Blistering speed and hyper-aggressive EU fragging." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 89, role: "Fragger", region: "EU", stats: { igling: 82, mechanics: 92, clutch: 88 }, note: "High-energy EU comeback fragger." }
-        }
-      },
-      {
-        id: "chap", name: "Chap",
-        seasons: {
-          "Chapter 1 (og)": { overall: 90, role: "Fragger", region: "NAE", stats: { igling: 84, mechanics: 91, clutch: 90 }, note: "Sharp early-game fragger & fight finisher in NAE lobbies." },
-          "Chapter 2 (Box / Surge)": { overall: 89, role: "Fragger", region: "NAE", stats: { igling: 83, mechanics: 90, clutch: 89 }, note: "Scrappy NAE fragger bringing heavy tempo and tag pressure." }
-        }
-      },
-      {
-        id: "zayt", name: "Zayt",
-        seasons: {
-          "Chapter 1 (og)": { overall: 95, role: "IGL", region: "NAE", stats: { igling: 98, mechanics: 91, clutch: 95 }, note: "Mastermind NAE IGL with unmatched zone reads." },
-          "Chapter 2 (Box / Surge)": { overall: 94, role: "IGL", region: "NAE", stats: { igling: 97, mechanics: 90, clutch: 94 }, note: "Tactical NAE caller dominating stacked finals." }
-        }
-      },
-      {
-        id: "saf", name: "Saf",
-        seasons: {
-          "Chapter 1 (og)": { overall: 93, role: "Support", region: "NAE", stats: { igling: 88, mechanics: 93, clutch: 95 }, note: "Ultra-consistent NAE support & endgame anchor." },
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "Support", region: "NAE", stats: { igling: 87, mechanics: 92, clutch: 94 }, note: "Steady NAE anchor paired with top-tier calling." }
-        }
-      },
-      {
-        id: "aqua", name: "Aqua",
-        seasons: {
-          "Chapter 1 (og)": { overall: 95, role: "IGL", region: "EU", stats: { igling: 96, mechanics: 94, clutch: 96 }, note: "World Cup champion & clutch EU caller." },
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "IGL", region: "EU", stats: { igling: 93, mechanics: 91, clutch: 93 }, note: "Experienced EU IGL & multi-era competitor." }
-        }
-      },
-      {
-        id: "malibuca", name: "Malibuca",
-        seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 94, role: "Fragger", region: "EU", stats: { igling: 84, mechanics: 96, clutch: 93 }, note: "Heavy-hitting EU fragger with lethal aim." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 94, role: "Fragger", region: "EU", stats: { igling: 85, mechanics: 96, clutch: 94 }, note: "Consistent EU top fragger in stacked lobbies." },
-          "Chapter 5 (Mods / Medallions)": { overall: 93, role: "Fragger", region: "EU", stats: { igling: 85, mechanics: 95, clutch: 93 }, note: "Reliable EU fighter & surge fragger." }
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 77, stats: { igling: 73, mechanics: 81, clutch: 78 }, note: "Early cash cup & qualifier appearances" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 85, stats: { igling: 81, mechanics: 88, clutch: 86 }, note: "Breakout NAC Grand Finals year; 16th at LAN" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 96, stats: { igling: 90, mechanics: 96, clutch: 98 }, note: "Major 2, Major 3 & 2024 Global LAN Champion" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 92, stats: { igling: 88, mechanics: 93, clutch: 93 }, note: "C6 Major 1 NAC Champion with Acorn & Ajerss" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 89, stats: { igling: 87, mechanics: 90, clutch: 90 }, note: "Major 1 Summit qualifier; 23rd at Antwerp LAN" }
         }
       },
       {
         id: "merstach", name: "Merstach",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 92, role: "Support", region: "EU", stats: { igling: 85, mechanics: 93, clutch: 92 }, note: "Sharp EU support player with clean endgame utility." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 92, role: "Support", region: "EU", stats: { igling: 86, mechanics: 93, clutch: 92 }, note: "Dependable EU support & fight back-up." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Support", overall: 79, stats: { igling: 75, mechanics: 83, clutch: 80 }, note: "Up-and-coming EU mechanical prospect" },
+          "Chapter 3 (2022)": { region: "EU", role: "Support", overall: 87, stats: { igling: 82, mechanics: 90, clutch: 88 }, note: "Breakout EU Grand Finals year alongside Malibuca" },
+          "Chapter 4 (2023)": { region: "EU", role: "Support", overall: 92, stats: { igling: 86, mechanics: 94, clutch: 93 }, note: "C4 Major 1 EU Champion with TaySon" },
+          "Chapter 5 (2024)": { region: "EU", role: "Support", overall: 92, stats: { igling: 87, mechanics: 93, clutch: 93 }, note: "C5 Major 1 EU Champion with Malibuca" },
+          "Chapter 6 (2025)": { region: "EU", role: "Support", overall: 95, stats: { igling: 90, mechanics: 95, clutch: 97 }, note: "2025 Lyon Global Champion with Queasy & SwizzY" }
+        }
+      },
+      {
+        id: "bugha", name: "Bugha",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "IGL", overall: 96, stats: { igling: 97, mechanics: 92, clutch: 96 }, note: "Back-to-back C2S8 & 2021 Grand Royale Champion" },
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 93, stats: { igling: 95, mechanics: 89, clutch: 93 }, note: "3-peat FNCS streak capped off in C3S1 with Mero" },
+          "Chapter 4 (2023)": { region: "NAC", role: "IGL", overall: 87, stats: { igling: 92, mechanics: 83, clutch: 87 }, note: "Consistent NAC Grand Finals IGL" },
+          "Chapter 5 (2024)": { region: "NAC", role: "IGL", overall: 84, stats: { igling: 90, mechanics: 80, clutch: 84 }, note: "Qualified for 2024 Global Championship" }
+        }
+      },
+      {
+        id: "veno", name: "Veno",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 81, stats: { igling: 71, mechanics: 87, clutch: 80 }, note: "Breakout EU solo/trio cash cup grinder" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 92, stats: { igling: 79, mechanics: 95, clutch: 91 }, note: "C3S2 EU FNCS Champion with Aqua" },
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 95, stats: { igling: 83, mechanics: 97, clutch: 95 }, note: "C4 Major 2 Winner & 2nd at Copenhagen Global LAN" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 89, stats: { igling: 89, mechanics: 92, clutch: 90 }, note: "Transitioned to IGL; 11th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 92, mechanics: 95, clutch: 94 }, note: "C6 Major 1 EU Champion with vic0 & Flickzy" },
+          "Chapter 7 (2026)": { region: "NAC", role: "IGL", overall: 91, stats: { igling: 91, mechanics: 94, clutch: 92 }, note: "C7 Major 1 NA Champion with Curve" }
+        }
+      },
+      {
+        id: "acorn", name: "Acorn",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "IGL", overall: 90, stats: { igling: 94, mechanics: 84, clutch: 91 }, note: "C2S5 NAE FNCS Champion with Slackes & Jahq" },
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 91, stats: { igling: 95, mechanics: 85, clutch: 92 }, note: "C3S2 NAE FNCS Champion with Edgey" },
+          "Chapter 4 (2023)": { region: "NAC", role: "IGL", overall: 94, stats: { igling: 97, mechanics: 86, clutch: 94 }, note: "C4 Major 1 & Major 2 Champion with Cold" },
+          "Chapter 5 (2024)": { region: "NAC", role: "IGL", overall: 93, stats: { igling: 97, mechanics: 86, clutch: 93 }, note: "C5 Major 2 NAC Champion with Cold" },
+          "Chapter 6 (2025)": { region: "NAC", role: "IGL", overall: 93, stats: { igling: 97, mechanics: 86, clutch: 93 }, note: "Won C6 Major 1 NAC & 2nd in Major 3 with Pollo & Ajerss" },
+          "Chapter 7 (2026)": { region: "NAC", role: "IGL", overall: 92, stats: { igling: 96, mechanics: 86, clutch: 92 }, note: "C7 Season 3 NAC Winner & 12th at Antwerp LAN" }
+        }
+      },
+      {
+        id: "cold", name: "Cold",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 76, stats: { igling: 67, mechanics: 83, clutch: 75 }, note: "Early NAE console-to-PC transition era" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 85, stats: { igling: 74, mechanics: 91, clutch: 84 }, note: "Breakout NAE Grand Finals fragger" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 93, stats: { igling: 80, mechanics: 96, clutch: 93 }, note: "C4 Major 1 & Major 2 NAC Champion with Acorn" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 92, stats: { igling: 81, mechanics: 95, clutch: 92 }, note: "C5 Major 2 NAC Champion with Acorn" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 93, stats: { igling: 82, mechanics: 96, clutch: 93 }, note: "2nd in C6 Major 1 & Major 3 NAC with Peterbot & Ritual" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 90, stats: { igling: 82, mechanics: 94, clutch: 90 }, note: "11th at 2026 Antwerp Global Championship" }
+        }
+      },
+      {
+        id: "pixie", name: "Pixie",
+        seasons: {
+          "Chapter 3 (2022)": { region: "EU", role: "Support", overall: 78, stats: { igling: 75, mechanics: 81, clutch: 79 }, note: "Early EU qualifier appearances" },
+          "Chapter 4 (2023)": { region: "EU", role: "Support", overall: 89, stats: { igling: 85, mechanics: 90, clutch: 91 }, note: "4th place at 2023 Copenhagen Global LAN" },
+          "Chapter 5 (2024)": { region: "EU", role: "Support", overall: 88, stats: { igling: 85, mechanics: 89, clutch: 89 }, note: "15th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "EU", role: "Support", overall: 94, stats: { igling: 90, mechanics: 94, clutch: 96 }, note: "C6 Major 2 EU Champion & 2nd at Lyon LAN" },
+          "Chapter 7 (2026)": { region: "EU", role: "Support", overall: 95, stats: { igling: 92, mechanics: 95, clutch: 97 }, note: "2026 Antwerp FNCS Global Champion with SwizzY" }
+        }
+      },
+      {
+        id: "vic0", name: "vic0",
+        seasons: {
+          "Chapter 3 (2022)": { region: "EU", role: "Support", overall: 78, stats: { igling: 75, mechanics: 80, clutch: 79 }, note: "Early EU Grand Finals qualifier" },
+          "Chapter 4 (2023)": { region: "EU", role: "Support", overall: 88, stats: { igling: 85, mechanics: 89, clutch: 89 }, note: "10th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "EU", role: "Support", overall: 94, stats: { igling: 91, mechanics: 94, clutch: 95 }, note: "C5 Major 3 EU Champion & 4th at 2024 LAN" },
+          "Chapter 6 (2025)": { region: "EU", role: "Support", overall: 94, stats: { igling: 92, mechanics: 94, clutch: 95 }, note: "C6 Major 1 EU Champion with Veno & Flickzy" },
+          "Chapter 7 (2026)": { region: "EU", role: "Support", overall: 92, stats: { igling: 91, mechanics: 92, clutch: 93 }, note: "3rd at 2026 Antwerp Global LAN with Malibuca" }
+        }
+      },
+      {
+        id: "flickzy", name: "Flickzy",
+        seasons: {
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 77, stats: { igling: 67, mechanics: 84, clutch: 76 }, note: "Rookie EU cash cup standout" },
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 88, stats: { igling: 76, mechanics: 94, clutch: 87 }, note: "12th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 93, stats: { igling: 80, mechanics: 96, clutch: 92 }, note: "C5 Major 3 EU Champion & 4th at 2024 LAN" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 93, stats: { igling: 81, mechanics: 96, clutch: 93 }, note: "C6 Major 1 EU Champion with Veno & vic0" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 88, stats: { igling: 80, mechanics: 92, clutch: 87 }, note: "Summit qualifier; 21st at Antwerp LAN" }
+        }
+      },
+      {
+        id: "malibuca", name: "Malibuca",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 82, stats: { igling: 84, mechanics: 81, clutch: 82 }, note: "Breakout late-Chapter 2 EU Grand Finalist" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 90, stats: { igling: 92, mechanics: 89, clutch: 90 }, note: "Gamers8 LAN winner & EU Major podium" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 89, stats: { igling: 92, mechanics: 88, clutch: 89 }, note: "Multiple EU Major top-3 finishes" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 92, stats: { igling: 95, mechanics: 90, clutch: 92 }, note: "C5 Major 1 EU Champion with Merstach" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 91, stats: { igling: 94, mechanics: 89, clutch: 91 }, note: "8th at 2025 Lyon Global Championship" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 96, mechanics: 90, clutch: 93 }, note: "3rd at 2026 Antwerp Global LAN with vic0" }
+        }
+      },
+      {
+        id: "kami", name: "Kami",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 91, stats: { igling: 90, mechanics: 88, clutch: 95 }, note: "C2S8 EU FNCS Champion with Setty & Teeq" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 95, stats: { igling: 93, mechanics: 90, clutch: 98 }, note: "2022 FNCS Invitational LAN Champion with Setty" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 92, mechanics: 89, clutch: 96 }, note: "2nd at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 82, clutch: 87 }, note: "23rd at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 90, stats: { igling: 90, mechanics: 87, clutch: 93 }, note: "4th at 2025 Lyon Global Championship" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 85, stats: { igling: 87, mechanics: 82, clutch: 87 }, note: "28th at 2026 Antwerp Global Championship" }
+        }
+      },
+      {
+        id: "setty", name: "Setty",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 91, stats: { igling: 94, mechanics: 87, clutch: 92 }, note: "C2S8 EU FNCS Champion with Kami & Teeq" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 95, stats: { igling: 97, mechanics: 89, clutch: 96 }, note: "2022 FNCS Invitational LAN Champion with Kami" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 96, mechanics: 88, clutch: 94 }, note: "2nd at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 84, stats: { igling: 89, mechanics: 80, clutch: 85 }, note: "EU Grand Finals IGL" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 91, stats: { igling: 95, mechanics: 87, clutch: 92 }, note: "3rd at 2025 Lyon Global Championship" }
+        }
+      },
+      {
+        id: "clix", name: "Clix",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 85, stats: { igling: 75, mechanics: 91, clutch: 84 }, note: "Consistent NAE Trio Grand Finalist" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 81, stats: { igling: 73, mechanics: 87, clutch: 80 }, note: "Mixed NAE Duo results" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 82, stats: { igling: 75, mechanics: 87, clutch: 81 }, note: "Qualified for Copenhagen LAN" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 88, stats: { igling: 80, mechanics: 92, clutch: 88 }, note: "Resurgence year; 11th at 2024 Global LAN" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 87, stats: { igling: 80, mechanics: 91, clutch: 87 }, note: "18th at 2025 Lyon Global LAN" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 91, stats: { igling: 83, mechanics: 94, clutch: 91 }, note: "Career-best 4th place at 2026 Antwerp LAN with Rapid" }
+        }
+      },
+      {
+        id: "khanada", name: "Khanada",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 88, stats: { igling: 84, mechanics: 90, clutch: 90 }, note: "Top NAE Grand Finals support & clutch player" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 86, stats: { igling: 83, mechanics: 88, clutch: 88 }, note: "Consistent NAE Duo finalist" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 91, stats: { igling: 88, mechanics: 92, clutch: 93 }, note: "C4 Major 3 NAC Champion with Ajerss" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 84, mechanics: 87, clutch: 88 }, note: "20th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 90, stats: { igling: 88, mechanics: 90, clutch: 92 }, note: "5th at 2025 Lyon Global LAN with Rapid & Boltz" },
+          "Chapter 7 (2026)": { region: "NAW", role: "Support", overall: 87, stats: { igling: 85, mechanics: 88, clutch: 89 }, note: "C7 Major 1 NAW Champion with VicterV" }
+        }
+      },
+      {
+        id: "cooper", name: "Cooper",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 78, stats: { igling: 75, mechanics: 80, clutch: 79 }, note: "Early NAE Grand Finals appearances" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 85, stats: { igling: 82, mechanics: 86, clutch: 86 }, note: "Breakout NAE Duo contender" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 95, stats: { igling: 90, mechanics: 94, clutch: 97 }, note: "2023 Copenhagen FNCS Global Champion with Mero" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 84, mechanics: 86, clutch: 87 }, note: "20th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 88, stats: { igling: 86, mechanics: 88, clutch: 89 }, note: "13th at 2025 Lyon Global Championship" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 85, stats: { igling: 84, mechanics: 85, clutch: 86 }, note: "Summit qualifier with Reet" }
+        }
+      },
+      {
+        id: "boltz", name: "Boltz",
+        seasons: {
+          "Chapter 3 (2022)": { region: "NAW", role: "Fragger", overall: 82, stats: { igling: 75, mechanics: 86, clutch: 81 }, note: "Rising NAW Grand Finals competitor" },
+          "Chapter 4 (2023)": { region: "NAW", role: "Fragger", overall: 86, stats: { igling: 78, mechanics: 90, clutch: 86 }, note: "C4 Major 1 NAW Champion with Thorik" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 90, stats: { igling: 81, mechanics: 94, clutch: 90 }, note: "7th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 91, stats: { igling: 82, mechanics: 95, clutch: 91 }, note: "5th at 2025 Lyon Global LAN with Rapid & Khanada" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 91, stats: { igling: 82, mechanics: 95, clutch: 91 }, note: "C7 Season 3 NAC Winner & 12th at Antwerp LAN" }
+        }
+      },
+      {
+        id: "rapid", name: "Rapid",
+        seasons: {
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 77, stats: { igling: 80, mechanics: 76, clutch: 77 }, note: "Early NAE qualifier runs" },
+          "Chapter 4 (2023)": { region: "NAC", role: "IGL", overall: 86, stats: { igling: 89, mechanics: 83, clutch: 86 }, note: "14th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "NAC", role: "IGL", overall: 89, stats: { igling: 92, mechanics: 85, clutch: 89 }, note: "9th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "IGL", overall: 91, stats: { igling: 94, mechanics: 87, clutch: 91 }, note: "5th at 2025 Lyon Global Championship" },
+          "Chapter 7 (2026)": { region: "NAC", role: "IGL", overall: 92, stats: { igling: 95, mechanics: 88, clutch: 92 }, note: "4th at 2026 Antwerp Global LAN with Clix" }
+        }
+      },
+      {
+        id: "reet", name: "Reet",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAW", role: "Fragger", overall: 88, stats: { igling: 76, mechanics: 93, clutch: 88 }, note: "C2S8 NAW Champion; dominant controller fragger" },
+          "Chapter 3 (2022)": { region: "NAW", role: "Fragger", overall: 88, stats: { igling: 77, mechanics: 92, clutch: 88 }, note: "C3S1 & C3S3 NAW FNCS Champion" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 89, stats: { igling: 79, mechanics: 93, clutch: 89 }, note: "9th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 88, stats: { igling: 79, mechanics: 92, clutch: 88 }, note: "12th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 88, stats: { igling: 80, mechanics: 91, clutch: 88 }, note: "13th at 2025 Lyon Global Championship" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 85, stats: { igling: 79, mechanics: 88, clutch: 85 }, note: "Summit qualifier with Cooper" }
+        }
+      },
+      {
+        id: "epikwhale", name: "EpikWhale",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAW", role: "IGL", overall: 90, stats: { igling: 93, mechanics: 87, clutch: 91 }, note: "Won 6 NAW FNCS titles across Chapter 2" },
+          "Chapter 3 (2022)": { region: "NAW", role: "IGL", overall: 88, stats: { igling: 91, mechanics: 85, clutch: 88 }, note: "C3S1 NAW Champion with Reet" },
+          "Chapter 4 (2023)": { region: "NAC", role: "IGL", overall: 85, stats: { igling: 90, mechanics: 81, clutch: 85 }, note: "Transitioned to NA Central Majors" },
+          "Chapter 5 (2024)": { region: "NAC", role: "IGL", overall: 84, stats: { igling: 89, mechanics: 80, clutch: 84 }, note: "27th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAW", role: "IGL", overall: 84, stats: { igling: 88, mechanics: 80, clutch: 84 }, note: "Returned to NAW Majors" },
+          "Chapter 7 (2026)": { region: "NAW", role: "IGL", overall: 87, stats: { igling: 91, mechanics: 83, clutch: 87 }, note: "7th career FNCS title in C7 Season 3 NAW" }
+        }
+      },
+      {
+        id: "arkhram", name: "Arkhram",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAW", role: "Fragger", overall: 88, stats: { igling: 82, mechanics: 91, clutch: 88 }, note: "5x NAW Trio FNCS Champion with EpikWhale & Rehx" },
+          "Chapter 3 (2022)": { region: "NAW", role: "Fragger", overall: 86, stats: { igling: 81, mechanics: 89, clutch: 86 }, note: "C3S2 NAW FNCS Champion with Falconer" }
+        }
+      },
+      {
+        id: "rehx", name: "Rehx",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAW", role: "Support", overall: 88, stats: { igling: 84, mechanics: 87, clutch: 90 }, note: "6x NAW FNCS Champion alongside EpikWhale & Arkhram" },
+          "Chapter 3 (2022)": { region: "NAW", role: "Support", overall: 84, stats: { igling: 81, mechanics: 84, clutch: 86 }, note: "Veteran NAW Grand Finals competitor" }
+        }
+      },
+      {
+        id: "mongraal", name: "Mongraal",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 93, stats: { igling: 76, mechanics: 97, clutch: 91 }, note: "Dominant C2S4 EU FNCS Champion with Mitr0 & TaySon" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 77, stats: { igling: 70, mechanics: 82, clutch: 76 }, note: "Semi-active competitive era" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 79, stats: { igling: 72, mechanics: 84, clutch: 78 }, note: "Comeback run qualifying for C5 Major 1 Finals" }
+        }
+      },
+      {
+        id: "mitr0", name: "Mitr0",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 92, stats: { igling: 78, mechanics: 96, clutch: 90 }, note: "C2S4 EU FNCS Champion with Mongraal & TaySon" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 78, stats: { igling: 71, mechanics: 83, clutch: 77 }, note: "EU Duo qualifier appearances" }
         }
       },
       {
         id: "vadeal", name: "Vadeal",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 94, role: "Fragger", region: "EU", stats: { igling: 84, mechanics: 96, clutch: 94 }, note: "High-impact EU fragger & box-fight threat." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 93, role: "Fragger", region: "EU", stats: { igling: 84, mechanics: 95, clutch: 93 }, note: "Strong EU fighter in high-pressure lobbies." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 91, stats: { igling: 78, mechanics: 96, clutch: 90 }, note: "Iconic EU Trio boxfighter alongside Rezon & Noahreyli" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 92, stats: { igling: 79, mechanics: 96, clutch: 91 }, note: "C3S3 EU FNCS Champion with JannisZ" },
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 77, mechanics: 91, clutch: 85 }, note: "Qualified for 2023 Copenhagen Global LAN" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 83, stats: { igling: 76, mechanics: 87, clutch: 82 }, note: "Veteran EU Major competitor" }
         }
       },
       {
-        id: "noahreyli", name: "Noahreyli",
+        id: "chapix", name: "Chapix",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 94, role: "Fragger", region: "EU", stats: { igling: 85, mechanics: 96, clutch: 94 }, note: "Fast, aggressive EU fragger with sharp mechanics." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 93, role: "Fragger", region: "EU", stats: { igling: 85, mechanics: 95, clutch: 93 }, note: "Consistent EU fragger in stacked finals." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Support", overall: 91, stats: { igling: 87, mechanics: 90, clutch: 93 }, note: "2x EU FNCS Champion (C2S5 & 2021 Grand Royale)" },
+          "Chapter 3 (2022)": { region: "EU", role: "Support", overall: 86, stats: { igling: 83, mechanics: 87, clutch: 87 }, note: "Qualified for 2022 FNCS Invitational LAN" },
+          "Chapter 4 (2023)": { region: "EU", role: "Support", overall: 82, stats: { igling: 80, mechanics: 83, clutch: 83 }, note: "Veteran EU Grand Finals support" }
         }
       },
       {
-        id: "rezon", name: "Rezon ay",
+        id: "andilex", name: "Andilex",
         seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 93, role: "Support", region: "EU", stats: { igling: 88, mechanics: 93, clutch: 94 }, note: "Veteran EU support & clutch anchor." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 92, role: "Support", region: "EU", stats: { igling: 87, mechanics: 92, clutch: 93 }, note: "Steady EU anchor with strong endgame awareness." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 89, stats: { igling: 92, mechanics: 85, clutch: 89 }, note: "C2S2 EU FNCS Champion with Nayte" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 86, stats: { igling: 89, mechanics: 83, clutch: 86 }, note: "Qualified for 2022 FNCS Invitational LAN" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 82, stats: { igling: 86, mechanics: 79, clutch: 82 }, note: "Veteran French EU Major IGL" }
         }
       },
       {
-        id: "anas", name: "Anas",
+        id: "nayte", name: "Nayte",
         seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "Fragger", region: "EU", stats: { igling: 83, mechanics: 94, clutch: 92 }, note: "Sharp EU fragger with clean mechanics." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 92, role: "Fragger", region: "EU", stats: { igling: 84, mechanics: 94, clutch: 92 }, note: "High-output EU fighter in stacked lobbies." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 90, stats: { igling: 81, mechanics: 94, clutch: 90 }, note: "C2S2 EU FNCS Champion with Andilex" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 85, stats: { igling: 78, mechanics: 89, clutch: 84 }, note: "Qualified for 2022 FNCS Invitational LAN" }
         }
       },
       {
-        id: "th0mas", name: "Th0masHD",
+        id: "stompy", name: "Stompy",
         seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "IGL", region: "EU", stats: { igling: 94, mechanics: 90, clutch: 92 }, note: "Experienced EU caller with strong macro." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 91, role: "IGL", region: "EU", stats: { igling: 93, mechanics: 89, clutch: 91 }, note: "Steady EU IGL guiding finals rotations." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Support", overall: 88, stats: { igling: 86, mechanics: 87, clutch: 90 }, note: "Season X EU Champion & consistent C2 Trio finalist" },
+          "Chapter 3 (2022)": { region: "EU", role: "Support", overall: 83, stats: { igling: 82, mechanics: 82, clutch: 85 }, note: "Veteran Austrian EU Grand Finalist" }
         }
       },
       {
-        id: "kwanti", name: "Kwanti",
+        id: "tschinken", name: "Tschinken",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 92, role: "Fragger", region: "NAC", stats: { igling: 83, mechanics: 94, clutch: 92 }, note: "Fast NAC fragger with strong fight instincts." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 93, role: "Fragger", region: "NAC", stats: { igling: 84, mechanics: 95, clutch: 93 }, note: "High-tempo NAC fragger in competitive lobbies." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 88, stats: { igling: 91, mechanics: 84, clutch: 88 }, note: "Season X EU Champion & multi-time C2 Grand Finalist" }
         }
       },
       {
-        id: "bylah", name: "Bylah",
+        id: "aqua", name: "Aqua",
         seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 92, role: "Support", region: "NAE", stats: { igling: 87, mechanics: 92, clutch: 93 }, note: "Reliable NAE support & FNCS champion anchor." },
-          "Chapter 3 (Spray / Zero-Build)": { overall: 91, role: "Support", region: "NAC", stats: { igling: 86, mechanics: 91, clutch: 92 }, note: "Steady NAC support player." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 92, stats: { igling: 96, mechanics: 87, clutch: 93 }, note: "Elite EU Trio IGL following World Cup wins" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 97, mechanics: 88, clutch: 94 }, note: "C3S2 EU FNCS Champion with Veno" }
         }
       },
       {
-        id: "danny", name: "Danny",
+        id: "hen", name: "Hen",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 91, role: "IGL", region: "NAC", stats: { igling: 92, mechanics: 90, clutch: 91 }, note: "Structured NAC caller with solid endgame reads." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 91, role: "IGL", region: "NAC", stats: { igling: 92, mechanics: 90, clutch: 91 }, note: "Consistent NAC IGL in stacked lobbies." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Support", overall: 93, stats: { igling: 89, mechanics: 92, clutch: 95 }, note: "C2S5 & 2021 EU Grand Royale Champion" },
+          "Chapter 3 (2022)": { region: "EU", role: "Support", overall: 92, stats: { igling: 88, mechanics: 91, clutch: 94 }, note: "C3S1 EU FNCS Champion with Queasy" },
+          "Chapter 4 (2023)": { region: "EU", role: "Support", overall: 85, stats: { igling: 84, mechanics: 85, clutch: 86 }, note: "Veteran EU Grand Finals competitor" }
         }
       },
       {
-        id: "ritual", name: "Ritual",
+        id: "jannisz", name: "JannisZ",
         seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 94, role: "Fragger", region: "NAC", stats: { igling: 85, mechanics: 96, clutch: 94 }, note: "High-upside NAC fragger with explosive fight pace." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 95, role: "Fragger", region: "NAC", stats: { igling: 86, mechanics: 97, clutch: 95 }, note: "Top NAC fragger turning momentum into wins." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Support", overall: 92, stats: { igling: 87, mechanics: 91, clutch: 94 }, note: "2020 FNCS Invitational & C2S5 EU Champion" },
+          "Chapter 3 (2022)": { region: "EU", role: "Support", overall: 91, stats: { igling: 86, mechanics: 90, clutch: 93 }, note: "C3S3 EU FNCS Champion with Vadeal" },
+          "Chapter 4 (2023)": { region: "EU", role: "Support", overall: 84, stats: { igling: 82, mechanics: 84, clutch: 86 }, note: "Consistent EU Grand Finals qualifier" },
+          "Chapter 7 (2026)": { region: "EU", role: "Support", overall: 84, stats: { igling: 83, mechanics: 83, clutch: 86 }, note: "13th at 2026 Antwerp Global LAN with Rax" }
         }
       },
       {
-        id: "ajerss", name: "Ajerss",
+        id: "vanyak3k", name: "Vanyak3k",
         seasons: {
-          "Chapter 4 (Heists / Kinetic)": { overall: 93, role: "IGL", region: "NAC", stats: { igling: 94, mechanics: 92, clutch: 93 }, note: "Sharp NAC IGL with strong surge & late-game calls." },
-          "Chapter 5 (Mods / Medallions)": { overall: 94, role: "IGL", region: "NAC", stats: { igling: 95, mechanics: 93, clutch: 94 }, note: "Proven NAC title-caliber caller." }
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 78, stats: { igling: 81, mechanics: 78, clutch: 77 }, note: "Emerging EU IGL & mechanical talent" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 86, stats: { igling: 88, mechanics: 86, clutch: 85 }, note: "Breakout EU Grand Finals IGL" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 92, stats: { igling: 94, mechanics: 91, clutch: 92 }, note: "Back-to-back C5 Major 1 & Major 2 EU Champion" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 94, stats: { igling: 96, mechanics: 93, clutch: 94 }, note: "C6 Major 2 EU Champion & 2nd at Lyon LAN" }
         }
       },
       {
-        id: "pers", name: "Pers",
+        id: "sky", name: "Sky",
         seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 92, role: "Support", region: "NAC", stats: { igling: 87, mechanics: 92, clutch: 93 }, note: "Dependable NAC support & endgame utility player." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 92, role: "Support", region: "NAC", stats: { igling: 88, mechanics: 92, clutch: 93 }, note: "Composed NAC anchor in high-pressure finals." }
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 79, stats: { igling: 82, mechanics: 77, clutch: 79 }, note: "Rising EU Grand Finals IGL" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 87, stats: { igling: 90, mechanics: 84, clutch: 87 }, note: "Consistent EU Major top-10 IGL" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 94, stats: { igling: 97, mechanics: 90, clutch: 95 }, note: "Dominant C7 Major 1 & Season 3 EU Champion; 5th at LAN" }
         }
       },
       {
-        id: "yuma", name: "Yuma",
+        id: "scroll", name: "Scroll",
         seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 90, role: "Fragger", region: "Asia", stats: { igling: 82, mechanics: 92, clutch: 90 }, note: "Top Asia fragger (reduced -2 rating)." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 91, role: "Fragger", region: "Asia", stats: { igling: 83, mechanics: 93, clutch: 91 }, note: "Premier Asia fighter (reduced -2 rating)." }
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 78, stats: { igling: 69, mechanics: 84, clutch: 77 }, note: "Early EU Grand Finals qualifier" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 87, stats: { igling: 76, mechanics: 93, clutch: 86 }, note: "Breakout EU Trio fragger" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 94, stats: { igling: 81, mechanics: 98, clutch: 93 }, note: "Dominant C7 Major 1 & Season 3 EU Champion; 5th at LAN" }
         }
       },
       {
-        id: "koyota", name: "Koyota",
+        id: "thomashd", name: "Th0masHD",
         seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 89, role: "IGL", region: "Asia", stats: { igling: 91, mechanics: 88, clutch: 89 }, note: "Asia caller & champ contender (reduced -2 rating)." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 90, role: "IGL", region: "Asia", stats: { igling: 92, mechanics: 89, clutch: 90 }, note: "Seasoned Asia IGL (reduced -2 rating)." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 90, stats: { igling: 81, mechanics: 94, clutch: 90 }, note: "Multiple EU FNCS podiums; iconic sniper" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 90, stats: { igling: 82, mechanics: 93, clutch: 90 }, note: "Consistent EU Grand Finals contender" },
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 91, stats: { igling: 83, mechanics: 93, clutch: 92 }, note: "Top-5 finisher at Copenhagen Global LAN" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 82, mechanics: 91, clutch: 90 }, note: "Top-5 finisher at Fort Worth Global LAN" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 81, mechanics: 88, clutch: 86 }, note: "Veteran EU Major finalist" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 81, mechanics: 88, clutch: 87 }, note: "Summit qualifier; 22nd at Antwerp LAN with FoCuS" }
         }
       },
       {
-        id: "rise_asia", name: "Rise (Asia)",
+        id: "mrsavage", name: "MrSavage",
         seasons: {
-          "Chapter 4 (Heists / Kinetic)": { overall: 87, role: "Support", region: "Asia", stats: { igling: 83, mechanics: 87, clutch: 88 }, note: "Asia support player (reduced -2 rating)." },
-          "Chapter 5 (Mods / Medallions)": { overall: 88, role: "Support", region: "Asia", stats: { igling: 84, mechanics: 88, clutch: 89 }, note: "Asia FNCS winner & support (reduced -2 rating)." }
+          "Chapter 2 (2019-2021)": { region: "EU", role: "IGL", overall: 88, stats: { igling: 91, mechanics: 87, clutch: 88 }, note: "DreamHack Anaheim LAN winner & EU Finalist" },
+          "Chapter 3 (2022)": { region: "EU", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 84, clutch: 85 }, note: "Consistent EU Duo Grand Finalist" },
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 83, stats: { igling: 87, mechanics: 81, clutch: 83 }, note: "Qualified for Copenhagen Global LAN" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 82, stats: { igling: 86, mechanics: 80, clutch: 82 }, note: "Qualified for Fort Worth Global LAN" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 83, stats: { igling: 87, mechanics: 81, clutch: 83 }, note: "C6 Major 3 EU Grand Finalist" }
         }
       },
       {
-        id: "rise_na", name: "Rise (NA)",
+        id: "k1ng", name: "K1nG",
         seasons: {
-          "Chapter 2 (Box / Surge)": { overall: 89, role: "Fragger", region: "NAE", stats: { igling: 82, mechanics: 91, clutch: 89 }, note: "NA fragger with clean box-fighting and surge tags." },
-          "Chapter 4 (Heists / Kinetic)": { overall: 89, role: "Fragger", region: "NAC", stats: { igling: 83, mechanics: 91, clutch: 89 }, note: "High-tempo NA fragger in competitive lobbies." }
+          "Chapter 2 (2019-2021)": { region: "BR", role: "Fragger", overall: 85, stats: { igling: 75, mechanics: 88, clutch: 85 }, note: "3x Brazil FNCS Champion (C2S3, C2S5, C2S6)" },
+          "Chapter 3 (2022)": { region: "BR", role: "Fragger", overall: 81, stats: { igling: 74, mechanics: 84, clutch: 81 }, note: "Top Brazil Grand Finals contender" },
+          "Chapter 4 (2023)": { region: "BR", role: "Fragger", overall: 85, stats: { igling: 77, mechanics: 88, clutch: 85 }, note: "Back-to-back C4 Major 2 & Major 3 BR Champion" },
+          "Chapter 5 (2024)": { region: "BR", role: "Fragger", overall: 84, stats: { igling: 77, mechanics: 87, clutch: 84 }, note: "C5 Major 3 Brazil Champion with Fazer" },
+          "Chapter 6 (2025)": { region: "BR", role: "Fragger", overall: 83, stats: { igling: 77, mechanics: 85, clutch: 83 }, note: "C6 Major 1 Brazil Champion with Fazer & Phzin" }
         }
       },
       {
         id: "phzin", name: "Phzin",
         seasons: {
-          "Chapter 3 (Spray / Zero-Build)": { overall: 88, role: "Fragger", region: "Brazil", stats: { igling: 81, mechanics: 90, clutch: 88 }, note: "Brazil fragger (reduced -2 rating)." },
-          "Chapter 5 (Mods / Medallions)": { overall: 89, role: "Fragger", region: "Brazil", stats: { igling: 82, mechanics: 91, clutch: 89 }, note: "Top Brazil fighter (reduced -2 rating)." }
+          "Chapter 2 (2019-2021)": { region: "BR", role: "IGL", overall: 82, stats: { igling: 85, mechanics: 78, clutch: 82 }, note: "C2S7 & C2S8 Brazil FNCS Champion" },
+          "Chapter 3 (2022)": { region: "BR", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 80, clutch: 85 }, note: "C3S1 Brazil FNCS Champion with Kitoz" },
+          "Chapter 4 (2023)": { region: "BR", role: "IGL", overall: 83, stats: { igling: 86, mechanics: 78, clutch: 83 }, note: "C4 Major 1 Brazil Champion" },
+          "Chapter 6 (2025)": { region: "BR", role: "IGL", overall: 83, stats: { igling: 86, mechanics: 79, clutch: 83 }, note: "C6 Major 1 Brazil Champion with K1nG & Fazer" }
         }
       },
       {
-        id: "k1ng", name: "k1ng",
+        id: "koyota", name: "Koyota",
         seasons: {
-          "Chapter 1 (og)": { overall: 88, role: "IGL", region: "Brazil", stats: { igling: 90, mechanics: 87, clutch: 88 }, note: "Brazil caller & LAN veteran (reduced -2 rating)." },
-          "Chapter 2 (Box / Surge)": { overall: 87, role: "IGL", region: "Brazil", stats: { igling: 89, mechanics: 86, clutch: 87 }, note: "Experienced Brazil IGL (reduced -2 rating)." }
+          "Chapter 3 (2022)": { region: "ASIA", role: "Fragger", overall: 72, stats: { igling: 63, mechanics: 78, clutch: 71 }, note: "Rookie Asia cash cup standout" },
+          "Chapter 4 (2023)": { region: "ASIA", role: "Fragger", overall: 77, stats: { igling: 68, mechanics: 82, clutch: 76 }, note: "Breakout Asia Grand Finals year" },
+          "Chapter 5 (2024)": { region: "ASIA", role: "Fragger", overall: 82, stats: { igling: 73, mechanics: 86, clutch: 81 }, note: "C5 Major 3 Asia Champion with xMipoli" },
+          "Chapter 6 (2025)": { region: "ASIA", role: "Fragger", overall: 84, stats: { igling: 75, mechanics: 88, clutch: 83 }, note: "2x C6 Asia Major Champion with Yuma & Rise (Asia)" },
+          "Chapter 7 (2026)": { region: "ASIA", role: "Fragger", overall: 85, stats: { igling: 76, mechanics: 89, clutch: 84 }, note: "2x C7 Asia Champion & 8th at Antwerp LAN" }
         }
       },
       {
-        id: "nuti", name: "Nuti",
+        id: "yuma", name: "Yuma",
         seasons: {
-          "Chapter 4 (Heists / Kinetic)": { overall: 87, role: "Support", region: "Brazil", stats: { igling: 83, mechanics: 87, clutch: 88 }, note: "Brazil support player (reduced -2 rating)." },
-          "Chapter 5 (Mods / Medallions)": { overall: 88, role: "Support", region: "Brazil", stats: { igling: 84, mechanics: 88, clutch: 89 }, note: "Brazil anchor & utility player (reduced -2 rating)." }
+          "Chapter 3 (2022)": { region: "ASIA", role: "IGL", overall: 73, stats: { igling: 76, mechanics: 72, clutch: 73 }, note: "Early Asia Grand Finals qualifier" },
+          "Chapter 4 (2023)": { region: "ASIA", role: "IGL", overall: 80, stats: { igling: 83, mechanics: 77, clutch: 80 }, note: "C4 Major 2 Asia Champion with Jaemon" },
+          "Chapter 5 (2024)": { region: "ASIA", role: "IGL", overall: 79, stats: { igling: 82, mechanics: 77, clutch: 79 }, note: "Top Asia Major finalist" },
+          "Chapter 6 (2025)": { region: "ASIA", role: "IGL", overall: 83, stats: { igling: 86, mechanics: 80, clutch: 83 }, note: "2x C6 Asia Major Champion with Koyota & Rise (Asia)" },
+          "Chapter 7 (2026)": { region: "ASIA", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 82, clutch: 85 }, note: "2x C7 Asia Champion & 8th at Antwerp LAN" }
         }
       },
       {
-        id: "cadu", name: "Cadu",
+        id: "muz", name: "Muz",
         seasons: {
-          "Chapter 5 (Mods / Medallions)": { overall: 88, role: "Fragger", region: "Brazil", stats: { igling: 82, mechanics: 90, clutch: 88 }, note: "Brazil fragger (reduced -2 rating)." },
-          "Chapter 6 (Sprites / Mobility)": { overall: 88, role: "Fragger", region: "Brazil", stats: { igling: 83, mechanics: 90, clutch: 88 }, note: "Brazil high-tempo fragger (reduced -2 rating)." }
+          "Chapter 2 (2019-2021)": { region: "OCE", role: "Fragger", overall: 86, stats: { igling: 76, mechanics: 89, clutch: 86 }, note: "Won C2S5/S6 OCE, then won C2S8 NAE with Bugha & Mero" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 86, stats: { igling: 79, mechanics: 89, clutch: 86 }, note: "Full-time NAE Grand Finals competitor" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 85, stats: { igling: 80, mechanics: 88, clutch: 85 }, note: "30th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 85, stats: { igling: 81, mechanics: 87, clutch: 85 }, note: "27th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 88, stats: { igling: 83, mechanics: 90, clutch: 88 }, note: "10th at 2025 Lyon Global Championship" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 85, stats: { igling: 81, mechanics: 87, clutch: 85 }, note: "Qualified for 2026 Antwerp Global LAN with Rise (NA)" }
+        }
+      },
+      {
+        id: "alex", name: "Alex",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "OCE", role: "IGL", overall: 82, stats: { igling: 85, mechanics: 79, clutch: 82 }, note: "C2S7 OCE FNCS Champion with Volx & Jace" },
+          "Chapter 3 (2022)": { region: "OCE", role: "IGL", overall: 81, stats: { igling: 84, mechanics: 78, clutch: 81 }, note: "C3S3 OCE FNCS Champion with Baily" },
+          "Chapter 4 (2023)": { region: "OCE", role: "IGL", overall: 82, stats: { igling: 85, mechanics: 79, clutch: 82 }, note: "Top OCE Grand Finals IGL" },
+          "Chapter 5 (2024)": { region: "OCE", role: "IGL", overall: 84, stats: { igling: 87, mechanics: 80, clutch: 84 }, note: "C5 Major 1 OCE Champion with Worthy" },
+          "Chapter 6 (2025)": { region: "OCE", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 81, clutch: 85 }, note: "Multi-time OCE FNCS Champion" },
+          "Chapter 7 (2026)": { region: "OCE", role: "IGL", overall: 84, stats: { igling: 87, mechanics: 80, clutch: 84 }, note: "C7 Major 1 OCE Champion with Wreckless" }
+        }
+      },
+      {
+        id: "jace", name: "Jace",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "OCE", role: "Support", overall: 82, stats: { igling: 79, mechanics: 82, clutch: 84 }, note: "C2S7 OCE FNCS Champion with Volx & Alex" },
+          "Chapter 3 (2022)": { region: "OCE", role: "Support", overall: 81, stats: { igling: 79, mechanics: 81, clutch: 83 }, note: "C3S1 OCE FNCS Champion with Basil" },
+          "Chapter 4 (2023)": { region: "OCE", role: "Support", overall: 81, stats: { igling: 79, mechanics: 81, clutch: 83 }, note: "C4 Major 3 OCE FNCS Champion with Forbes" },
+          "Chapter 6 (2025)": { region: "OCE", role: "Support", overall: 83, stats: { igling: 81, mechanics: 83, clutch: 85 }, note: "C6 Major 1 & Major 3 OCE Champion with Volx" }
+        }
+      },
+      {
+        id: "fks", name: "FKS",
+        seasons: {
+          "Chapter 3 (2022)": { region: "ME", role: "IGL", overall: 80, stats: { igling: 83, mechanics: 77, clutch: 80 }, note: "C3S1 Middle East FNCS Champion with Bleed" },
+          "Chapter 4 (2023)": { region: "ME", role: "IGL", overall: 80, stats: { igling: 83, mechanics: 77, clutch: 80 }, note: "Top ME Grand Finals IGL" },
+          "Chapter 5 (2024)": { region: "ME", role: "IGL", overall: 82, stats: { igling: 85, mechanics: 79, clutch: 82 }, note: "C5 Major 2 Middle East Champion with Adapter" },
+          "Chapter 6 (2025)": { region: "ME", role: "IGL", overall: 84, stats: { igling: 87, mechanics: 81, clutch: 84 }, note: "Multi-time Middle East FNCS Champion" },
+          "Chapter 7 (2026)": { region: "ME", role: "IGL", overall: 83, stats: { igling: 86, mechanics: 80, clutch: 83 }, note: "C7 Major 1 Middle East Champion with Hero" }
+        }
+      },
+      {
+        id: "kalgamer", name: "Kalgamer",
+        seasons: {
+          "Chapter 4 (2023)": { region: "ME", role: "Support", overall: 81, stats: { igling: 79, mechanics: 81, clutch: 83 }, note: "Back-to-back C4 Major 2 & Major 3 ME Champion with 7man" },
+          "Chapter 5 (2024)": { region: "ME", role: "Support", overall: 82, stats: { igling: 80, mechanics: 82, clutch: 84 }, note: "Back-to-back C5 Major 1 & Major 3 ME Champion with 7man" }
+        }
+      },
+      {
+        id: "zayt", name: "Zayt",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "IGL", overall: 92, stats: { igling: 97, mechanics: 82, clutch: 93 }, note: "C2S2 NAE Champion & pioneering macro IGL" }
+        }
+      },
+      {
+        id: "saf", name: "Saf",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 91, stats: { igling: 89, mechanics: 88, clutch: 94 }, note: "C2S2 NAE Champion & elite endgame tarp support" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 84, stats: { igling: 84, mechanics: 81, clutch: 86 }, note: "Final competitive chapter before retirement" }
+        }
+      },
+      {
+        id: "deyy", name: "Deyy",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 92, stats: { igling: 76, mechanics: 96, clutch: 91 }, note: "3x NAE Trio FNCS Champion with Mero & Reverse2k" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 86, stats: { igling: 75, mechanics: 90, clutch: 85 }, note: "Consistent NAE Duo Grand Finalist" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 81, stats: { igling: 73, mechanics: 85, clutch: 80 }, note: "NAC Major Grand Finals appearances" }
+        }
+      },
+      {
+        id: "commandment", name: "Commandment",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 90, stats: { igling: 86, mechanics: 90, clutch: 93 }, note: "C2S7 NAE FNCS Champion with Cented & Edgey" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 90, stats: { igling: 86, mechanics: 90, clutch: 93 }, note: "C3S3 NAE FNCS Champion with Avery" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 84, stats: { igling: 82, mechanics: 84, clutch: 86 }, note: "Qualified for 2023 Copenhagen Global LAN" }
+        }
+      },
+      {
+        id: "avery", name: "Avery",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 86, stats: { igling: 77, mechanics: 90, clutch: 85 }, note: "Consistent NAE Trio Grand Finalist" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 90, stats: { igling: 80, mechanics: 94, clutch: 89 }, note: "C3S3 NAE FNCS Champion with Commandment" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Fragger", overall: 84, stats: { igling: 77, mechanics: 88, clutch: 83 }, note: "Qualified for 2023 Copenhagen Global LAN" }
+        }
+      },
+      {
+        id: "higgs", name: "Higgs",
+        seasons: {
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 77, stats: { igling: 80, mechanics: 76, clutch: 77 }, note: "Early NAE cash cup & qualifier appearances" },
+          "Chapter 4 (2023)": { region: "NAC", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 82, clutch: 85 }, note: "14th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "NAC", role: "IGL", overall: 88, stats: { igling: 91, mechanics: 85, clutch: 88 }, note: "9th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "IGL", overall: 87, stats: { igling: 90, mechanics: 84, clutch: 87 }, note: "18th at 2025 Lyon Global LAN" },
+          "Chapter 7 (2026)": { region: "NAC", role: "IGL", overall: 89, stats: { igling: 92, mechanics: 86, clutch: 89 }, note: "10th at 2026 Antwerp Global LAN with Curve" }
+        }
+      },
+      {
+        id: "shxrk", name: "Shxrk",
+        seasons: {
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 79, stats: { igling: 70, mechanics: 85, clutch: 78 }, note: "Emerging EU Grand Finals fragger" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 79, mechanics: 93, clutch: 89 }, note: "Top EU Major contender" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 95, stats: { igling: 84, mechanics: 98, clutch: 96 }, note: "2nd at 2026 Antwerp Global LAN (2 pts off 1st)" }
+        }
+      },
+      {
+        id: "t3eny", name: "T3eny",
+        seasons: {
+          "Chapter 4 (2023)": { region: "EU", role: "IGL", overall: 78, stats: { igling: 81, mechanics: 77, clutch: 78 }, note: "Early EU qualifier appearances" },
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 85, stats: { igling: 88, mechanics: 82, clutch: 85 }, note: "Breakout EU Major finalist" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 88, stats: { igling: 91, mechanics: 85, clutch: 88 }, note: "EU Major top-10 IGL" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 93, stats: { igling: 96, mechanics: 90, clutch: 94 }, note: "2nd at 2026 Antwerp Global LAN with Shxrk" }
+        }
+      },
+      {
+        id: "tjino", name: "Tjino",
+        seasons: {
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 82, stats: { igling: 73, mechanics: 87, clutch: 81 }, note: "Rising EU mechanical talent" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 90, stats: { igling: 79, mechanics: 95, clutch: 90 }, note: "C6 Major 3 EU Champion with PabloWingu & Fredoxie" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 93, stats: { igling: 82, mechanics: 97, clutch: 93 }, note: "7th at Antwerp LAN (#1 elims) & C7S4 EU Solo Champ" }
+        }
+      },
+      {
+        id: "pablowingu", name: "PabloWingu",
+        seasons: {
+          "Chapter 5 (2024)": { region: "EU", role: "IGL", overall: 80, stats: { igling: 83, mechanics: 78, clutch: 80 }, note: "Early EU Grand Finals qualifier" },
+          "Chapter 6 (2025)": { region: "EU", role: "IGL", overall: 89, stats: { igling: 92, mechanics: 85, clutch: 89 }, note: "C6 Major 3 EU Champion with Tjino & Fredoxie" },
+          "Chapter 7 (2026)": { region: "EU", role: "IGL", overall: 90, stats: { igling: 93, mechanics: 87, clutch: 91 }, note: "7th at 2026 Antwerp Global LAN with Tjino" }
+        }
+      },
+      {
+        id: "chap", name: "Chap",
+        seasons: {
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 81, stats: { igling: 73, mechanics: 86, clutch: 80 }, note: "Emerging Swiss EU Grand Finals fragger" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 85, stats: { igling: 76, mechanics: 90, clutch: 84 }, note: "Consistent EU Major fragger" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 77, mechanics: 91, clutch: 85 }, note: "C6 Major 3 EU Grand Finalist with MrSavage & Rezon" },
+          "Chapter 7 (2026)": { region: "EU", role: "Fragger", overall: 88, stats: { igling: 79, mechanics: 93, clutch: 87 }, note: "Summit qualifier; 21st at Antwerp LAN with Flickzy" }
+        }
+      },
+      {
+        id: "rezon", name: "Rezon ay",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 77, mechanics: 94, clutch: 88 }, note: "Iconic EU Trio boxfighter alongside Vadeal & Noahreyli" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 86, stats: { igling: 76, mechanics: 91, clutch: 85 }, note: "Top EU Duo Grand Finalist" },
+          "Chapter 4 (2023)": { region: "EU", role: "Fragger", overall: 83, stats: { igling: 75, mechanics: 87, clutch: 82 }, note: "Veteran EU Major competitor" },
+          "Chapter 6 (2025)": { region: "EU", role: "Fragger", overall: 82, stats: { igling: 75, mechanics: 86, clutch: 81 }, note: "C6 Major 3 EU Grand Finalist" }
+        }
+      },
+      {
+        id: "noahreyli", name: "Noahreyli",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "EU", role: "Fragger", overall: 89, stats: { igling: 76, mechanics: 95, clutch: 88 }, note: "Elite Chapter 2 EU mechanical fragger" },
+          "Chapter 3 (2022)": { region: "EU", role: "Fragger", overall: 85, stats: { igling: 75, mechanics: 90, clutch: 84 }, note: "EU Duo Grand Finals regular" },
+          "Chapter 5 (2024)": { region: "EU", role: "Fragger", overall: 80, stats: { igling: 73, mechanics: 84, clutch: 79 }, note: "Veteran EU qualifier" }
+        }
+      },
+      {
+        id: "ritual", name: "Ritual",
+        seasons: {
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 77, stats: { igling: 75, mechanics: 79, clutch: 78 }, note: "Early NAE qualifier runs" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 84, mechanics: 86, clutch: 88 }, note: "9th at 2023 Copenhagen Global Championship" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 87, stats: { igling: 85, mechanics: 87, clutch: 89 }, note: "12th at 2024 Fort Worth Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 90, stats: { igling: 87, mechanics: 90, clutch: 92 }, note: "Top NAC Major Trio finalist with Peterbot & Cold" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 89, stats: { igling: 87, mechanics: 89, clutch: 91 }, note: "11th at 2026 Antwerp Global LAN with Cold" }
+        }
+      },
+      {
+        id: "ajerss", name: "Ajerss",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 83, stats: { igling: 81, mechanics: 84, clutch: 84 }, note: "Consistent NAE Grand Finals support" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 86, stats: { igling: 84, mechanics: 86, clutch: 88 }, note: "Top NAE Duo Grand Finalist" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 90, stats: { igling: 87, mechanics: 90, clutch: 92 }, note: "C4 Major 3 NAC Champion with Khanada" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 85, mechanics: 86, clutch: 87 }, note: "16th at 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 90, stats: { igling: 88, mechanics: 90, clutch: 92 }, note: "C6 Major 1 NAC Champion with Acorn & Pollo" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 88, stats: { igling: 86, mechanics: 88, clutch: 90 }, note: "C7S4 NAC Solo FNCS Champion; qualified for Antwerp LAN" }
+        }
+      },
+      {
+        id: "curve", name: "Curve",
+        seasons: {
+          "Chapter 5 (2024)": { region: "NAC", role: "Fragger", overall: 80, stats: { igling: 71, mechanics: 85, clutch: 79 }, note: "Rising NAC mechanical prospect" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Fragger", overall: 86, stats: { igling: 76, mechanics: 91, clutch: 85 }, note: "Breakout NAC Major finalist" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Fragger", overall: 90, stats: { igling: 80, mechanics: 94, clutch: 90 }, note: "C7 Major 1 NA Champion & 10th at Antwerp LAN" }
+        }
+      },
+      {
+        id: "eomzo", name: "Eomzo",
+        seasons: {
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 78, stats: { igling: 75, mechanics: 80, clutch: 79 }, note: "Early NAE Grand Finals qualifier" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 84, stats: { igling: 82, mechanics: 85, clutch: 85 }, note: "8th at 2023 Copenhagen Global LAN with Rise (NA)" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 84, mechanics: 87, clutch: 87 }, note: "Top-15 NAC Major regular" },
+          "Chapter 6 (2025)": { region: "NAC", role: "IGL", overall: 87, stats: { igling: 88, mechanics: 84, clutch: 87 }, note: "Shifted to IGL; 18th at 2025 Lyon Global LAN with Clix & Higgs" },
+          "Chapter 7 (2026)": { region: "NAC", role: "IGL", overall: 86, stats: { igling: 89, mechanics: 85, clutch: 89 }, note: "Veteran NAC IGL; qualified for 2026 Antwerp Global LAN" }
+        }
+      },
+      {
+        id: "dukez", name: "Dukez",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 88, stats: { igling: 84, mechanics: 89, clutch: 90 }, note: "C2S7 NAE FNCS Champion with Justice & Userz" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 88, stats: { igling: 84, mechanics: 89, clutch: 90 }, note: "C3S3 NAE FNCS Champion with Mero" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 89, stats: { igling: 85, mechanics: 90, clutch: 91 }, note: "C4 Major 2 NAC Champion with Edgey" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 90, stats: { igling: 86, mechanics: 91, clutch: 92 }, note: "C5 Major 1 NAC Champion with Mero" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 91, stats: { igling: 87, mechanics: 92, clutch: 93 }, note: "C6 Major 1 NAC Champion with Peterbot & Mero" }
+        }
+      },
+      {
+        id: "cented", name: "Cented",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "IGL", overall: 91, stats: { igling: 95, mechanics: 87, clutch: 92 }, note: "C2S7 NAE FNCS Champion & 4x 2nd place finishes" },
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 85, stats: { igling: 89, mechanics: 82, clutch: 85 }, note: "Top NAE Duo IGL" }
+        }
+      },
+      {
+        id: "edgey", name: "Edgey",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 90, stats: { igling: 88, mechanics: 89, clutch: 93 }, note: "C2S7 NAE FNCS Champion with Cented & Commandment" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 90, stats: { igling: 88, mechanics: 89, clutch: 93 }, note: "C3S2 NAE FNCS Champion with Acorn" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 89, stats: { igling: 87, mechanics: 88, clutch: 91 }, note: "C4 Major 2 NAC Champion with Dukez" }
+        }
+      },
+      {
+        id: "reverse2k", name: "Reverse2k",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "IGL", overall: 90, stats: { igling: 94, mechanics: 83, clutch: 92 }, note: "3x NAE Trio FNCS Champion (C2S4, C2S5, C2S6) with Mero & Deyy" },
+          "Chapter 3 (2022)": { region: "NAE", role: "IGL", overall: 80, stats: { igling: 85, mechanics: 76, clutch: 81 }, note: "Late-career NAE qualifier runs" }
+        }
+      },
+      {
+        id: "stretch", name: "Stretch",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Fragger", overall: 90, stats: { igling: 83, mechanics: 93, clutch: 90 }, note: "Dominant NAE Trio fragger alongside Zayt & Saf" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Fragger", overall: 83, stats: { igling: 79, mechanics: 86, clutch: 82 }, note: "NAE Duo Grand Finalist" }
+        }
+      },
+      {
+        id: "fazer", name: "Fazer",
+        seasons: {
+          "Chapter 3 (2022)": { region: "BR", role: "IGL", overall: 77, stats: { igling: 80, mechanics: 74, clutch: 77 }, note: "Rising Brazil Grand Finals IGL" },
+          "Chapter 4 (2023)": { region: "BR", role: "IGL", overall: 84, stats: { igling: 87, mechanics: 80, clutch: 84 }, note: "Back-to-back C4 Major 2 & Major 3 BR Champion with K1nG" },
+          "Chapter 5 (2024)": { region: "BR", role: "IGL", overall: 83, stats: { igling: 86, mechanics: 79, clutch: 83 }, note: "C5 Major 3 Brazil Champion with K1nG" },
+          "Chapter 6 (2025)": { region: "BR", role: "IGL", overall: 83, stats: { igling: 86, mechanics: 79, clutch: 83 }, note: "C6 Major 1 Brazil Champion with K1nG & Phzin" }
+        }
+      },
+      {
+        id: "lewa", name: "Lewa",
+        seasons: {
+          "Chapter 5 (2024)": { region: "BR", role: "IGL", overall: 76, stats: { igling: 79, mechanics: 73, clutch: 76 }, note: "Emerging Brazil Grand Finals IGL" },
+          "Chapter 6 (2025)": { region: "BR", role: "IGL", overall: 80, stats: { igling: 83, mechanics: 77, clutch: 80 }, note: "Top Brazil Major finalist" },
+          "Chapter 7 (2026)": { region: "BR", role: "IGL", overall: 83, stats: { igling: 86, mechanics: 80, clutch: 84 }, note: "14th at 2026 Antwerp Global LAN (top BR duo)" }
+        }
+      },
+      {
+        id: "rise_asia", name: "Rise (Asia)",
+        seasons: {
+          "Chapter 4 (2023)": { region: "ASIA", role: "Support", overall: 75, stats: { igling: 73, mechanics: 76, clutch: 76 }, note: "Early Asia Grand Finals appearances with Yuma" },
+          "Chapter 5 (2024)": { region: "ASIA", role: "Support", overall: 79, stats: { igling: 77, mechanics: 80, clutch: 80 }, note: "2nd in C5 Major 3 Asia Grand Finals" },
+          "Chapter 6 (2025)": { region: "ASIA", role: "Support", overall: 83, stats: { igling: 81, mechanics: 83, clutch: 85 }, note: "2x C6 Asia Major Champion with Koyota & Yuma" }
+        }
+      },
+      {
+        id: "rise_na", name: "Rise (NA)",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "NAE", role: "Support", overall: 81, stats: { igling: 79, mechanics: 81, clutch: 83 }, note: "Consistent NAE Grand Finals support" },
+          "Chapter 3 (2022)": { region: "NAE", role: "Support", overall: 83, stats: { igling: 81, mechanics: 83, clutch: 85 }, note: "Top NAE Duo Grand Finalist" },
+          "Chapter 4 (2023)": { region: "NAC", role: "Support", overall: 87, stats: { igling: 85, mechanics: 87, clutch: 89 }, note: "8th at 2023 Copenhagen Global LAN with Eomzo" },
+          "Chapter 5 (2024)": { region: "NAC", role: "Support", overall: 85, stats: { igling: 83, mechanics: 85, clutch: 87 }, note: "Qualified for 2024 Global Championship" },
+          "Chapter 6 (2025)": { region: "NAC", role: "Support", overall: 86, stats: { igling: 84, mechanics: 86, clutch: 88 }, note: "C6 Major 3 NAC Champion with Ceice & Npen" },
+          "Chapter 7 (2026)": { region: "NAC", role: "Support", overall: 85, stats: { igling: 83, mechanics: 86, clutch: 86 }, note: "5th in C7 Major 2 NAC & Antwerp LAN qualifier with Muz" }
+        }
+      },
+      {
+        id: "volx", name: "Volx",
+        seasons: {
+          "Chapter 2 (2019-2021)": { region: "OCE", role: "Fragger", overall: 83, stats: { igling: 73, mechanics: 87, clutch: 83 }, note: "C2S7 OCE FNCS Champion with Alex & Jace" },
+          "Chapter 3 (2022)": { region: "OCE", role: "Fragger", overall: 82, stats: { igling: 73, mechanics: 86, clutch: 82 }, note: "C3S2 OCE FNCS Champion with Looter" },
+          "Chapter 4 (2023)": { region: "OCE", role: "Fragger", overall: 80, stats: { igling: 72, mechanics: 83, clutch: 80 }, note: "OCE Major finalist" },
+          "Chapter 6 (2025)": { region: "OCE", role: "Fragger", overall: 83, stats: { igling: 75, mechanics: 86, clutch: 83 }, note: "C6 Major 1 & Major 3 OCE Champion with Jace" }
+        }
+      },
+      {
+        id: "adapter", name: "Adapter",
+        seasons: {
+          "Chapter 3 (2022)": { region: "ME", role: "Fragger", overall: 78, stats: { igling: 70, mechanics: 82, clutch: 77 }, note: "Breakout Middle East Grand Finals fragger" },
+          "Chapter 4 (2023)": { region: "ME", role: "Fragger", overall: 80, stats: { igling: 72, mechanics: 84, clutch: 79 }, note: "Top ME Major contender" },
+          "Chapter 5 (2024)": { region: "ME", role: "Fragger", overall: 82, stats: { igling: 74, mechanics: 86, clutch: 81 }, note: "C5 Major 2 Middle East Champion with FKS" }
+        }
+      },
+      {
+        id: "howly", name: "Howly",
+        seasons: {
+          "Chapter 4 (2023)": { region: "ME", role: "IGL", overall: 76, stats: { igling: 79, mechanics: 74, clutch: 76 }, note: "Emerging Middle East IGL" },
+          "Chapter 5 (2024)": { region: "ME", role: "IGL", overall: 79, stats: { igling: 82, mechanics: 76, clutch: 79 }, note: "Consistent ME Major finalist" },
+          "Chapter 6 (2025)": { region: "ME", role: "IGL", overall: 81, stats: { igling: 84, mechanics: 78, clutch: 81 }, note: "Top ME Major IGL" },
+          "Chapter 7 (2026)": { region: "ME", role: "IGL", overall: 82, stats: { igling: 85, mechanics: 79, clutch: 82 }, note: "C7 Major 2 Middle East Champion with 1Lusha" }
         }
       }
     ];
 
     const CHEMISTRY_PAIRS = [
-      ["peterbot", "cold"],
-      ["peterbot", "pollo"],
-      ["acorn", "pollo"],
-      ["acorn", "ajerss"],
-      ["bugha", "mero"],
-      ["zayt", "saf"],
-      ["queasy", "swizzy"],
-      ["queasy", "vico"],
-      ["tayson", "chapix"],
-      ["kami", "setty"],
-      ["aqua", "nyhrox"],
-      ["epikhwhale", "rehx"],
-      ["epikhwhale", "arkham"],
-      ["rehx", "arkham"],
-      ["yuma", "koyota"],
-      ["yuma", "rise_asia"],
-      ["koyota", "rise_asia"],
-      ["phzin", "k1ng"],
-      ["phzin", "nuti"],
-      ["phzin", "cadu"],
-      ["clix", "khanada"],
-      ["malibuca", "merstach"],
-      ["vadeal", "noahreyli"]
+      ["peterbot", "pollo"], ["peterbot", "cold"], ["peterbot", "ritual"], ["peterbot", "mero"], ["peterbot", "dukez"],
+      ["queasy", "veno"], ["queasy", "merstach"], ["queasy", "hen"], ["swizzy", "pixie"], ["swizzy", "vanyak3k"],
+      ["swizzy", "merstach"], ["acorn", "cold"], ["acorn", "boltz"], ["acorn", "edgey"], ["acorn", "ajerss"], ["acorn", "pollo"],
+      ["kami", "setty"], ["bugha", "mero"], ["bugha", "muz"], ["mero", "cooper"], ["mero", "deyy"],
+      ["mero", "reverse2k"], ["mero", "dukez"], ["deyy", "reverse2k"], ["vic0", "flickzy"], ["vic0", "malibuca"],
+      ["sky", "scroll"], ["epikwhale", "arkhram"], ["epikwhale", "rehx"], ["arkhram", "rehx"], ["zayt", "saf"],
+      ["zayt", "stretch"], ["saf", "stretch"], ["cented", "edgey"], ["cented", "commandment"], ["edgey", "commandment"],
+      ["edgey", "dukez"], ["avery", "commandment"], ["mongraal", "mitr0"], ["mongraal", "tayson"], ["mitr0", "tayson"],
+      ["tayson", "chapix"], ["hen", "chapix"], ["hen", "jannisz"], ["jannisz", "vadeal"], ["vadeal", "rezon"],
+      ["vadeal", "noahreyli"], ["rezon", "noahreyli"], ["andilex", "nayte"], ["stompy", "tschinken"],
+      ["koyota", "yuma"], ["koyota", "rise_asia"], ["yuma", "rise_asia"],
+      ["eomzo", "rise_na"], ["muz", "rise_na"],
+      ["k1ng", "phzin"], ["k1ng", "fazer"], ["clix", "rapid"], ["clix", "eomzo"],
+      ["khanada", "boltz"], ["khanada", "ajerss"], ["shxrk", "t3eny"], ["tjino", "pablowingu"], ["fks", "adapter"],
+      ["muz", "volx"], ["alex", "volx"], ["alex", "jace"], ["volx", "jace"], ["chap", "flickzy"], ["chap", "mrsavage"]
     ];
 
     const FNCS_2025_PLACEMENT_PTS = {
-      1: 65, 2: 56, 3: 50, 4: 46, 5: 42, 6: 39, 7: 36, 8: 34, 9: 32, 10: 30,
-      11: 28, 12: 26, 13: 24, 14: 22, 15: 20, 16: 18, 17: 16, 18: 14, 19: 12, 20: 10,
-      21: 9, 22: 8, 23: 7, 24: 6, 25: 5, 26: 4, 27: 3, 28: 2, 29: 1, 30: 1, 31: 0, 32: 0, 33: 0
+      1: 65, 2: 56, 3: 52, 4: 48, 5: 44, 6: 40,
+      7: 38, 8: 36, 9: 33, 10: 30, 11: 27, 12: 24,
+      13: 21, 14: 18, 15: 15, 16: 12, 17: 9
     };
 
-    const CONTEST_WIN_PERF_DELTA = 1.4;
-    const CONTEST_LOSS_PERF_DELTA = -14.5;
-    const UNCON_CLEAN_PERF_DELTA = 1.8;
+    const UNCON_CLEAN_PERF_DELTA = 2.0;
+    const CONTEST_WIN_PERF_DELTA = 0.1;
+    const CONTEST_LOSS_PERF_DELTA = -18.0;
 
     // ==========================================
-    // 2. DRAFT & SIMULATION STATE
+    // 3. GAME & SNAKE DRAFT STATE
     // ==========================================
-    let mode = "finals";
-    let humanCount = 1;
+    let mode = "finals"; // "finals" | "pvp"
+    let humanCount = 2;
     let savedPlayerNames = ["Player 1", "Player 2", "Player 3", "Player 4", "Player 5", "Player 6", "Player 7", "Player 8"];
     let pvpSetupConfirmed = false;
 
-    let humanPlayers = [];
-    let snakeOrder = [];
-    let snakeStep = 0;
+    let humanPlayers = []; // [{ index, name, roster: [], poi: null, rerolls: 1 }]
+    let snakeOrder = [];   // Array of { playerIndex, roundIndex, type: "pro" | "poi" }
+    let snakeStep = 0;     // Current index inside snakeOrder
     let viewingPlayerIndex = 0;
 
     let currentChoices = [];
-    let currentChoiceType = "player";
+    let currentChoiceType = "player"; // "player" | "poi"
     let hasSpun = false;
     let lastEra = "";
     let lastPoiIds = [];
-    let simTimer = null;
-
     let showAllStandings = false;
     let latestStandingsState = null;
+    let simTimer = null;
 
-    // DOM Elements
-    const spinBtn = document.getElementById("spinBtn");
-    const rerollBtn = document.getElementById("rerollBtn");
-    const simBtn = document.getElementById("simBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const eraVal = document.getElementById("eraVal");
-    const regionVal = document.getElementById("regionVal");
-    const reel1Label = document.getElementById("reel1Label");
-    const reel2Label = document.getElementById("reel2Label");
-    const choicesGrid = document.getElementById("choicesGrid");
-    const rosterSlots = document.getElementById("rosterSlots");
-    const rosterTitle = document.getElementById("rosterTitle");
-    const pickCounter = document.getElementById("pickCounter");
-    const spinnerTitle = document.getElementById("spinnerTitle");
-    const simPanel = document.getElementById("simPanel");
-    const simBanner = document.getElementById("simBanner");
-    const matchLog = document.getElementById("matchLog");
-    const leaderboardContainer = document.getElementById("leaderboardContainer");
-    const contestedSummaryContainer = document.getElementById("contestedSummaryContainer");
-    const summaryScore = document.getElementById("summaryScore");
-
-    const pvpBanner = document.getElementById("pvpBanner");
-    const pvpBannerText = document.getElementById("pvpBannerText");
-    const pvpSnakeOrderBadge = document.getElementById("pvpSnakeOrderBadge");
+    // DOM refs
     const pvpSetupCard = document.getElementById("pvpSetupCard");
     const humanCountSelect = document.getElementById("humanCountSelect");
     const playerNamesGrid = document.getElementById("playerNamesGrid");
     const snakePreview = document.getElementById("snakePreview");
     const startPvpDraftBtn = document.getElementById("startPvpDraftBtn");
-    const draftGrid = document.getElementById("draftGrid");
-    const pvpRosterTabs = document.getElementById("pvpRosterTabs");
 
+    const draftGrid = document.getElementById("draftGrid");
+    const spinnerTitle = document.getElementById("spinnerTitle");
+    const reel1Label = document.getElementById("reel1Label");
+    const reel2Label = document.getElementById("reel2Label");
+    const eraVal = document.getElementById("eraVal");
+    const regionVal = document.getElementById("regionVal");
+    const pickCounter = document.getElementById("pickCounter");
+    const spinBtn = document.getElementById("spinBtn");
+    const rerollBtn = document.getElementById("rerollBtn");
+    const choicesGrid = document.getElementById("choicesGrid");
+    const rosterSlots = document.getElementById("rosterSlots");
+    const rosterTitle = document.getElementById("rosterTitle");
+    const pvpRosterTabs = document.getElementById("pvpRosterTabs");
+    const simBtn = document.getElementById("simBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const simPanel = document.getElementById("simPanel");
     const twelveZeroScreen = document.getElementById("twelveZeroScreen");
     const tzTitle = document.getElementById("tzTitle");
     const tzSub = document.getElementById("tzSub");
     const tzPts = document.getElementById("tzPts");
     const tzElims = document.getElementById("tzElims");
-    const tzKeepBtn = document.getElementById("tzKeepBtn");
-    const tzNewDraftBtn = document.getElementById("tzNewDraftBtn");
+    const simBanner = document.getElementById("simBanner");
+    const matchLog = document.getElementById("matchLog");
+    const leaderboardContainer = document.getElementById("leaderboardContainer");
+    const contestedSummaryContainer = document.getElementById("contestedSummaryContainer");
+    const summaryScore = document.getElementById("summaryScore");
+    const pvpBanner = document.getElementById("pvpBanner");
+    const pvpBannerText = document.getElementById("pvpBannerText");
+    const pvpSnakeOrderBadge = document.getElementById("pvpSnakeOrderBadge");
 
-    tzKeepBtn.addEventListener("click", () => {
-      twelveZeroScreen.classList.remove("visible");
-    });
-
-    tzNewDraftBtn.addEventListener("click", () => {
-      twelveZeroScreen.classList.remove("visible");
-      resetDraft();
-    });
-
-    // ==========================================
-    // 3. SNAKE ORDER & TURN HELPERS
-    // ==========================================
     function buildSnakeOrder(numPlayers) {
       const order = [];
       for (let round = 0; round < 4; round++) {
@@ -1927,7 +2096,7 @@
     }
 
     // ==========================================
-    // 7. SIMULATION ENGINE (33-TRIO LOBBY + UNIQUE PLACEMENTS)
+    // 7. SIMULATION ENGINE (33-TRIO LOBBY + MULTI-HUMAN CONTESTS)
     // ==========================================
     function bellRandom(spread) {
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
@@ -1955,48 +2124,38 @@
 
       const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + poiBoost + contestDelta + rng;
 
-      let elims;
+      let placement, elims;
+      const extraPoiElims = (poi && !lostOffSpawn ? poi.elimBonus : 0) + bonusElim;
+
       if (lostOffSpawn) {
+        placement = Math.floor(Math.random() * 8) + 26;
         elims = 0;
       } else if (perf >= 98.4) {
-        elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1 + (poi ? poi.elimBonus : 0) + bonusElim);
+        placement = 1;
+        elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1 + extraPoiElims);
       } else if (perf >= 94.2) {
-        elims = Math.max(2, Math.round((teamStats.mech - 80) * 0.18) + Math.floor(Math.random() * 2) + (poi ? poi.elimBonus : 0) + bonusElim);
+        placement = Math.random() < 0.45 ? 2 : 3;
+        elims = Math.max(2, Math.round((teamStats.mech - 80) * 0.18) + Math.floor(Math.random() * 2) + extraPoiElims);
       } else if (perf >= 89.2) {
-        elims = Math.max(0, Math.round((teamStats.mech - 82) * 0.12) + Math.floor(Math.random() * 2) + ((poi && poi.elimBonus > 0) ? 1 : 0));
+        placement = Math.floor(Math.random() * 7) + 4;
+        elims = Math.max(0, Math.round((teamStats.mech - 82) * 0.12) + Math.floor(Math.random() * 2) + (extraPoiElims > 0 ? 1 : 0));
       } else if (perf >= 83.2) {
+        placement = Math.floor(Math.random() * 10) + 11;
         elims = Math.max(0, Math.round((teamStats.mech - 84) * 0.08) + (Math.random() < 0.45 ? 1 : 0) + (bonusElim > 0 ? 1 : 0));
       } else {
+        placement = Math.floor(Math.random() * 13) + 21;
         elims = (Math.random() < 0.35 ? 1 : 0) + (bonusElim > 0 ? 1 : 0);
       }
 
+      const placePts = FNCS_2025_PLACEMENT_PTS[placement] || 0;
+      const elimPts = elims * 4;
       return {
-        placement: 33,
+        placement,
         elims,
-        points: elims * 4,
+        points: placePts + elimPts,
         perf,
-        lostOffSpawn,
-        isWin: false
+        isWin: placement === 1
       };
-    }
-
-    function resolveMatchPlacementsAndPoints(matchEntries) {
-      // Guarantees every trio in the 33-trio lobby receives a unique placement from #1 to #33
-      const ranked = [...matchEntries].sort((a, b) => {
-        if (a.res.lostOffSpawn !== b.res.lostOffSpawn) {
-          return a.res.lostOffSpawn ? 1 : -1;
-        }
-        return b.res.perf - a.res.perf;
-      });
-
-      ranked.forEach((entry, idx) => {
-        const placement = idx + 1;
-        const placePts = FNCS_2025_PLACEMENT_PTS[placement] || 0;
-        const elimPts = entry.res.elims * 4;
-        entry.res.placement = placement;
-        entry.res.points = placePts + elimPts;
-        entry.res.isWin = placement === 1;
-      });
     }
 
     function assignPoiToRival(trioStats, poiCounts, contestedUsedCount) {
@@ -2428,9 +2587,20 @@
           };
         });
 
-        resolveMatchPlacementsAndPoints(matchEntries);
-
-        const humanWonThisGame = matchEntries.some(e => e.team.isUser && e.res.isWin);
+        const vrContenders = matchEntries.filter(e => e.res.isWin);
+        let humanWonThisGame = false;
+        if (vrContenders.length > 0) {
+          vrContenders.sort((a, b) => b.res.perf - a.res.perf);
+          const winnerEntry = vrContenders[0];
+          if (winnerEntry.team.isUser) {
+            humanWonThisGame = true;
+          }
+          vrContenders.slice(1).forEach(runnerUp => {
+            runnerUp.res.placement = 2;
+            runnerUp.res.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (runnerUp.res.elims * 4);
+            runnerUp.res.isWin = false;
+          });
+        }
 
         matchEntries.forEach(({ team, res }) => {
           team.pts += res.points;
