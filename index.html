@@ -2096,14 +2096,14 @@
     }
 
     // ==========================================
-    // 7. SIMULATION ENGINE (33-TRIO LOBBY + MULTI-HUMAN CONTESTS)
+    // 7. SIMULATION ENGINE (33-TRIO LOBBY + UNIQUE PER-GAME PLACEMENTS)
     // ==========================================
     function bellRandom(spread) {
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
     }
 
-    function simulateSingleMatch(teamStats, poi, spawnOutcome = null) {
-      const rng = bellRandom(12.0);
+    function computeMatchPerformance(teamStats, poi, spawnOutcome = null) {
+      const rng = bellRandom(14.5);
       const poiBoost = poi ? poi.perfMod : 0;
 
       let contestDelta = 0;
@@ -2123,27 +2123,36 @@
       }
 
       const perf = (0.35 * teamStats.igl) + (0.35 * teamStats.mech) + (0.30 * teamStats.clutch) + poiBoost + contestDelta + rng;
-
-      let placement, elims;
       const extraPoiElims = (poi && !lostOffSpawn ? poi.elimBonus : 0) + bonusElim;
 
+      return {
+        perf,
+        lostOffSpawn,
+        extraPoiElims,
+        bonusElim
+      };
+    }
+
+    function scoreEntryForPlacement(entry) {
+      if (entry.lostOffSpawn) {
+        return -500 + entry.perf + (Math.random() * 0.01);
+      }
+      return entry.perf + bellRandom(2.5) + (Math.random() * 0.01);
+    }
+
+    function buildMatchResultFromPlacement(teamStats, placement, lostOffSpawn, extraPoiElims, bonusElim, perf) {
+      let elims;
       if (lostOffSpawn) {
-        placement = Math.floor(Math.random() * 8) + 26;
         elims = 0;
-      } else if (perf >= 98.4) {
-        placement = 1;
+      } else if (placement === 1) {
         elims = Math.max(4, Math.round((teamStats.mech - 78) * 0.28) + Math.floor(Math.random() * 3) + 1 + extraPoiElims);
-      } else if (perf >= 94.2) {
-        placement = Math.random() < 0.45 ? 2 : 3;
+      } else if (placement <= 3) {
         elims = Math.max(2, Math.round((teamStats.mech - 80) * 0.18) + Math.floor(Math.random() * 2) + extraPoiElims);
-      } else if (perf >= 89.2) {
-        placement = Math.floor(Math.random() * 7) + 4;
+      } else if (placement <= 10) {
         elims = Math.max(0, Math.round((teamStats.mech - 82) * 0.12) + Math.floor(Math.random() * 2) + (extraPoiElims > 0 ? 1 : 0));
-      } else if (perf >= 83.2) {
-        placement = Math.floor(Math.random() * 10) + 11;
+      } else if (placement <= 20) {
         elims = Math.max(0, Math.round((teamStats.mech - 84) * 0.08) + (Math.random() < 0.45 ? 1 : 0) + (bonusElim > 0 ? 1 : 0));
       } else {
-        placement = Math.floor(Math.random() * 13) + 21;
         elims = (Math.random() < 0.35 ? 1 : 0) + (bonusElim > 0 ? 1 : 0);
       }
 
@@ -2575,38 +2584,48 @@
       simTimer = setInterval(() => {
         const spawnMap = resolveOffSpawnContests(allLobby);
 
-        const matchEntries = allLobby.map(team => {
+        const rawEntries = allLobby.map(team => {
           const sp = spawnMap.get(team.id);
           if (sp.contested && sp.wonSpawn) {
             team.spawnWins++;
           }
+          const perfData = computeMatchPerformance(team.stats, team.poi, sp);
           return {
             team,
             spawn: sp,
-            res: simulateSingleMatch(team.stats, team.poi, sp)
+            ...perfData,
+            sortScore: scoreEntryForPlacement(perfData)
           };
         });
 
-        const vrContenders = matchEntries.filter(e => e.res.isWin);
-        let humanWonThisGame = false;
-        if (vrContenders.length > 0) {
-          vrContenders.sort((a, b) => b.res.perf - a.res.perf);
-          const winnerEntry = vrContenders[0];
-          if (winnerEntry.team.isUser) {
-            humanWonThisGame = true;
-          }
-          vrContenders.slice(1).forEach(runnerUp => {
-            runnerUp.res.placement = 2;
-            runnerUp.res.points = (FNCS_2025_PLACEMENT_PTS[2] || 56) + (runnerUp.res.elims * 4);
-            runnerUp.res.isWin = false;
-          });
-        }
+        rawEntries.sort((a, b) => b.sortScore - a.sortScore);
 
+        const matchEntries = rawEntries.map((entry, idx) => {
+          const uniquePlacement = idx + 1;
+          const res = buildMatchResultFromPlacement(
+            entry.team.stats,
+            uniquePlacement,
+            entry.lostOffSpawn,
+            entry.extraPoiElims,
+            entry.bonusElim,
+            entry.perf
+          );
+          return {
+            team: entry.team,
+            spawn: entry.spawn,
+            res
+          };
+        });
+
+        let humanWonThisGame = false;
         matchEntries.forEach(({ team, res }) => {
           team.pts += res.points;
           team.elims += res.elims;
           if (res.placement === 1) {
             team.wins++;
+            if (team.isUser) {
+              humanWonThisGame = true;
+            }
           }
         });
 
