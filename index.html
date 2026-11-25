@@ -275,12 +275,30 @@
       font-size: 0.82rem;
       cursor: pointer;
     }
-    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--accent); }
+    .btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-secondary.active-toggle {
       background: rgba(56, 189, 248, 0.18);
       border-color: var(--accent);
       color: #e0f2fe;
     }
+
+    .btn-map {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.22), rgba(56, 189, 248, 0.22));
+      color: #fef08a;
+      border: 1px solid var(--mythic);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-map:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(251, 191, 36, 0.25);
+    }
+    .btn-map:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* Draft Choices */
     .choices-grid {
@@ -448,6 +466,13 @@
     .banner-running { background: rgba(56, 189, 248, 0.14); border: 1px solid var(--accent); }
     .banner-win { background: rgba(34, 197, 94, 0.18); border: 1px solid var(--win); color: #bbf7d0; }
     .banner-loss { background: rgba(239, 68, 68, 0.18); border: 1px solid var(--loss); color: #fecaca; }
+
+    .sim-controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
 
     .contest-pill {
       display: inline-block;
@@ -677,6 +702,190 @@
       font-weight: 700;
     }
 
+    /* Interactive Tactical Drop Map Modal */
+    .map-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 14, 0.86);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .map-modal-backdrop.visible { display: flex; }
+
+    .map-modal {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 1120px;
+      max-height: 94vh;
+      overflow-y: auto;
+      padding: 18px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .map-modal-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .map-modal-body {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 920px) {
+      .map-modal-body { grid-template-columns: 1fr; }
+    }
+
+    .tactical-map-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      background: radial-gradient(circle at 50% 50%, #165e94 0%, #0b3559 75%, #07233c 100%);
+      user-select: none;
+    }
+
+    .tactical-map-bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .tactical-map-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .poi-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      background: rgba(9, 13, 22, 0.88);
+      border: 1.5px solid rgba(255, 255, 255, 0.45);
+      color: #fff;
+      border-radius: 7px;
+      padding: 3px 6px;
+      font-size: 0.64rem;
+      font-weight: 800;
+      line-height: 1.15;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.65);
+      transition: transform 0.12s, border-color 0.12s, z-index 0s;
+    }
+    .poi-pin:hover, .poi-pin.selected {
+      transform: translate(-50%, -50%) scale(1.13);
+      z-index: 10;
+      border-color: #fff;
+      box-shadow: 0 0 0 2px var(--accent), 0 6px 16px rgba(0, 0, 0, 0.8);
+    }
+
+    .poi-pin.pin-empty {
+      border-color: var(--win);
+      background: rgba(11, 38, 24, 0.92);
+      color: #bbf7d0;
+    }
+    .poi-pin.pin-contested {
+      border-color: var(--loss);
+      background: rgba(48, 14, 18, 0.92);
+      color: #fecaca;
+    }
+    .poi-pin.pin-top8 {
+      border-color: var(--mythic);
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.45);
+    }
+    .poi-pin.pin-mine {
+      border-color: var(--accent);
+      background: rgba(12, 42, 66, 0.96);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .pin-sub-tag {
+      display: block;
+      font-size: 0.56rem;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      margin-top: 1px;
+    }
+    .tag-empty { color: #4ade80; }
+    .tag-top8 { color: #fbbf24; }
+    .tag-con { color: #f87171; }
+    .tag-mine { color: #38bdf8; }
+
+    .map-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .map-detail-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px;
+    }
+    .map-legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.71rem;
+    }
+    .legend-chip {
+      padding: 3px 7px;
+      border-radius: 5px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+    }
+
+    .top8-mini-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 225px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+    .top8-mini-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      padding: 5px 8px;
+      border-radius: 6px;
+      background: rgba(9, 13, 22, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+    }
+    .top8-mini-row:hover {
+      border-color: var(--mythic);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -808,7 +1017,11 @@
     <div class="card-box sim-panel" id="simPanel">
       <div class="section-title">
         <span>3. Grand Finals Match Log &amp; Live Standings</span>
-        <span id="summaryScore"></span>
+        <div class="sim-controls-bar">
+          <span id="summaryScore"></span>
+          <button type="button" class="btn-secondary" id="pauseSimBtn" style="display:none;">Pause</button>
+          <button type="button" class="btn-map" id="openDropMapBtn" style="display:none;">Tactical Drop Map / Swap POI</button>
+        </div>
       </div>
 
       <div class="twelve-zero-screen" id="twelveZeroScreen">
@@ -834,47 +1047,126 @@
     </div>
   </div>
 
+  <!-- TACTICAL DROP MAP & MID-TOURNAMENT SWAP MODAL -->
+  <div class="map-modal-backdrop" id="dropMapModal">
+    <div class="map-modal">
+      <div class="map-modal-header">
+        <div>
+          <h3 style="font-size:1.05rem;color:#fff;">Tactical Island Drop Map — Top 8 Teams &amp; Open POIs</h3>
+          <p style="font-size:0.78rem;color:var(--muted);" id="mapModalSubtitle">
+            Inspect live drop occupancy, see where the Top 8 teams are landing, or swap to an empty POI / contest a leader before the next game.
+          </p>
+        </div>
+        <button type="button" class="btn-secondary" id="closeDropMapBtn">Resume / Close Map</button>
+      </div>
+
+      <div id="mapHumanSelectorRow" class="pvp-roster-tabs" style="margin-bottom:10px;"></div>
+
+      <div class="map-modal-body">
+        <div>
+          <div class="tactical-map-stage" id="tacticalMapStage">
+            <!-- Built-in cartographic island fallback matching your custom layout -->
+            <svg class="tactical-map-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <defs>
+                <radialGradient id="oceanGrad" cx="50%" cy="50%" r="70%">
+                  <stop offset="0%" stop-color="#15639c" />
+                  <stop offset="100%" stop-color="#082846" />
+                </radialGradient>
+              </defs>
+              <rect width="100" height="100" fill="url(#oceanGrad)" />
+              <!-- Grid lines -->
+              <g stroke="rgba(255,255,255,0.08)" stroke-width="0.25">
+                <line x1="20" y1="0" x2="20" y2="100" />
+                <line x1="40" y1="0" x2="40" y2="100" />
+                <line x1="60" y1="0" x2="60" y2="100" />
+                <line x1="80" y1="0" x2="80" y2="100" />
+                <line x1="0" y1="20" x2="100" y2="20" />
+                <line x1="0" y1="40" x2="100" y2="40" />
+                <line x1="0" y1="60" x2="100" y2="60" />
+                <line x1="0" y1="80" x2="100" y2="80" />
+              </g>
+              <!-- Main Custom Island Silhouette matching your drawing -->
+              <path d="M16,13 C22,9 29,11 33,17 C37,22 41,20 45,15 C51,12 62,13 71,11 C79,10 86,15 88,22 C89,27 83,29 80,31 C80,35 87,40 89,47 C90,54 85,61 81,66 C80,72 80,82 77,88 C74,93 67,92 65,86 C63,80 62,74 59,75 C56,78 55,86 48,88 C40,89 29,87 22,84 C19,78 21,70 17,63 C14,56 17,48 15,41 C12,34 8,26 11,18 Z"
+                    fill="#3a7d44" stroke="#e2d198" stroke-width="1.3" />
+              <!-- Biome Accents: Autumn Farm East, Snow Southeast, Sand West -->
+              <path d="M72,38 Q86,42 86,55 Q76,58 70,48 Z" fill="#b5892e" opacity="0.7" />
+              <path d="M62,64 Q79,64 77,87 Q66,87 62,73 Z" fill="#dbeafe" opacity="0.6" />
+              <path d="M16,32 Q28,31 28,42 Q17,43 16,32 Z" fill="#e6c87a" opacity="0.7" />
+              <!-- Winding Rivers -->
+              <path d="M31,18 Q36,34 45,44 Q55,54 64,63" fill="none" stroke="#1d78b8" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M78,24 Q63,36 47,46 Q33,57 25,84" fill="none" stroke="#1d78b8" stroke-width="1.7" stroke-linecap="round" />
+              <!-- Central Agency Island -->
+              <circle cx="46" cy="48" r="4.2" fill="#478c4f" stroke="#1d78b8" stroke-width="1.4" />
+            </svg>
+            <!-- Optional external clean map image (loads automatically if map.png is in same folder) -->
+            <img src="map.png" alt="Island Map" class="tactical-map-bg-img" onerror="this.style.display='none'" />
+            <div id="mapPinsLayer"></div>
+          </div>
+
+          <div class="map-legend-row" style="margin-top:8px;">
+            <span class="legend-chip" style="border-color:var(--accent);color:#7dd3fc;">Blue = Your Drop</span>
+            <span class="legend-chip" style="border-color:var(--win);color:#86efac;">Green = Empty (0 Trios)</span>
+            <span class="legend-chip" style="border-color:var(--mythic);color:#fde047;">Gold Border = Top 8 Team</span>
+            <span class="legend-chip" style="border-color:var(--loss);color:#fca5a5;">Red = Contested</span>
+          </div>
+        </div>
+
+        <div class="map-sidebar">
+          <div class="map-detail-card" id="selectedPoiDetailCard">
+            <div style="font-size:0.78rem;color:var(--muted);">Click any POI pin on the map to inspect its occupancy, Top 8 teams, or swap your drop spot.</div>
+          </div>
+
+          <div class="map-detail-card">
+            <div class="lb-title" style="margin-bottom:4px;">Current Top 8 Teams &amp; Their Drop Spots</div>
+            <div style="font-size:0.71rem;color:var(--muted);">Click any Top 8 team below to highlight their POI on the map.</div>
+            <div class="top8-mini-list" id="top8MapList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ==========================================
-    // 1. 25-POI DROP SPOT DATABASE (CHAPTERS 1-7)
+    // 1. 25-POI DROP SPOT DATABASE (WITH EXACT CUSTOM MAP POSITIONS)
     // ==========================================
     const POIS = [
       // S-TIER (7 POIs)
-      { id: "stark", name: "Stark Industries", chapter: "Chapter 2", tier: "S", perfMod: 1.4, elimBonus: 1, riskLabel: "High Contest Risk", note: "Unibeam Mythics, vault & Stark robot loot" },
-      { id: "agency", name: "The Agency", chapter: "Chapter 2", tier: "S", perfMod: 1.3, elimBonus: 1, riskLabel: "High Contest Risk", note: "Dead-center map control + Midas Drum Gun" },
-      { id: "tilted", name: "Tilted Towers", chapter: "Chapter 1", tier: "S", perfMod: 1.2, elimBonus: 1, riskLabel: "High Contest Risk", note: "Center map, max mats & high early elim potential" },
-      { id: "lavish", name: "Lavish Lair", chapter: "Chapter 5", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Medallion + Oscar's Frenzy Auto Shotgun" },
-      { id: "crime_city", name: "Crime City", chapter: "Chapter 6", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Vaults, black market loot & dense chests" },
-      { id: "reality_reign", name: "Reality's Reign", chapter: "Chapter 7", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Geno/Eggman fortress with Override Console & mythic AR" },
-      { id: "rig_shark", name: "The Rig / The Shark", chapter: "Chapter 2", tier: "S", perfMod: 1.0, elimBonus: 1, riskLabel: "High Contest Risk", note: "Skye's Assault Rifle & Grappler mobility" },
+      { id: "stark", name: "Stark Industries", chapter: "Chapter 2", tier: "S", perfMod: 1.4, elimBonus: 1, riskLabel: "High Contest Risk", note: "Unibeam Mythics, vault & Stark robot loot", x: 64, y: 39 },
+      { id: "agency", name: "The Agency", chapter: "Chapter 2", tier: "S", perfMod: 1.3, elimBonus: 1, riskLabel: "High Contest Risk", note: "Dead-center map control + Midas Drum Gun", x: 46, y: 48 },
+      { id: "tilted", name: "Tilted Towers", chapter: "Chapter 1", tier: "S", perfMod: 1.2, elimBonus: 1, riskLabel: "High Contest Risk", note: "Center map, max mats & high early elim potential", x: 35, y: 50 },
+      { id: "lavish", name: "Lavish Lair", chapter: "Chapter 5", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Medallion + Oscar's Frenzy Auto Shotgun", x: 52, y: 19 },
+      { id: "crime_city", name: "Crime City", chapter: "Chapter 6", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Vaults, black market loot & dense chests", x: 25, y: 78 },
+      { id: "reality_reign", name: "Reality's Reign", chapter: "Chapter 7", tier: "S", perfMod: 1.1, elimBonus: 1, riskLabel: "High Contest Risk", note: "Geno/Eggman fortress with Override Console & mythic AR", x: 54, y: 76 },
+      { id: "rig_shark", name: "The Shark", chapter: "Chapter 2", tier: "S", perfMod: 1.0, elimBonus: 1, riskLabel: "High Contest Risk", note: "Skye's Assault Rifle & Grappler mobility", x: 18, y: 16 },
 
       // A-TIER (6 POIs)
-      { id: "slappy", name: "Slappy Shores", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Slap barrels & elite endgame rotation stamina" },
-      { id: "mega_city", name: "Mega City", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Grind rails, vaults & high chest count" },
-      { id: "lazy_lake", name: "Lazy Lake", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Clean splits, high chest density & central rotations" },
-      { id: "sweaty_sands", name: "Sweaty Sands", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Massive loot pool & gold/upgrade economy" },
-      { id: "lonewolf", name: "Lonewolf Lair", chapter: "Chapter 6", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Fletcher Kane boss loot & medallion" },
-      { id: "green_hill", name: "Green Hill Zone", chapter: "Chapter 7", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Boost pads/loops for fast early-game rotates & boss loot" },
+      { id: "slappy", name: "Slappy Shores", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Slap barrels & elite endgame rotation stamina", x: 22, y: 47 },
+      { id: "mega_city", name: "Mega City", chapter: "Chapter 4", tier: "A", perfMod: 1.0, elimBonus: 0, riskLabel: "Moderate Risk", note: "Grind rails, vaults & high chest count", x: 61, y: 65 },
+      { id: "lazy_lake", name: "Lazy Lake", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Clean splits, high chest density & central rotations", x: 36, y: 78 },
+      { id: "sweaty_sands", name: "Sweaty Sands", chapter: "Chapter 2", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Massive loot pool & gold/upgrade economy", x: 28, y: 36 },
+      { id: "lonewolf", name: "Lonewolf Lair", chapter: "Chapter 6", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Fletcher Kane boss loot & medallion", x: 54, y: 36 },
+      { id: "green_hill", name: "Green Hill Zone", chapter: "Chapter 7", tier: "A", perfMod: 0.9, elimBonus: 0, riskLabel: "Moderate Risk", note: "Boost pads/loops for fast early-game rotates & boss loot", x: 50, y: 64 },
 
       // B-TIER (6 POIs)
-      { id: "pleasant", name: "Pleasant Park", chapter: "Chapter 2", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Classic safe splits & predictable mid-map rotates" },
-      { id: "retail", name: "Retail Row", chapter: "Chapter 1", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Reliable loot & easy surge tags" },
-      { id: "frenzy", name: "Frenzy Farm", chapter: "Chapter 2", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Open sightlines for surge & central position" },
-      { id: "coney", name: "Coney Crossroads", chapter: "Chapter 3", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Solid mid-map hub with vehicle spawns" },
-      { id: "anvil", name: "Anvil Square", chapter: "Chapter 4", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Good cover & balanced chest count" },
-      { id: "stone_sanctum", name: "Stone Sanctum", chapter: "Chapter 7", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Quiet drop with shifting temple walls" },
+      { id: "pleasant", name: "Pleasant Park", chapter: "Chapter 2", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Classic safe splits & predictable mid-map rotates", x: 64, y: 28 },
+      { id: "retail", name: "Retail Row", chapter: "Chapter 1", tier: "B", perfMod: 0.5, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Reliable loot & easy surge tags", x: 23, y: 62 },
+      { id: "frenzy", name: "Frenzy Farms", chapter: "Chapter 2", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Open sightlines for surge & central position", x: 78, y: 47 },
+      { id: "coney", name: "Coney Crossroads", chapter: "Chapter 3", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Solid mid-map hub with vehicle spawns", x: 63, y: 54 },
+      { id: "anvil", name: "Anvil Square", chapter: "Chapter 4", tier: "B", perfMod: 0.4, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Good cover & balanced chest count", x: 42, y: 34 },
+      { id: "stone_sanctum", name: "Stone Sanctum", chapter: "Chapter 7", tier: "B", perfMod: 0.3, elimBonus: 0, riskLabel: "Low Contest Risk", note: "Quiet drop with shifting temple walls", x: 73, y: 68 },
 
       // C-TIER (6 POIs)
-      { id: "coral", name: "Coral Castle", chapter: "Chapter 2", tier: "C", perfMod: -1.2, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Low-ground pit, poor mats & brutal uphill rotations" },
-      { id: "junk", name: "Junk Junction", chapter: "Chapter 1", tier: "C", perfMod: -1.0, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far northwest corner & sparse chest count" },
-      { id: "stealthy", name: "Stealthy Stronghold", chapter: "Chapter 2", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Walled-in choke points & slow zone pulls" },
-      { id: "haunted", name: "Haunted Hills", chapter: "Chapter 1", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Edge-map isolation & weak upgrade/heal economy" },
-      { id: "sleepy", name: "Sleepy Sound", chapter: "Chapter 3", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far edge rotates with limited mobility" },
-      { id: "shifty", name: "Shifty Shafts", chapter: "Chapter 1", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Cramped tunnels & low trio loot capacity" }
+      { id: "coral", name: "Coral Castle", chapter: "Chapter 2", tier: "C", perfMod: -1.2, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Low-ground pit, poor mats & brutal uphill rotations", x: 76, y: 21 },
+      { id: "junk", name: "Junk Junction", chapter: "Chapter 1", tier: "C", perfMod: -1.0, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Far corner scrapyard & sparse chest count", x: 70, y: 84 },
+      { id: "stealthy", name: "Stealthy Stronghold", chapter: "Chapter 2", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Walled-in choke points & slow zone pulls", x: 46, y: 83 },
+      { id: "haunted", name: "Haunted Hills", chapter: "Chapter 1", tier: "C", perfMod: -0.9, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Edge-map isolation & weak upgrade/heal economy", x: 18, y: 31 },
+      { id: "sleepy", name: "Sleepy Sound", chapter: "Chapter 3", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Edge bay rotates with limited mobility", x: 34, y: 23 },
+      { id: "shifty", name: "Shifty Shafts", chapter: "Chapter 1", tier: "C", perfMod: -0.7, elimBonus: 0, riskLabel: "Almost Always Uncon", note: "Cramped tunnels & low trio loot capacity", x: 39, y: 65 }
     ];
 
     // ==========================================
-    // 2. MULTI-ERA FNCS DATABASE
+    // 2. MULTI-ERA FNCS DATABASE (UNCHANGED)
     // ==========================================
     const ERAS = [
       "Chapter 2 (2019-2021)",
@@ -1652,18 +1944,23 @@
     let pvpSetupConfirmed = false;
 
     let humanPlayers = []; // [{ index, name, roster: [], poi: null, rerolls: 1 }]
-    let snakeOrder = [];   // Array of { playerIndex, roundIndex, type: "pro" | "poi" }
-    let snakeStep = 0;     // Current index inside snakeOrder
+    let snakeOrder = [];
+    let snakeStep = 0;
     let viewingPlayerIndex = 0;
 
     let currentChoices = [];
-    let currentChoiceType = "player"; // "player" | "poi"
+    let currentChoiceType = "player";
     let hasSpun = false;
     let lastEra = "";
     let lastPoiIds = [];
     let showAllStandings = false;
     let latestStandingsState = null;
     let simTimer = null;
+
+    // Live Simulation & Drop Swap Map State
+    let liveLobbyState = null; // { allLobby, humanTeams, game, finished, paused }
+    let activeMapHumanIndex = 0;
+    let selectedMapPoiId = null;
 
     // DOM refs
     const pvpSetupCard = document.getElementById("pvpSetupCard");
@@ -1702,6 +1999,16 @@
     const pvpBannerText = document.getElementById("pvpBannerText");
     const pvpSnakeOrderBadge = document.getElementById("pvpSnakeOrderBadge");
 
+    // Map Modal DOM refs
+    const pauseSimBtn = document.getElementById("pauseSimBtn");
+    const openDropMapBtn = document.getElementById("openDropMapBtn");
+    const dropMapModal = document.getElementById("dropMapModal");
+    const closeDropMapBtn = document.getElementById("closeDropMapBtn");
+    const mapHumanSelectorRow = document.getElementById("mapHumanSelectorRow");
+    const mapPinsLayer = document.getElementById("mapPinsLayer");
+    const selectedPoiDetailCard = document.getElementById("selectedPoiDetailCard");
+    const top8MapList = document.getElementById("top8MapList");
+
     function buildSnakeOrder(numPlayers) {
       const order = [];
       for (let round = 0; round < 4; round++) {
@@ -1723,78 +2030,10 @@
     function initHumanDraftState(count, names) {
       humanPlayers = [];
       for (let i = 0; i < count; i++) {
-        const cleanName = (names[i] || "").trim() || `Player ${i + 1}`;
-        humanPlayers.push({
-          index: i,
-          name: cleanName,
-          roster: [],
-          poi: null,
-          rerolls: 1
-        });
-      }
-      snakeOrder = buildSnakeOrder(count);
-      snakeStep = 0;
-      viewingPlayerIndex = 0;
-    }
-
-    function getCurrentSnakeTurn() {
-      if (snakeStep >= snakeOrder.length) return null;
-      return snakeOrder[snakeStep];
-    }
-
-    function getActiveHuman() {
-      const turn = getCurrentSnakeTurn();
-      if (!turn) return humanPlayers[0];
-      return humanPlayers[turn.playerIndex];
-    }
-
-    function isDraftComplete() {
-      return snakeStep >= snakeOrder.length && humanPlayers.length > 0;
-    }
-
-    function isActivePlayerInPoiPhase() {
-      const turn = getCurrentSnakeTurn();
-      return Boolean(turn && turn.type === "poi");
-    }
-
-    function getAllHumanClaimedEraKeys() {
-      const keys = new Set();
-      humanPlayers.forEach(hp => {
-        hp.roster.forEach(p => {
-          keys.add(`${p.id}::${p.era}`);
-        });
-      });
-      return keys;
-    }
-
-    function getTierClass(ovr) {
-      if (ovr >= 96) return "tier-mythic";
-      if (ovr >= 91) return "tier-champion";
-      if (ovr >= 84) return "tier-contender";
-      return "tier-rookie";
-    }
-
-    function getPoiTierClass(tier) {
-      if (tier === "S") return "tier-mythic";
-      if (tier === "A") return "tier-champion";
-      if (tier === "B") return "tier-contender";
-      return "tier-rookie";
-    }
-
-    // ==========================================
-    // 4. PRE-DRAFT PASS & PLAY LOBBY RENDER
-    // ==========================================
-    function renderPvpSetupForm() {
-      humanCount = parseInt(humanCountSelect.value, 10) || 2;
-      playerNamesGrid.innerHTML = "";
-
-      for (let i = 0; i < humanCount; i++) {
-        const wrap = document.createElement("div");
-        wrap.className = "name-input-wrap";
-        const defaultVal = savedPlayerNames[i] || `Player ${i + 1}`;
+        const cleanName = (names[i] || "").trim() || `Player ${i + 1}`; humanPlayers.push({ index: i, name: cleanName, roster: [], poi: null, rerolls: 1 }); } snakeOrder = buildSnakeOrder(count); snakeStep = 0; viewingPlayerIndex = 0; }  function getCurrentSnakeTurn() { if (snakeStep >= snakeOrder.length) return null; return snakeOrder[snakeStep]; }  function getActiveHuman() { const turn = getCurrentSnakeTurn(); if (!turn) return humanPlayers[0]; return humanPlayers[turn.playerIndex]; }  function isDraftComplete() { return snakeStep >= snakeOrder.length && humanPlayers.length > 0; }  function isActivePlayerInPoiPhase() { const turn = getCurrentSnakeTurn(); return Boolean(turn && turn.type === "poi"); }  function getAllHumanClaimedEraKeys() { const keys = new Set(); humanPlayers.forEach(hp => { hp.roster.forEach(p => { keys.add(`${p.id}::${p.era}`); }); }); return keys; }  function getTierClass(ovr) { if (ovr >= 96) return "tier-mythic"; if (ovr >= 91) return "tier-champion"; if (ovr >= 84) return "tier-contender"; return "tier-rookie"; }  function getPoiTierClass(tier) { if (tier === "S") return "tier-mythic"; if (tier === "A") return "tier-champion"; if (tier === "B") return "tier-contender"; return "tier-rookie"; }  // ========================================== // 4. PRE-DRAFT PASS & PLAY LOBBY RENDER // ========================================== function renderPvpSetupForm() { humanCount = parseInt(humanCountSelect.value, 10) \vert{}\vert{} 2; playerNamesGrid.innerHTML = "";  for (let i = 0; i < humanCount; i++) { const wrap = document.createElement("div"); wrap.className = "name-input-wrap"; const defaultVal = savedPlayerNames[i] \vert{}\vert{} `Player ${i + 1}`;
         wrap.innerHTML = `
           <label for="pName_${i}">Player ${i + 1} Name</label>
-          <input type="text" id="pName_${i}" maxlength="22" placeholder="Player ${i + 1}" value="${defaultVal.replace(/"/g, "&quot;")}" />
+          <input type="text" id="pName_\${i}" maxlength="22" placeholder="Player ${i + 1}" value="${defaultVal.replace(/"/g, "&quot;")}" />
         `;
         const input = wrap.querySelector("input");
         input.addEventListener("input", () => {
@@ -1810,96 +2049,17 @@
     function updateSnakePreviewText() {
       const labels = [];
       for (let i = 0; i < humanCount; i++) {
-        labels.push((savedPlayerNames[i] || "").trim() || `Player ${i + 1}`);
+        labels.push((savedPlayerNames[i] || "").trim() || `Player \${i + 1}`);
       }
       const fwd = labels.join(" → ");
       const rev = [...labels].reverse().join(" → ");
-      snakePreview.innerHTML = `<strong>Snake Order:</strong> Pro 1 (${fwd}) • Pro 2 (${rev}) • Pro 3 (${fwd}) • POI (${rev})`;
-    }
-
-    function confirmPvpSetup() {
-      const names = [];
-      for (let i = 0; i < humanCount; i++) {
-        const inp = document.getElementById(`pName_${i}`);
+      snakePreview.innerHTML = `<strong>Snake Order:</strong> Pro 1 (\${fwd}) • Pro 2 (${rev}) • Pro 3 (${fwd}) • POI (${rev})`; }  function confirmPvpSetup() { const names = []; for (let i = 0; i < humanCount; i++) { const inp = document.getElementById(`pName_${i}`);
         const val = inp ? inp.value.trim() : "";
-        savedPlayerNames[i] = val || `Player ${i + 1}`;
-        names.push(savedPlayerNames[i]);
-      }
-      pvpSetupConfirmed = true;
-      pvpSetupCard.classList.remove("visible");
-      draftGrid.classList.remove("hidden");
-      initHumanDraftState(humanCount, names);
-      currentChoices = [];
-      currentChoiceType = "player";
-      hasSpun = false;
-      lastEra = "";
-      lastPoiIds = [];
-      eraVal.textContent = "Ready to Spin";
-      regionVal.textContent = "—";
-      updateUI();
-    }
-
-    // ==========================================
-    // 5. SYNERGY & TEAM RATING CALCULATOR
-    // ==========================================
-    function calculateTeamStats(roster, poi = null) {
-      if (roster.length === 0) {
-        return { igl: 0, mech: 0, clutch: 0, tags: [] };
-      }
-
-      const iglVals = roster.map(p => p.stats.igling).sort((a, b) => b - a);
-      const mechVals = roster.map(p => p.stats.mechanics);
-      const clutchVals = roster.map(p => p.stats.clutch).sort((a, b) => b - a);
-
-      const avgIgl = iglVals.reduce((a, b) => a + b, 0) / roster.length;
-      const avgMech = mechVals.reduce((a, b) => a + b, 0) / roster.length;
-      const avgClutch = clutchVals.reduce((a, b) => a + b, 0) / roster.length;
-
-      const supportPlayer = roster.find(p => p.role === "Support");
-      const anchorClutch = supportPlayer ? supportPlayer.stats.clutch : clutchVals[0];
-
-      let teamIgl = Math.round(iglVals[0] * 0.6 + avgIgl * 0.4);
-      let teamMech = Math.round(avgMech);
-      let teamClutch = Math.round(anchorClutch * 0.5 + avgClutch * 0.5);
-
-      let mod = 0;
-      const tags = [];
-
-      if (roster.length === 3) {
-        const roles = new Set(roster.map(p => p.role));
-        if (roles.size === 3) {
-          mod += 1;
-          tags.push({ text: "+1 True Trio (IGL/Fragger/Support)", pos: true });
-        } else if (!roles.has("IGL")) {
-          mod -= 1;
-          tags.push({ text: "-1 No IGL Penalty", pos: false });
-        }
-
-        const regions = roster.map(p => p.region);
-        const uniqueRegions = new Set(regions);
-        if (uniqueRegions.size === 1) {
-          mod += 2;
-          tags.push({ text: `+2 Full ${regions[0]} Region Trio`, pos: true });
+        savedPlayerNames[i] = val || `Player ${i + 1}`; names.push(savedPlayerNames[i]); } pvpSetupConfirmed = true; pvpSetupCard.classList.remove("visible"); draftGrid.classList.remove("hidden"); initHumanDraftState(humanCount, names); currentChoices = []; currentChoiceType = "player"; hasSpun = false; lastEra = ""; lastPoiIds = []; eraVal.textContent = "Ready to Spin"; regionVal.textContent = "—"; updateUI(); }  // ========================================== // 5. SYNERGY & TEAM RATING CALCULATOR // ========================================== function calculateTeamStats(roster, poi = null) { if (roster.length === 0) { return { igl: 0, mech: 0, clutch: 0, tags: [] }; }  const iglVals = roster.map(p => p.stats.igling).sort((a, b) => b - a); const mechVals = roster.map(p => p.stats.mechanics); const clutchVals = roster.map(p => p.stats.clutch).sort((a, b) => b - a);  const avgIgl = iglVals.reduce((a, b) => a + b, 0) / roster.length; const avgMech = mechVals.reduce((a, b) => a + b, 0) / roster.length; const avgClutch = clutchVals.reduce((a, b) => a + b, 0) / roster.length;  const supportPlayer = roster.find(p => p.role === "Support"); const anchorClutch = supportPlayer ? supportPlayer.stats.clutch : clutchVals[0];  let teamIgl = Math.round(iglVals[0] * 0.6 + avgIgl * 0.4); let teamMech = Math.round(avgMech); let teamClutch = Math.round(anchorClutch * 0.5 + avgClutch * 0.5);  let mod = 0; const tags = [];  if (roster.length === 3) { const roles = new Set(roster.map(p => p.role)); if (roles.size === 3) { mod += 1; tags.push({ text: "+1 True Trio (IGL/Fragger/Support)", pos: true }); } else if (!roles.has("IGL")) { mod -= 1; tags.push({ text: "-1 No IGL Penalty", pos: false }); }  const regions = roster.map(p => p.region); const uniqueRegions = new Set(regions); if (uniqueRegions.size === 1) { mod += 2; tags.push({ text: `+2 Full ${regions[0]} Region Trio`, pos: true });
         } else if (uniqueRegions.size === 2) {
           const sharedReg = regions[0] === regions[1] || regions[0] === regions[2] ? regions[0] : regions[1];
           mod += 1;
-          tags.push({ text: `+1 Same-Region Duo (${sharedReg})`, pos: true });
-        }
-
-        let chemCount = 0;
-        for (let i = 0; i < roster.length; i++) {
-          for (let j = i + 1; j < roster.length; j++) {
-            const a = roster[i].id, b = roster[j].id;
-            const match = CHEMISTRY_PAIRS.some(pair =>
-              (pair[0] === a && pair[1] === b) || (pair[0] === b && pair[1] === a)
-            );
-            if (match) chemCount++;
-          }
-        }
-        if (chemCount > 0) {
-          const chemBonus = chemCount * 2;
-          mod += chemBonus;
-          tags.push({ text: `+${chemBonus} Real-Life Teammate Chem`, pos: true });
+          tags.push({ text: `+1 Same-Region Duo (${sharedReg})`, pos: true }); }  let chemCount = 0; for (let i = 0; i < roster.length; i++) { for (let j = i + 1; j < roster.length; j++) { const a = roster[i].id, b = roster[j].id; const match = CHEMISTRY_PAIRS.some(pair => (pair[0] === a && pair[1] === b) \vert{}\vert{} (pair[0] === b && pair[1] === a) ); if (match) chemCount++; } } if (chemCount > 0) { const chemBonus = chemCount * 2; mod += chemBonus; tags.push({ text: `+${chemBonus} Real-Life Teammate Chem`, pos: true });
         }
 
         const eras = roster.map(p => p.era);
@@ -1913,7 +2073,7 @@
       if (poi) {
         const sign = poi.perfMod >= 0 ? "+" : "";
         tags.push({
-          text: `${poi.name} (${poi.tier}-Tier: ${sign}${poi.perfMod.toFixed(1)} Perf${poi.elimBonus ? `, +${poi.elimBonus} Elim` : ""})`,
+          text: `\${poi.name} (${poi.tier}-Tier:${sign}${poi.perfMod.toFixed(1)} Perf${poi.elimBonus ? `, +${poi.elimBonus} Elim` : ""})`,
           pos: poi.perfMod >= 0
         });
       }
@@ -2083,7 +2243,7 @@
 
       if (isDraftComplete()) {
         eraVal.textContent = "All Rosters & POIs Locked";
-        regionVal.textContent = `${humanPlayers.length} Human + ${33 - humanPlayers.length} AI Trios`;
+        regionVal.textContent = `${humanPlayers.length} Human +${33 - humanPlayers.length} AI Trios`;
         viewingPlayerIndex = 0;
       } else {
         const nextTurn = getCurrentSnakeTurn();
@@ -2096,7 +2256,7 @@
     }
 
     // ==========================================
-    // 7. SIMULATION ENGINE (33-TRIO LOBBY + UNIQUE PER-GAME PLACEMENTS)
+    // 7. SIMULATION ENGINE (33-TRIO LOBBY + UNIQUE PER-GAME PLACEMENTS + DROP SWAPS)
     // ==========================================
     function bellRandom(spread) {
       return ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2 * spread;
@@ -2280,9 +2440,9 @@
         const idx = rivals.length;
 
         rivals.push({
-          id: `rival_${idx}`,
-          squad: `${trio[0].name} • ${trio[1].name} • ${trio[2].name}`,
+          id: `rival_${idx}`, squad: `${trio[0].name} • ${trio[1].name} •${trio[2].name}`,
           ownerLabel: "AI",
+          roster: trio,
           stats: calculateTeamStats(trio, poi),
           poi,
           pts: 0,
@@ -2317,6 +2477,30 @@
       }
 
       return rivals;
+    }
+
+    function refreshContestStatuses(allLobby) {
+      allLobby.forEach(team => {
+        const sameDrop = allLobby.filter(other => other.id !== team.id && other.poi.id === team.poi.id);
+        team.isContested = sameDrop.length > 0;
+        team.contestedBy = sameDrop.map(o => o.squad);
+      });
+    }
+
+    // Allows AI teams losing off-spawn to rotate to an empty POI mid-tournament, opening up drops dynamically
+    function simulateAiMidTournamentRotations(allLobby) {
+      const contestedAis = allLobby.filter(t => !t.isUser && t.isContested && Math.random() < 0.25);
+      if (contestedAis.length === 0) return;
+
+      contestedAis.forEach(aiTeam => {
+        const emptyPois = POIS.filter(p => !allLobby.some(t => t.poi.id === p.id));
+        if (emptyPois.length === 0) return;
+        const targetPoi = emptyPois[Math.floor(Math.random() * emptyPois.length)];
+        aiTeam.poi = targetPoi;
+        aiTeam.stats = calculateTeamStats(aiTeam.roster, targetPoi);
+      });
+
+      refreshContestStatuses(allLobby);
     }
 
     function resolveOffSpawnContests(lobbyTeams) {
@@ -2381,45 +2565,45 @@
       const rowsHtml = rowsToShow.map((row, idx) => {
         const rank = row.customRank || (idx + 1);
         const badgeHtml = row.isContested
-          ? `<span class="contest-pill pill-con" title="Contested by ${row.contestedBy.join(", ")}">CONTESTED</span>`
+          ? `<span class="contest-pill pill-con" title="Contested by \${row.contestedBy.join(", ")}">CONTESTED</span>`
           : `<span class="contest-pill pill-uncon">UNCON</span>`;
 
         return `
-          <tr class="${row.isUser ? "user-row" : ""}">
-            <td>#${rank}</td>
-            <td>${row.squad}</td>
+          <tr class="\${row.isUser ? "user-row" : ""}">
+            <td>#\${rank}</td>
+            <td>\${row.squad}</td>
             <td class="lb-poi-cell">
               <div><strong>${row.poi.name}</strong> (${row.poi.tier})</div>
-              <div>${badgeHtml}</div>
+              <div>\${badgeHtml}</div>
             </td>
-            <td>${row.wins} VR</td>
-            <td><strong>${row.pts} pts</strong></td>
+            <td>\${row.wins} VR</td>
+            <td><strong>\${row.pts} pts</strong></td>
           </tr>
         `;
       }).join("");
 
       const heading = currentGame >= 12
         ? (showAllStandings
-          ? `Final Lobby Standings — All ${totalTeams} Trios`
-          : `Final Lobby Standings — Top 10 Trio Leaderboard (${totalTeams} Trios)`)
+          ? `Final Lobby Standings — All \${totalTeams} Trios`
+          : `Final Lobby Standings — Top 10 Trio Leaderboard (\${totalTeams} Trios)`)
         : (showAllStandings
-          ? `Live Lobby Standings — All ${totalTeams} Trios (Game ${currentGame}/12)`
+          ? `Live Lobby Standings — All ${totalTeams} Trios (Game${currentGame}/12)`
           : `Live Lobby Standings — Top 10 After Game ${currentGame} of 12 (${totalTeams} Trios)`);
 
-      const toggleLabel = showAllStandings ? "Show Top 10 Only" : `Show All ${totalTeams} Teams`;
+      const toggleLabel = showAllStandings ? "Show Top 10 Only" : `Show All \${totalTeams} Teams`;
 
       leaderboardContainer.innerHTML = `
         <div class="leaderboard-box">
           <div class="lb-header">
-            <div class="lb-title">${heading}</div>
+            <div class="lb-title">\${heading}</div>
             <button
               type="button"
               id="toggleAllTeamsBtn"
-              class="btn-secondary lb-toggle-btn ${showAllStandings ? "active-toggle" : ""}"
+              class="btn-secondary lb-toggle-btn \${showAllStandings ? "active-toggle" : ""}"
               onclick="toggleFullStandings()"
-            >${toggleLabel}</button>
+            >\${toggleLabel}</button>
           </div>
-          <div class="lb-scroll-wrap ${showAllStandings ? "expanded" : ""}">
+          <div class="lb-scroll-wrap \${showAllStandings ? "expanded" : ""}">
             <table class="lb-table">
               <thead>
                 <tr>
@@ -2430,7 +2614,7 @@
                   <th>Points</th>
                 </tr>
               </thead>
-              <tbody>${rowsHtml}</tbody>
+              <tbody>\${rowsHtml}</tbody>
             </table>
           </div>
         </div>
@@ -2494,47 +2678,291 @@
           const isDropKing = t.id === topSpawnWinner.id && t.spawnWins > 0;
           return `
             <div>
-              ${isDropKing ? `<span class="spawn-winner-tag">★ ${t.squad}</span>` : `<span>${t.squad}</span>`}
-              — <strong>${t.spawnWins}/12 spawn wins</strong> • Finished <strong>#${t.finalRank}</strong> (${t.pts} pts)
+              \${isDropKing ? `<span class="spawn-winner-tag">★ ${t.squad}</span>` : `<span>${t.squad}</span>`}
+              — <strong>\${t.spawnWins}/12 spawn wins</strong> • Finished <strong>#${t.finalRank}</strong> (${t.pts} pts)
             </div>
           `;
         }).join("");
 
         const badgeText = humanCountAtPoi >= 2
-          ? `${humanCountAtPoi} HUMANS CONTESTED`
-          : `${sortedTeams.length} TRIOS CONTESTED`;
+          ? `\${humanCountAtPoi} HUMANS CONTESTED`
+          : `\${sortedTeams.length} TRIOS CONTESTED`;
 
         return `
-          <div class="contested-item ${hasUser ? "user-involved" : ""}">
+          <div class="contested-item \${hasUser ? "user-involved" : ""}">
             <div class="contested-item-header">
-              <span class="contested-poi-name">${group.poi.name} (${group.poi.tier}-Tier • ${group.poi.chapter})</span>
-              <span class="contest-pill pill-con">${badgeText}</span>
+              <span class="contested-poi-name">\${group.poi.name} (${group.poi.tier}-Tier • ${group.poi.chapter})</span>
+              <span class="contest-pill pill-con">\${badgeText}</span>
             </div>
-            <div class="contested-matchup">${teamsLines}</div>
+            <div class="contested-matchup">\${teamsLines}</div>
           </div>
         `;
       }).join("");
 
       contestedSummaryContainer.innerHTML = `
         <div class="leaderboard-box">
-          <div class="lb-title">Post-Tournament Contested POIs Summary (${entries.length} Contested Drops)</div>
-          <div class="contested-summary-list">${itemsHtml}</div>
+          <div class="lb-title">Post-Tournament Contested POIs Summary (\${entries.length} Contested Drops)</div>
+          <div class="contested-summary-list">\${itemsHtml}</div>
         </div>
       `;
     }
 
     function showTwelveZeroCelebration(squadLabel, totalPts, totalElims) {
-      tzTitle.textContent = `${squadLabel} — PERFECT 12-WIN SWEEP!`;
+      tzTitle.textContent = `\${squadLabel} — PERFECT 12-WIN SWEEP!`;
       tzSub.textContent = "Dominated all 12 Grand Finals games with back-to-back Victory Royales.";
-      tzPts.textContent = `${totalPts} pts`;
-      tzElims.textContent = `${totalElims}`;
+      tzPts.textContent = `${totalPts} pts`; tzElims.textContent = `${totalElims}`;
       twelveZeroScreen.classList.add("visible");
+    }
+
+    // ==========================================
+    // 7B. INTERACTIVE DROP MAP & MID-TOURNAMENT SWAP MODAL
+    // ==========================================
+    function updateSimControlButtons() {
+      if (!liveLobbyState) {
+        pauseSimBtn.style.display = "none";
+        openDropMapBtn.style.display = "none";
+        return;
+      }
+
+      openDropMapBtn.style.display = "inline-block";
+      const totalSwapsLeft = liveLobbyState.humanTeams.reduce((sum, h) => sum + h.dropSwapsLeft, 0);
+      openDropMapBtn.textContent = liveLobbyState.finished
+        ? "View Final Drop Map"
+        : `Tactical Drop Map (${totalSwapsLeft} Swap${totalSwapsLeft === 1 ? "" : "s"})`;
+
+      if (liveLobbyState.finished) {
+        pauseSimBtn.style.display = "none";
+      } else {
+        pauseSimBtn.style.display = "inline-block";
+        pauseSimBtn.textContent = liveLobbyState.paused ? "Resume Sim" : "Pause";
+        pauseSimBtn.classList.toggle("active-toggle", liveLobbyState.paused);
+      }
+    }
+
+    function toggleSimulationPause() {
+      if (!liveLobbyState || liveLobbyState.finished) return;
+      liveLobbyState.paused = !liveLobbyState.paused;
+      updateSimControlButtons();
+      refreshLiveSimBanner();
+    }
+
+    function refreshLiveSimBanner() {
+      if (!liveLobbyState || liveLobbyState.finished) return;
+      const { humanTeams, game, paused } = liveLobbyState;
+      const standings = latestStandingsState ? latestStandingsState.standings : liveLobbyState.allLobby;
+      const leaderPts = standings[0] ? standings[0].pts : 0;
+      const pauseTag = paused ? ` <span class="contest-pill pill-con">PAUSED FOR DROP MAP</span>` : "";
+
+if (mode === "finals") {
+        const ht = humanTeams[0];
+        const statusPill = ht.isContested
+          ? `<span class="contest-pill pill-con">CONTESTED @ ${ht.poi.name} (${ht.spawnWins}/${game} Spawn Wins)</span>`
+          : `<span class="contest-pill pill-uncon">UNCON @ ${ht.poi.name}</span>`;
+        simBanner.innerHTML = `<span>Game ${game}/12 — Currently #${ht.finalRank} (${ht.pts} pts | 1st: ${leaderPts} pts)${pauseTag}</span>${statusPill}`;
+      } else {
+        const sortedHumans = [...humanTeams].sort((a, b) => a.finalRank - b.finalRank);
+        const topHuman = sortedHumans[0];
+        simBanner.innerHTML = `<span>Game ${game}/12 — Best Human: ${topHuman.ownerLabel} at #${topHuman.finalRank} (${topHuman.pts} pts | Lobby 1st: ${leaderPts} pts)${pauseTag}</span>`;
+      }
+    }
+
+    function openDropMapModal() {
+      if (!liveLobbyState) return;
+      if (!liveLobbyState.finished) {
+        liveLobbyState.paused = true;
+        updateSimControlButtons();
+        refreshLiveSimBanner();
+      }
+
+      if (activeMapHumanIndex >= liveLobbyState.humanTeams.length) {
+        activeMapHumanIndex = 0;
+      }
+
+      const activeHumanTeam = liveLobbyState.humanTeams[activeMapHumanIndex];
+      if (!selectedMapPoiId && activeHumanTeam && activeHumanTeam.poi) {
+        selectedMapPoiId = activeHumanTeam.poi.id;
+      }
+
+      renderDropMapModal();
+      dropMapModal.classList.add("visible");
+    }
+
+    function closeDropMapModal() {
+      dropMapModal.classList.remove("visible");
+      if (liveLobbyState && !liveLobbyState.finished) {
+        liveLobbyState.paused = false;
+        updateSimControlButtons();
+        refreshLiveSimBanner();
+      }
+    }
+
+    function swapHumanDropSpot(newPoiId) {
+      if (!liveLobbyState || liveLobbyState.finished) return;
+      const humanTeam = liveLobbyState.humanTeams[activeMapHumanIndex];
+      if (!humanTeam || humanTeam.dropSwapsLeft <= 0) return;
+
+      const targetPoi = POIS.find(p => p.id === newPoiId);
+      if (!targetPoi || humanTeam.poi.id === targetPoi.id) return;
+
+      humanTeam.poi = targetPoi;
+      humanTeam.stats = calculateTeamStats(humanTeam.roster, targetPoi);
+      humanTeam.dropSwapsLeft -= 1;
+
+      const draftPlayerObj = humanPlayers[humanTeam.humanIndex];
+      if (draftPlayerObj) {
+        draftPlayerObj.poi = targetPoi;
+      }
+
+      refreshContestStatuses(liveLobbyState.allLobby);
+      if (latestStandingsState) {
+        paintLeaderboardDom(latestStandingsState.standings, latestStandingsState.currentGame);
+      }
+      renderRoster();
+      updateSimControlButtons();
+      refreshLiveSimBanner();
+      renderDropMapModal();
+    }
+
+    function renderDropMapModal() {
+      if (!liveLobbyState) return;
+      const { allLobby, humanTeams, finished } = liveLobbyState;
+
+      // Compute current sorted standings so we know exact Top 8 teams
+      const ranked = [...allLobby].sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
+      ranked.forEach((team, idx) => {
+        team.finalRank = idx + 1;
+      });
+      const top8Teams = ranked.slice(0, 8);
+      const top8Ids = new Set(top8Teams.map(t => t.id));
+
+      // Pass & Play Human Selector inside modal
+      if (humanTeams.length > 1) {
+        mapHumanSelectorRow.style.display = "flex";
+        mapHumanSelectorRow.innerHTML = humanTeams.map((ht, idx) => `
+          <button
+            type="button"
+            class="pvp-tab-pill ${idx === activeMapHumanIndex ? "viewing" : ""}"
+            onclick="activeMapHumanIndex = ${idx}; selectedMapPoiId = liveLobbyState.humanTeams[${idx}].poi.id; renderDropMapModal();"
+          >
+            ${ht.ownerLabel} (${ht.poi.name} • ${ht.dropSwapsLeft} Swap${ht.dropSwapsLeft === 1 ? "" : "s"})
+          </button>
+        `).join("");
+      } else {
+        mapHumanSelectorRow.style.display = "none";
+      }
+
+      const activeHuman = humanTeams[activeMapHumanIndex] || humanTeams[0];
+
+      // Render all 25 POI pins at exact coordinates
+      mapPinsLayer.innerHTML = "";
+      POIS.forEach(poi => {
+        const occupants = ranked.filter(t => t.poi.id === poi.id);
+        const top8Here = occupants.filter(t => top8Ids.has(t.id));
+        const isMine = activeHuman && activeHuman.poi.id === poi.id;
+        const isEmpty = occupants.length === 0;
+        const isContested = occupants.length >= 2;
+
+        const classes = ["poi-pin"];
+        if (isMine) classes.push("pin-mine");
+        else if (isEmpty) classes.push("pin-empty");
+        else if (isContested) classes.push("pin-contested");
+        if (top8Here.length > 0) classes.push("pin-top8");
+        if (selectedMapPoiId === poi.id) classes.push("selected");
+
+        let subTagHtml = "";
+        if (top8Here.length > 0) {
+          const rankLabels = top8Here.map(t => `#${t.finalRank}`).join(" & ");
+          subTagHtml = `<span class="pin-sub-tag tag-top8">${rankLabels} TOP 8${isMine ? " • YOU" : ""}</span>`;
+        } else if (isMine) {
+          subTagHtml = `<span class="pin-sub-tag tag-mine">YOUR DROP (${occupants.length})</span>`;
+        } else if (isEmpty) {
+          subTagHtml = `<span class="pin-sub-tag tag-empty">EMPTY (0)</span>`;
+        } else if (isContested) {
+          subTagHtml = `<span class="pin-sub-tag tag-con">CONTESTED (${occupants.length})</span>`;
+        } else {
+          subTagHtml = `<span class="pin-sub-tag" style="color:#cbd5e1;">1 TRIO</span>`;
+        }
+
+        const pin = document.createElement("button");
+        pin.type = "button";
+        pin.className = classes.join(" ");
+        pin.style.left = `${poi.x}%`;
+        pin.style.top = `${poi.y}%`;
+        pin.innerHTML = `${poi.name}${subTagHtml}`;
+        pin.onclick = () => {
+          selectedMapPoiId = poi.id;
+          renderDropMapModal();
+        };
+        mapPinsLayer.appendChild(pin);
+      });
+
+      // Render Top 8 Teams quick list
+      top8MapList.innerHTML = top8Teams.map(team => `
+        <div class="top8-mini-row" onclick="selectedMapPoiId = '${team.poi.id}'; renderDropMapModal();">
+          <span>
+            <strong style="color:${team.finalRank === 1 ? "var(--mythic)" : "#fff"};">#${team.finalRank}</strong>
+            ${team.squad}
+          </span>
+          <span style="color:var(--accent);font-weight:700;white-space:nowrap;">${team.poi.name} (${team.pts}p)</span>
+        </div>
+      `).join("");
+
+      // Render Selected POI Details & Swap Action
+      const selectedPoi = POIS.find(p => p.id === selectedMapPoiId) || activeHuman.poi;
+      const occupants = ranked.filter(t => t.poi.id === selectedPoi.id);
+      const isAlreadyHere = activeHuman && activeHuman.poi.id === selectedPoi.id;
+      const sign = selectedPoi.perfMod >= 0 ? "+" : "";
+
+      const occupantsHtml = occupants.length === 0
+        ? `<div style="color:#86efac;font-weight:800;font-size:0.82rem;margin-top:6px;">EMPTY DROP SPOT — 0 Trios landing here (Guaranteed Uncontested!)</div>`
+        : `<div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">
+            ${occupants.map(occ => {
+              const isTop8 = top8Ids.has(occ.id);
+              return `
+                <div style="font-size:0.77rem;padding:4px 7px;border-radius:5px;background:rgba(9,13,22,0.65);border:1px solid ${isTop8 ? "rgba(251,191,36,0.5)" : "rgba(255,255,255,0.08)"};">
+                  <strong>#${occ.finalRank}</strong> ${occ.squad} (${occ.pts} pts)
+                  ${isTop8 ? `<span class="contest-pill" style="background:rgba(251,191,36,0.2);color:#fde047;border:1px solid var(--mythic);margin-left:4px;">TOP 8</span>` : ""}
+                </div>
+              `;
+            }).join("")}
+          </div>`;
+
+      let actionHtml = "";
+      if (finished) {
+        actionHtml = `<div style="margin-top:10px;font-size:0.76rem;color:var(--muted);">Grand Finals complete — drop swaps are locked.</div>`;
+      } else if (isAlreadyHere) {
+        actionHtml = `<button type="button" class="btn-secondary" style="width:100%;margin-top:10px;" disabled>${activeHuman.ownerLabel} Already Lands Here</button>`;
+      } else if (activeHuman.dropSwapsLeft <= 0) {
+        actionHtml = `<button type="button" class="btn-secondary" style="width:100%;margin-top:10px;" disabled>0 Drop Swaps Remaining for ${activeHuman.ownerLabel}</button>`;
+      } else {
+        const targetLabel = occupants.length === 0
+          ? `Swap ${activeHuman.ownerLabel} to Uncontested ${selectedPoi.name}`
+          : `Contest ${selectedPoi.name} (${occupants.length} Trio${occupants.length > 1 ? "s" : ""} Here)`;
+        actionHtml = `
+          <button type="button" class="btn-primary" style="margin-top:10px;padding:10px 14px;font-size:0.84rem;" onclick="swapHumanDropSpot('${selectedPoi.id}')">
+            ${targetLabel} (${activeHuman.dropSwapsLeft} Left)
+          </button>
+        `;
+      }
+
+      selectedPoiDetailCard.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <strong style="font-size:0.98rem;color:#fff;">${selectedPoi.name}</strong>
+          <span class="role-pill">${selectedPoi.tier}-Tier • ${selectedPoi.chapter}</span>
+        </div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:3px;">
+          ${sign}${selectedPoi.perfMod.toFixed(1)} Perf${selectedPoi.elimBonus ? ` • +${selectedPoi.elimBonus} Elim` : ""} • ${selectedPoi.note}
+        </div>
+        ${occupantsHtml}
+        ${actionHtml}
+      `;
     }
 
     function runSimulation() {
       if (simTimer) clearInterval(simTimer);
       simPanel.classList.add("visible");
       twelveZeroScreen.classList.remove("visible");
+      dropMapModal.classList.remove("visible");
       matchLog.innerHTML = "";
       leaderboardContainer.innerHTML = "";
       contestedSummaryContainer.innerHTML = "";
@@ -2544,10 +2972,13 @@
 
       const humanTeams = humanPlayers.map(hp => ({
         id: `human_${hp.index}`,
+        humanIndex: hp.index,
         ownerLabel: hp.name,
         squad: `[${hp.name}] ${hp.roster.map(p => p.name).join(" • ")}`,
+        roster: hp.roster,
         stats: calculateTeamStats(hp.roster, hp.poi),
         poi: hp.poi,
+        dropSwapsLeft: 2,
         pts: 0,
         wins: 0,
         elims: 0,
@@ -2562,13 +2993,19 @@
       const rivalTeams = buildRandomRivalTrios(humanTeams, aiCount);
       const allLobby = [...humanTeams, ...rivalTeams];
 
-      allLobby.forEach(team => {
-        const sameDrop = allLobby.filter(other => other.id !== team.id && other.poi.id === team.poi.id);
-        team.isContested = sameDrop.length > 0;
-        team.contestedBy = sameDrop.map(o => o.squad);
-      });
+      refreshContestStatuses(allLobby);
 
       let game = 1;
+      liveLobbyState = {
+        allLobby,
+        humanTeams,
+        game: 0,
+        finished: false,
+        paused: false
+      };
+      activeMapHumanIndex = 0;
+      selectedMapPoiId = humanTeams[0] ? humanTeams[0].poi.id : null;
+      updateSimControlButtons();
 
       simBanner.className = "banner banner-running";
       if (mode === "finals") {
@@ -2582,6 +3019,12 @@
       }
 
       simTimer = setInterval(() => {
+        if (!liveLobbyState || liveLobbyState.paused) return;
+
+        if (game > 1) {
+          simulateAiMidTournamentRotations(allLobby);
+        }
+
         const spawnMap = resolveOffSpawnContests(allLobby);
 
         const rawEntries = allLobby.map(team => {
@@ -2674,29 +3117,25 @@
         }
         matchLog.appendChild(row);
 
+        liveLobbyState.game = game;
         const { leaderPts, standings } = renderLiveLeaderboard(allLobby, game);
 
         if (mode === "finals") {
           const ht = humanTeams[0];
           summaryScore.textContent = `Total: ${ht.pts} pts • ${ht.wins} VR`;
-          if (game < 12) {
-            const statusPill = ht.isContested
-              ? `<span class="contest-pill pill-con">CONTESTED @ ${ht.poi.name} (${ht.spawnWins}/${game} Spawn Wins)</span>`
-              : `<span class="contest-pill pill-uncon">UNCON @ ${ht.poi.name}</span>`;
-            simBanner.innerHTML = `<span>Game ${game}/12 — Currently #${ht.finalRank} (${ht.pts} pts | 1st: ${leaderPts} pts)</span>${statusPill}`;
-          }
         } else {
           const sortedHumans = [...humanTeams].sort((a, b) => a.finalRank - b.finalRank);
-          const topHuman = sortedHumans[0];
           summaryScore.textContent = sortedHumans.slice(0, 3).map(h => `${h.ownerLabel}: #${h.finalRank} (${h.pts})`).join(" | ");
-          if (game < 12) {
-            simBanner.innerHTML = `<span>Game ${game}/12 — Best Human: ${topHuman.ownerLabel} at #${topHuman.finalRank} (${topHuman.pts} pts | Lobby 1st: ${leaderPts} pts)</span>`;
-          }
         }
 
-        if (game >= 12) {
+        if (game < 12) {
+          refreshLiveSimBanner();
+        } else {
           clearInterval(simTimer);
           simBtn.disabled = false;
+          liveLobbyState.finished = true;
+          liveLobbyState.paused = false;
+          updateSimControlButtons();
 
           renderContestedPoisSummary(standings);
 
@@ -2968,6 +3407,12 @@
 
     function resetDraft() {
       if (simTimer) clearInterval(simTimer);
+      liveLobbyState = null;
+      selectedMapPoiId = null;
+      activeMapHumanIndex = 0;
+      dropMapModal.classList.remove("visible");
+      updateSimControlButtons();
+
       currentChoices = [];
       currentChoiceType = "player";
       hasSpun = false;
@@ -2996,6 +3441,12 @@
     resetBtn.addEventListener("click", resetDraft);
     humanCountSelect.addEventListener("change", renderPvpSetupForm);
     startPvpDraftBtn.addEventListener("click", confirmPvpSetup);
+    pauseSimBtn.addEventListener("click", toggleSimulationPause);
+    openDropMapBtn.addEventListener("click", openDropMapModal);
+    closeDropMapBtn.addEventListener("click", closeDropMapModal);
+    dropMapModal.addEventListener("click", e => {
+      if (e.target === dropMapModal) closeDropMapModal();
+    });
 
     document.querySelectorAll(".mode-btn").forEach(btn => {
       btn.addEventListener("click", () => {
