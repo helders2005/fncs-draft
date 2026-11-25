@@ -780,7 +780,7 @@
         <div class="sim-controls-bar">
           <span id="summaryScore"></span>
           <button type="button" class="btn-secondary" id="pauseSimBtn" style="display:none;">Pause</button>
-          <button type="button" class="btn-map" id="openDropMapBtn" style="display:none;">Tactical Drop Map / Swap POI</button>
+          <button type="button" class="btn-map" id="openDropMapBtn" style="display:none;">Tactical Drop Map</button>
         </div>
       </div>
 
@@ -811,9 +811,9 @@
     <div class="map-modal">
       <div class="map-modal-header">
         <div>
-          <h3 style="font-size:1.05rem;color:#fff;">Tactical Island Drop Map — Top 8 Teams &amp; Open POIs</h3>
+          <h3 style="font-size:1.05rem;color:#fff;">Tactical Island Drop Map — Top 8 Teams &amp; Drop Occupancy</h3>
           <p style="font-size:0.78rem;color:var(--muted);" id="mapModalSubtitle">
-            Inspect live drop occupancy, see where the Top 8 teams are landing, or swap to an empty POI / contest a leader before the next game.
+            Inspect live drop occupancy and see where the Top 8 teams are landing across the island.
           </p>
         </div>
         <button type="button" class="btn-secondary" id="closeDropMapBtn">Resume / Close Map</button>
@@ -864,7 +864,7 @@
 
         <div class="map-sidebar">
           <div class="map-detail-card" id="selectedPoiDetailCard">
-            <div style="font-size:0.78rem;color:var(--muted);">Click any POI pin on the map to inspect its occupancy, Top 8 teams, or swap your drop spot.</div>
+            <div style="font-size:0.78rem;color:var(--muted);">Click any POI pin on the map to inspect its occupancy and see which teams land there.</div>
           </div>
 
           <div class="map-detail-card">
@@ -2153,10 +2153,9 @@
       }
 
       openDropMapBtn.style.display = "inline-block";
-      const totalSwapsLeft = liveLobbyState.humanTeams.reduce((sum, h) => sum + h.dropSwapsLeft, 0);
       openDropMapBtn.textContent = liveLobbyState.finished
         ? "View Final Drop Map"
-        : `Tactical Drop Map (${totalSwapsLeft} Swap${totalSwapsLeft === 1 ? "" : "s"})`;
+        : "Tactical Drop Map";
 
       if (liveLobbyState.finished) {
         pauseSimBtn.style.display = "none";
@@ -2179,7 +2178,7 @@
       const { humanTeams, game, paused } = liveLobbyState;
       const standings = latestStandingsState ? latestStandingsState.standings : liveLobbyState.allLobby;
       const leaderPts = standings[0] ? standings[0].pts : 0;
-      const pauseTag = paused ? ` <span class="contest-pill pill-con">PAUSED FOR DROP MAP</span>` : "";
+      const pauseTag = paused ? ` <span class="contest-pill pill-con">PAUSED</span>` : "";
 
       if (mode === "finals") {
         const ht = humanTeams[0];
@@ -2218,32 +2217,9 @@
       }
     }
 
-    function swapHumanDropSpot(newPoiId) {
-      if (!liveLobbyState || liveLobbyState.finished) return;
-      const humanTeam = liveLobbyState.humanTeams[activeMapHumanIndex];
-      if (!humanTeam || humanTeam.dropSwapsLeft <= 0) return;
-
-      const targetPoi = POIS.find(p => p.id === newPoiId);
-      if (!targetPoi || humanTeam.poi.id === targetPoi.id) return;
-
-      humanTeam.poi = targetPoi;
-      humanTeam.stats = calculateTeamStats(humanTeam.roster, targetPoi);
-      humanTeam.dropSwapsLeft -= 1;
-
-      const draftPlayerObj = humanPlayers[humanTeam.humanIndex];
-      if (draftPlayerObj) draftPlayerObj.poi = targetPoi;
-
-      refreshContestStatuses(liveLobbyState.allLobby);
-      if (latestStandingsState) paintLeaderboardDom(latestStandingsState.standings, latestStandingsState.currentGame);
-      renderRoster();
-      updateSimControlButtons();
-      refreshLiveSimBanner();
-      renderDropMapModal();
-    }
-
     function renderDropMapModal() {
       if (!liveLobbyState) return;
-      const { allLobby, humanTeams, finished } = liveLobbyState;
+      const { allLobby, humanTeams } = liveLobbyState;
 
       const ranked = [...allLobby].sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
       ranked.forEach((team, idx) => { team.finalRank = idx + 1; });
@@ -2257,7 +2233,7 @@
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = `pvp-tab-pill ${idx === activeMapHumanIndex ? "viewing" : ""}`;
-          btn.textContent = `${ht.ownerLabel} (${ht.poi.name} • ${ht.dropSwapsLeft} Swap${ht.dropSwapsLeft === 1 ? "" : "s"})`;
+          btn.textContent = `${ht.ownerLabel} (${ht.poi.name})`;
           btn.addEventListener("click", () => {
             activeMapHumanIndex = idx;
             selectedMapPoiId = liveLobbyState.humanTeams[idx].poi.id;
@@ -2330,11 +2306,10 @@
 
       const selectedPoi = POIS.find(p => p.id === selectedMapPoiId) || activeHuman.poi;
       const occupants = ranked.filter(t => t.poi.id === selectedPoi.id);
-      const isAlreadyHere = activeHuman && activeHuman.poi.id === selectedPoi.id;
       const sign = selectedPoi.perfMod >= 0 ? "+" : "";
 
       const occupantsHtml = occupants.length === 0
-        ? `<div style="color:#86efac;font-weight:800;font-size:0.82rem;margin-top:6px;">EMPTY DROP SPOT — 0 Trios landing here (Guaranteed Uncontested!)</div>`
+        ? `<div style="color:#86efac;font-weight:800;font-size:0.82rem;margin-top:6px;">EMPTY DROP SPOT — 0 Trios landing here</div>`
         : `<div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">
             ${occupants.map(occ => {
               const isTop8 = top8Ids.has(occ.id);
@@ -2356,29 +2331,7 @@
           ${sign}${selectedPoi.perfMod.toFixed(1)} Perf${selectedPoi.elimBonus ? ` • +${selectedPoi.elimBonus} Elim` : ""} • ${selectedPoi.note}
         </div>
         ${occupantsHtml}
-        <div id="mapSwapActionSlot"></div>
       `;
-
-      const swapSlot = document.getElementById("mapSwapActionSlot");
-      if (finished) {
-        swapSlot.innerHTML = `<div style="margin-top:10px;font-size:0.76rem;color:var(--muted);">Grand Finals complete — drop swaps are locked.</div>`;
-      } else if (isAlreadyHere) {
-        swapSlot.innerHTML = `<button type="button" class="btn-secondary" style="width:100%;margin-top:10px;" disabled>${activeHuman.ownerLabel} Already Lands Here</button>`;
-      } else if (activeHuman.dropSwapsLeft <= 0) {
-        swapSlot.innerHTML = `<button type="button" class="btn-secondary" style="width:100%;margin-top:10px;" disabled>0 Drop Swaps Remaining for ${activeHuman.ownerLabel}</button>`;
-      } else {
-        const swapBtn = document.createElement("button");
-        swapBtn.type = "button";
-        swapBtn.className = "btn-primary";
-        swapBtn.style.marginTop = "10px";
-        swapBtn.style.padding = "10px 14px";
-        swapBtn.style.fontSize = "0.84rem";
-        swapBtn.textContent = occupants.length === 0
-          ? `Swap ${activeHuman.ownerLabel} to Uncontested ${selectedPoi.name} (${activeHuman.dropSwapsLeft} Left)`
-          : `Contest ${selectedPoi.name} (${occupants.length} Trio Here) • ${activeHuman.dropSwapsLeft} Left`;
-        swapBtn.addEventListener("click", () => swapHumanDropSpot(selectedPoi.id));
-        swapSlot.appendChild(swapBtn);
-      }
     }
 
     function runSimulation() {
@@ -2401,7 +2354,6 @@
         roster: hp.roster,
         stats: calculateTeamStats(hp.roster, hp.poi),
         poi: hp.poi,
-        dropSwapsLeft: 2,
         pts: 0,
         wins: 0,
         elims: 0,
